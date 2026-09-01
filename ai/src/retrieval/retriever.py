@@ -67,6 +67,41 @@ INTENT_IP_DOMAINS: Dict[str, List[str]] = {
 }
 
 
+def get_adaptive_query_anchor(query: str, intent: Optional[str] = None) -> str:
+    """Derives dynamic statutory semantic anchors tailored to the query's specific domain context."""
+    q_lower = query.lower()
+    anchors = []
+
+    # 1. Extraction / Process / Isolation
+    if any(w in q_lower for w in ["extract", "process", "method", "isolate", "fraction", "purif", "solvent", "yield", "synthesis"]):
+        anchors.append("process patent Section 2(1)(ja) inventive step Section 3(d) technical advance")
+
+    # 2. Formulation / Synergistic combination / Traditional Ayush
+    if any(w in q_lower for w in ["formulat", "combin", "mixtur", "synerg", "ayurved", "herbal", "tradition", "oil", "powder", "churna", "ghrita", "bhasma", "vati", "kwath"]):
+        anchors.append("Section 3(p) traditional knowledge exclusion Section 3(e) synergistic admixture")
+
+    # 3. Polymorph / Crystalline / New form / Bioavailability
+    if any(w in q_lower for w in ["polymorph", "crystallin", "bioavailab", "efficacy", "salt", "derivative"]):
+        anchors.append("Section 3(d) new form of known substance enhancement of efficacy")
+
+    # 4. Biological material / Sourcing / Foreign filing / NBA ABS
+    if any(w in q_lower for w in ["herb", "plant", "collect", "wild", "himalayan", "foreign", "export", "nba", "biodiversity", "source", "origin", "abs", "benefit sharing"]):
+        anchors.append("Section 10(4)(d)(ii) biological material origin disclosure Biological Diversity Act Section 3 NBA approval")
+
+    # 5. Trademark / Brand Name / Prohibited names
+    if any(w in q_lower for w in ["brand", "trademark", "name", "logo", "mark", "generic"]):
+        anchors.append("Trade Marks Act Section 9 absolute grounds Section 11 relative grounds")
+
+    # 6. Food / Nutraceutical / Aahara
+    if any(w in q_lower for w in ["food", "supplement", "nutraceutical", "aahar", "dietary", "fssai"]):
+        anchors.append("FSSAI Ayurveda Aahara Regulations 2022 schedule food safety standards")
+
+    return " ".join(anchors)
+
+
+MIN_RELEVANCE_SCORE = 0.45
+
+
 class HybridRetriever:
     """Executes multi-collection hybrid retrieval with metadata filtering."""
 
@@ -89,7 +124,7 @@ class HybridRetriever:
         target_collections: Optional[List[str]] = None,
     ) -> List[RetrievedEvidence]:
         """
-        Executes hybrid retrieval across routed collections with jurisdiction and domain filtering.
+        Executes hybrid retrieval across routed collections with strict jurisdiction and domain filtering.
         """
         # 1. Determine collections to query
         if target_collections:
@@ -103,18 +138,22 @@ class HybridRetriever:
             else:
                 collections = ["legal_statutory", "standards_formulations", "case_law_prior_art", "procedural_forms_checklists"]
 
-        # 2. Vectorize query
-        dense_vec = self.dense_provider.embed(query)
-        sparse_vec = self.sparse_provider.embed_sparse(query)
+        # 2. Derive dynamic semantic anchor and vectorize query
+        anchor = get_adaptive_query_anchor(query, intent=intent)
+        search_query = f"{query} {anchor}".strip() if anchor else query
 
-        # 3. Build robust metadata filters
+        dense_vec = self.dense_provider.embed(search_query)
+        sparse_vec = self.sparse_provider.embed_sparse(search_query)
+
+        # 3. Build strict jurisdiction metadata filters (never cross-contaminate India vs International)
         filters: Dict[str, Any] = {}
         if jurisdiction:
             jur_lower = jurisdiction.lower()
             if jur_lower in ["india", "in"]:
-                filters["jurisdiction"] = ["India", "india", "INDIA", "IN", "in", "International", "None"]
-            elif jur_lower in ["international", "usa", "eu", "wipo"]:
-                filters["jurisdiction"] = ["International", "international", "WIPO", "wipo", "India", "india"]
+                filters["jurisdiction"] = ["India", "india", "INDIA", "IN", "in"]
+            else:
+                # For any international or foreign jurisdiction query, strictly search international corpus
+                filters["jurisdiction"] = ["International", "international", "WIPO", "wipo"]
 
         if intent and intent in INTENT_IP_DOMAINS:
             filters["ip_domain"] = INTENT_IP_DOMAINS[intent]
@@ -154,16 +193,17 @@ class HybridRetriever:
                     )
                     all_hits.append(evidence)
             except Exception:
-                # If collection empty or error, continue to next
                 continue
 
-        # 5. Fallback: if collection routing or filters yielded 0 hits, query legal_statutory directly
+        # 5. Fallback: if domain filters yielded 0 hits, retry with only jurisdiction filter
         if not all_hits:
             try:
+                jur_only_filter = {"jurisdiction": filters["jurisdiction"]} if "jurisdiction" in filters else None
                 scored_points = self.qdrant.search_dense(
                     collection_name="legal_statutory",
                     vector=dense_vec,
                     limit=top_k,
+                    filters=jur_only_filter,
                 )
                 for pt in scored_points:
                     payload = pt.payload or {}
@@ -187,6 +227,7 @@ class HybridRetriever:
             except Exception:
                 pass
 
-        # 6. Sort by relevance score descending and take top_k
-        all_hits.sort(key=lambda x: x.score, reverse=True)
-        return all_hits[:top_k]
+        # 6. Apply Minimum Relevance Score Gate (Discard weak/irrelevant noise)
+        qualified_hits = [h for h in all_hits if h.score >= MIN_RELEVANCE_SCORE]
+        qualified_hits.sort(key=lambda x: x.score, reverse=True)
+        return qualified_hits[:top_k]

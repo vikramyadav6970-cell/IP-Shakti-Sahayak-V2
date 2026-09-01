@@ -444,6 +444,79 @@ def chunk_document_adaptively(file_path: Path, doc_entry: Dict[str, Any], analys
                 })
                 chunk_index += 1
 
+    # Explicitly inject high-precision atomic clause chunks for core non-patentable inventions and definitions
+    if "patents-act" in doc_id:
+        patent_core_clauses = [
+            {
+                "sec_num": "Section 3(p)",
+                "sec_title": "Traditional Knowledge & Component Aggregation Exclusion",
+                "text": "The Patents Act, 1970 — Section 3(p): What are not inventions. The following are not inventions within the meaning of this Act, namely: (p) an invention which, in effect, is traditional knowledge or which is an aggregation or duplication of known properties of traditionally known component or components.",
+                "domain": ["patents", "traditional_knowledge"],
+            },
+            {
+                "sec_num": "Section 3(e)",
+                "sec_title": "Mere Admixture Exclusion & Synergistic Effect Requirement",
+                "text": "The Patents Act, 1970 — Section 3(e): What are not inventions. The following are not inventions within the meaning of this Act, namely: (e) a substance obtained by a mere admixture resulting only in the aggregation of the properties of the components thereof or a process for producing such substance.",
+                "domain": ["patents", "traditional_knowledge", "drugs_cosmetics"],
+            },
+            {
+                "sec_num": "Section 3(d)",
+                "sec_title": "Known Substance & Enhanced Efficacy Requirement",
+                "text": "The Patents Act, 1970 — Section 3(d): What are not inventions. The following are not inventions within the meaning of this Act, namely: (d) the mere discovery of a new form of a known substance which does not result in the enhancement of the known efficacy of that substance or the mere discovery of any new property or new use for a known substance or of the mere use of a known process, machine or apparatus unless such known process results in a new product or employs at least one new reactant.",
+                "domain": ["patents", "drugs_cosmetics"],
+            },
+            {
+                "sec_num": "Section 3(j)",
+                "sec_title": "Plants, Animals, Seeds & Biological Processes Exclusion",
+                "text": "The Patents Act, 1970 — Section 3(j): What are not inventions. The following are not inventions within the meaning of this Act, namely: (j) plants and animals in whole or any part thereof other than micro-organisms but including seeds, varieties and species and essentially biological processes for production or propagation of plants and animals.",
+                "domain": ["patents", "biological_diversity", "traditional_knowledge"],
+            },
+            {
+                "sec_num": "Section 3(i)",
+                "sec_title": "Medicinal, Curative & Diagnostic Treatment Methods Exclusion",
+                "text": "The Patents Act, 1970 — Section 3(i): What are not inventions. The following are not inventions within the meaning of this Act, namely: (i) any process for the medicinal, surgical, curative, prophylactic, diagnostic, therapeutic or other treatment of human beings or any process for a similar treatment of animals to render them free of disease or to increase their economic value or that of their products.",
+                "domain": ["patents", "drugs_cosmetics"],
+            },
+            {
+                "sec_num": "Section 2(1)(ja)",
+                "sec_title": "Inventive Step & Non-Obviousness Standard",
+                "text": "The Patents Act, 1970 — Section 2(1)(ja) & Section 2(1)(j): Definition of Invention & Inventive Step. 'inventive step' means a feature of an invention that involves technical advance as compared to the existing knowledge or having economic significance or both and that makes the invention not obvious to a person skilled in the art; 'invention' means a new product or process involving an inventive step and capable of industrial application.",
+                "domain": ["patents"],
+            },
+            {
+                "sec_num": "Section 10(4)(d)(ii)",
+                "sec_title": "Source & Geographical Origin Disclosure Requirement for Biological Material",
+                "text": "The Patents Act, 1970 — Section 10(4)(d)(ii): Specification Requirements. If the applicant mentions a biological material in the specification which may not be described in such a way as to satisfy clauses (a) and (b), the applicant must disclose the source and geographical origin of the biological material in the specification.",
+                "domain": ["patents", "biological_diversity", "traditional_knowledge"],
+            },
+        ]
+        for pc in patent_core_clauses:
+            chunk_id = f"{doc_id}_atomic_{pc['sec_num'].lower().replace(' ', '_').replace('(', '').replace(')', '').replace('&', 'and')}"
+            chunks.append({
+                "id": chunk_id,
+                "document_id": doc_id,
+                "source_filename": doc_entry["source_filename"],
+                "jurisdiction": doc_entry["jurisdiction"],
+                "country_code": doc_entry["country_code"],
+                "doc_category": "primary_law",
+                "ip_domain": pc["domain"],
+                "agent_scope": ["ip_agent", "patent_agent"],
+                "section_number": pc["sec_num"],
+                "section_title": pc["sec_title"],
+                "page_number": 10,
+                "chunk_index": chunk_index,
+                "folder_path": doc_entry["folder_path"],
+                "enactment_year": doc_entry["enactment_year"],
+                "amendment_year": doc_entry["amendment_year"],
+                "is_current_version": doc_entry["is_current_version"],
+                "source_language": "en",
+                "retrieval_priority": "CRITICAL",
+                "cross_reference_ids": ["in-biological-diversity-act-2002", "in-drugs-cosmetics-act-rules-2016"],
+                "chunk_text": pc["text"],
+                "embedding_model": EMBEDDING_MODEL_NAME,
+            })
+            chunk_index += 1
+
     return chunks
 
 

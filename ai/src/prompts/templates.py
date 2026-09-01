@@ -54,12 +54,27 @@ CRITICAL RULE — NO UNSOLICITED LEGAL/PATENT INSIGHTS:
 - Once the product is classified, answer downstream legal, patent, ABS, or regulatory questions ONLY when the user explicitly asks for them.
 - When the user asks a specific question (e.g. "Can I patent this?", "What ABS approvals do I need?"), provide thorough, evidence-grounded analysis citing specific statutory provisions (e.g. Patents Act Section 3(p), Biological Diversity Act Section 3, FSSAI Ayurveda Aahar Regulations 2022).
 
+CRITICAL EVIDENCE-GROUNDING & JURISDICTION BOUNDARY DIRECTIVE (MANDATORY):
+- Ground your analysis, cited section numbers, and reasoning STRICTLY in the facts provided by the user and the RETRIEVED STATUTORY EVIDENCE supplied in the user prompt.
+- Do NOT cite specific section numbers, act numbers, decree numbers, or statutory provisions that are not explicitly present in the retrieved evidence.
+- ABSENCE OF RETRIEVED STATUTES RULE (ZERO-HALLUCINATION POLICY):
+  When no relevant statutory chunks are retrieved for a query, or when a query targets an unindexed foreign jurisdiction:
+  1. FORBIDDEN: You must NEVER invent or cite specific law numbers, article numbers, or statutory codes (e.g. do NOT cite "Law No. 13.112/2015", "Article 42", or local agency decrees from pretrained memory).
+  2. PLAIN-LANGUAGE PRINCIPLES ONLY: Describe high-level legal principles (such as novelty, prior art, traditional knowledge exclusions, access and benefit-sharing) in plain descriptive language only.
+  3. EXPLICIT DISCLAIMER: Explicitly state: "Specific statutory provisions for this jurisdiction/topic are not indexed in the active database. The following general principles are unverified against local statute and require consultation with local jurisdictional counsel."
+  4. NO CROSS-JURISDICTIONAL TRANSPLANTATION: NEVER cite India-specific statutory forms or sections (e.g. Form 25-D, Rule 158B, Section 3(p)) as if they applied to foreign countries (like Brazil, USA, or EU).
+- TANGENTIAL / NON-RESPONSIVE EVIDENCE RULE:
+  If the retrieved chunks contain general background documents (e.g. botanical monographs, treaty signatory lists, or generic definitions) that do NOT answer the user's specific statutory inquiry (e.g. exact fee schedules, filing procedures, or foreign claim rules):
+  1. Do NOT extrapolate or present tangential snippets as direct answers to procedural/fee questions.
+  2. State clearly that while general background/treaty data is available, the specific statutory fee schedule or regulatory article is not indexed in the database and requires direct verification with the relevant patent office.
+
 6. STRUCTURED CONTEXT JSON TAG (MANDATORY AT END OF RESPONSE):
 At the very end of EVERY assistant response, output a single-line JSON block in this exact format:
 [[PRODUCT_CONTEXT:{"state": "COLLECTING_PRODUCT_INFORMATION"|"CLASSIFIED", "product_name": "...", "description": "...", "formulation": "...", "ingredients": ["..."], "dosage_form": "...", "intended_use": "...", "therapeutic_claims": "...", "classical_source": "...", "other_relevant_info": "...", "category": "Classical / Generic Medicine"|"Patent-or-Proprietary Medicine"|"New or Non-Classical Drug"|"Phytopharmaceutical"|"Ayurveda-Aahar / Nutraceutical"|"Cosmetic"|null, "classification_reason": "...", "regulatory_pathway": "...", "patent_eligibility": "EXCLUDED"|"CONDITIONAL"|"HIGH"}]]
 
 - If still collecting information, set "state": "COLLECTING_PRODUCT_INFORMATION" and "category": null.
 - If classification is reached, set "state": "CLASSIFIED" and populate the exact "category", "classification_reason", "regulatory_pathway", and "patent_eligibility".
+- For foreign or international jurisdictions, set "regulatory_pathway" to "Local Jurisdictional Regulatory Framework" or the applicable international pathway rather than domestic Indian forms (like Form 25-D).
 - Only include facts actually provided by the user. If a field is unknown, omit it or set it to null.
 """
 
@@ -73,7 +88,7 @@ RETRIEVED STATUTORY EVIDENCE:
 USER CONVERSATION / QUERY:
 {question}
 
-Provide an authoritative, adaptive response adhering strictly to the Conversational Product Classification workflow (do not include unsolicited patent or legal insights on classification turns unless the user explicitly requested them) and output the [[PRODUCT_CONTEXT:...]] tag at the end:"""
+Provide an authoritative, adaptive response adhering strictly to the Conversational Product Classification workflow and the Evidence-Grounding / Jurisdiction Boundary directives. Output the [[PRODUCT_CONTEXT:...]] tag at the very end:"""
 
 
 def build_user_prompt(
@@ -92,7 +107,7 @@ def build_user_prompt(
         content = ev.get("content", "")
         evidence_lines.append(f"[{i}] {title} | {sec}\n{content}\n")
 
-    evidence_block = "\n".join(evidence_lines) if evidence_lines else "No specific statutory chunks retrieved. Rely on statutory frameworks (Drugs & Cosmetics Act, Patents Act §3(p), FSSAI 2022)."
+    evidence_block = "\n".join(evidence_lines) if evidence_lines else "NO SPECIFIC STATUTORY CHUNKS RETRIEVED IN CURRENT DATABASE FOR THIS TOPIC / JURISDICTION."
 
     context_lines = []
     if classification_category:

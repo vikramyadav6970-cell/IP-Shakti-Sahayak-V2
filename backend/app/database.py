@@ -29,10 +29,10 @@ if db_url.startswith("postgresql"):
     }
     engine_kwargs.update({
         "pool_size": 5,
-        "max_overflow": 5,
-        "pool_recycle": 300,
+        "max_overflow": 10,
+        "pool_recycle": 180,
         "pool_timeout": 30,
-        "pool_pre_ping": False,
+        "pool_pre_ping": True,
         "connect_args": connect_args,
     })
 
