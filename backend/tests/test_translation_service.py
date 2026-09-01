@@ -128,17 +128,17 @@ def test_split_text_into_chunks():
     ts = TranslationService()
 
     short_text = "This is a short text."
-    assert ts._split_text_into_chunks(short_text, max_chars=1400) == [short_text]
+    assert ts._split_text_into_chunks(short_text, max_chars=700) == [short_text]
 
     # Create long text of 3500 chars across paragraphs
     para1 = "Paragraph 1: " + "This is a detailed legal analysis under Section 3(p). " * 20
     para2 = "Paragraph 2: " + "Here are the manufacturing license requirements under Rule 153. " * 20
     long_text = f"{para1}\n\n{para2}"
 
-    chunks = ts._split_text_into_chunks(long_text, max_chars=1400)
+    chunks = ts._split_text_into_chunks(long_text, max_chars=700)
     assert len(chunks) >= 2
     for chunk in chunks:
-        assert len(chunk) <= 1400
+        assert len(chunk) <= 700
 
 
 @pytest.mark.asyncio

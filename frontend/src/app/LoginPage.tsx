@@ -3,13 +3,15 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { LogIn, UserPlus, Scale, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
+import { LogIn, UserPlus, Scale, AlertCircle, Loader2, ArrowLeft, Languages } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useChatStore } from "@/store/useChatStore";
 import { authService } from "@/services/authService";
+import { SUPPORTED_LANGUAGES } from "@/components/chat/LanguageSelector";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -31,6 +33,7 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { setAuth, setToken } = useAuthStore();
+  const { selectedLanguage, setSelectedLanguage } = useChatStore();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || "/chat";
@@ -116,6 +119,33 @@ export const LoginPage: React.FC = () => {
         </CardHeader>
 
         <CardContent className="space-y-4">
+          {/* Language Preference Selector */}
+          <div className="space-y-1.5 p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                <Languages className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                Default Consultation Language
+              </label>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                Sarvam AI
+              </span>
+            </div>
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="w-full h-9 px-2.5 text-xs rounded-md bg-white dark:bg-slate-900 border border-emerald-300/80 dark:border-emerald-700/60 text-slate-800 dark:text-slate-100 font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+            >
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.nativeName} ({lang.name})
+                </option>
+              ))}
+            </select>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+              You can also change language anytime mid-conversation in the chat header.
+            </p>
+          </div>
+
           {errorMessage && (
             <div
               role="alert"

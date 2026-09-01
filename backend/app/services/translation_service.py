@@ -198,10 +198,10 @@ class TranslationService:
             original_error=last_err,
         )
 
-    def _split_text_into_chunks(self, text: str, max_chars: int = 1400) -> List[str]:
+    def _split_text_into_chunks(self, text: str, max_chars: int = 700) -> List[str]:
         """
-        Splits text into chunks <= max_chars respecting markdown paragraph,
-        newline, sentence, and word boundaries.
+        Splits text into chunks <= max_chars (strictly under Sarvam mayura:v1 1000-char limit)
+        respecting markdown paragraph, newline, sentence, and word boundaries.
         """
         if not text or len(text) <= max_chars:
             return [text] if text else []
@@ -258,14 +258,14 @@ class TranslationService:
                 return text
             norm_source = detected
 
-        if len(text) <= 1400:
+        if len(text) <= 700:
             return await self._call_sarvam_translate_api(
                 text=text,
                 source_lang=norm_source,
                 target_lang="en-IN",
             )
 
-        chunks = self._split_text_into_chunks(text, max_chars=1400)
+        chunks = self._split_text_into_chunks(text, max_chars=700)
         tasks = [
             self._call_sarvam_translate_api(
                 text=chunk,
@@ -281,22 +281,22 @@ class TranslationService:
         """
         Translates generated English answer back into target_lang.
         If target_lang is English, returns text as-is without API call.
-        Handles text chunking if text exceeds Sarvam AI's 2000 character limit.
+        Handles text chunking if text exceeds Sarvam AI's mayura:v1 character limit.
         """
         norm_target = self.normalize_language_code(target_lang)
         if norm_target in ["en-IN", "en", "auto"]:
             return text
 
-        if len(text) <= 1400:
+        if len(text) <= 700:
             return await self._call_sarvam_translate_api(
                 text=text,
                 source_lang="en-IN",
                 target_lang=norm_target,
             )
 
-        chunks = self._split_text_into_chunks(text, max_chars=1400)
+        chunks = self._split_text_into_chunks(text, max_chars=700)
         logger.info(
-            f"[SarvamTranslation] Chunking text ({len(text)} chars -> {len(chunks)} chunks) for {norm_target}"
+            f"[SarvamTranslation] Chunking text ({len(text)} chars -> {len(chunks)} chunks <= 700 chars) for {norm_target}"
         )
         tasks = [
             self._call_sarvam_translate_api(

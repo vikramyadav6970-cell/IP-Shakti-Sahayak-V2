@@ -20,14 +20,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const IndexRoute: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
-  if (isAuthenticated) {
-    return <Navigate to="/chat" replace />;
-  }
-  return <LandingPage />;
-};
-
 const LoginRoute: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
   if (isAuthenticated) {
@@ -42,7 +34,7 @@ export const App: React.FC = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
-            <Route index element={<IndexRoute />} />
+            <Route index element={<LandingPage />} />
             <Route
               path="chat"
               element={

@@ -10,6 +10,7 @@ import {
   Citation,
 } from "@/types";
 import { chatService, SendMessagePayload } from "@/services/chatService";
+import { getWelcomeMessage, isWelcomeMessage } from "@/lib/welcomeLocalization";
 
 export interface ChatMessage extends Message {
   citations?: Citation[];
@@ -17,19 +18,25 @@ export interface ChatMessage extends Message {
   product_classification?: ProductClassificationMeta;
 }
 
-const DEFAULT_WELCOME_MESSAGE: ChatMessage = {
+const getInitialLang = (): string => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("ip_sakti_lang") || "auto";
+  }
+  return "auto";
+};
+
+const createInitialWelcomeMessage = (lang: string = "auto"): ChatMessage => ({
   id: "welcome-msg",
   conversation_id: "init",
   role: "assistant",
-  content:
-    "Namaste! I am **IP-SAKTI Sahayak**, your specialized AI IP & Regulatory Intelligence Assistant for Ayurvedic Innovations under the Ministry of Ayush.\n\nTo begin, please share your **product formulation, ingredients, intended usage, or traditional classical references**. I will classify your product under the 6 statutory categories, evaluate Section 3(p) patentability, and check ABS compliance.",
+  content: getWelcomeMessage(lang),
   jurisdiction: "INDIA",
   confidence_score: 1.0,
   confidence_label: "HIGH",
   requires_human_review: false,
   citations: [],
   created_at: new Date().toISOString(),
-};
+});
 
 const DEFAULT_PRODUCT_CONTEXT: ProductContextData = {
   state: "PENDING",
@@ -75,7 +82,7 @@ export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
       activeConversationId: null,
-      messages: [DEFAULT_WELCOME_MESSAGE],
+      messages: [createInitialWelcomeMessage(getInitialLang())],
       productContext: DEFAULT_PRODUCT_CONTEXT,
       activeClassification: null,
       classificationState: "PENDING",
@@ -84,14 +91,39 @@ export const useChatStore = create<ChatState>()(
       isSending: false,
       isTranslating: false,
       isHistoryOpen: false,
-      selectedLanguage: "auto",
+      selectedLanguage: getInitialLang(),
 
       setActiveConversationId: (id) => set({ activeConversationId: id }),
       setMessages: (messages) => set({ messages }),
       setProductContext: (productContext) => set({ productContext }),
       setActiveClassification: (activeClassification) => set({ activeClassification }),
       setClassificationState: (classificationState) => set({ classificationState }),
-      setSelectedLanguage: (selectedLanguage) => set({ selectedLanguage }),
+      setSelectedLanguage: (selectedLanguage) => {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("ip_sakti_lang", selectedLanguage);
+        }
+        set((state) => {
+          // If current conversation is unstarted / initial welcome message, dynamically update its text
+          let updatedMessages = state.messages;
+          if (
+            state.activeConversationId === null &&
+            state.messages.length === 1 &&
+            state.messages[0].role === "assistant" &&
+            isWelcomeMessage(state.messages[0].content)
+          ) {
+            updatedMessages = [
+              {
+                ...state.messages[0],
+                content: getWelcomeMessage(selectedLanguage),
+              },
+            ];
+          }
+          return {
+            selectedLanguage,
+            messages: updatedMessages,
+          };
+        });
+      },
       setIsTranslating: (isTranslating) => set({ isTranslating }),
       toggleHistory: (open) =>
         set((state) => ({
@@ -111,11 +143,12 @@ export const useChatStore = create<ChatState>()(
       },
 
       startNewConsultation: () => {
+        const lang = get().selectedLanguage || getInitialLang();
         set({
           activeConversationId: null,
           messages: [
             {
-              ...DEFAULT_WELCOME_MESSAGE,
+              ...createInitialWelcomeMessage(lang),
               id: `welcome-${Date.now()}`,
               created_at: new Date().toISOString(),
             },
@@ -151,7 +184,7 @@ export const useChatStore = create<ChatState>()(
                 ? formattedMessages
                 : [
                     {
-                      ...DEFAULT_WELCOME_MESSAGE,
+                      ...createInitialWelcomeMessage(get().selectedLanguage),
                       id: `welcome-${Date.now()}`,
                       created_at: detail.created_at,
                     },
@@ -303,6 +336,7 @@ export const useChatStore = create<ChatState>()(
         productContext: state.productContext,
         activeClassification: state.activeClassification,
         classificationState: state.classificationState,
+        selectedLanguage: state.selectedLanguage,
       }),
     }
   )

@@ -229,6 +229,14 @@ class ChatService:
             product_context=req.active_product_context,
         )
 
+        if is_indic_query:
+            user_prompt += (
+                "\n\nCRITICAL CONCISENESS REQUIREMENT: The user is consulting in an Indian language. "
+                "Your advisory response (excluding the [[PRODUCT_CONTEXT:...]] tag) MUST BE CONCISE, CRISP, "
+                "AND STRICTLY UNDER 800 CHARACTERS (under 120 words). Provide direct legal conclusions, specific Section references "
+                "(e.g., Section 3(p), Section 3(e), Form 25-D), and brief bullet points so that the output translates cleanly within character limits."
+            )
+
         # 6. Generate answer via LLM Provider
         is_generation_error = False
         try:

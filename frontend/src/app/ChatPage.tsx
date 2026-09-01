@@ -28,15 +28,12 @@ import { ExpertEscalationModal } from "@/components/chat/ExpertEscalationModal";
 import { ProductClassificationPanel } from "@/components/chat/ProductClassificationPanel";
 import { ProductHistorySidebar } from "@/components/chat/ProductHistorySidebar";
 import { LanguageSelector } from "@/components/chat/LanguageSelector";
-
-const MANDATORY_INITIAL_QUESTION = "Please provide a description of the product and its formulation.";
-
-const SAMPLE_QUERIES = [
-  "Ashwagandha root extract in sesame oil with piperine for enhanced bioavailability.",
-  "Classical Triphala Churna prepared per Ayurvedic Formulary of India (AFI).",
-  "Herbal moisturizing cream with Aloe vera, Turmeric, and Chandana for daily skin hydration.",
-  "Standardized 4-marker fraction of Boswellia serrata for anti-inflammatory clinical evaluation.",
-];
+import { VoiceInputButton } from "@/components/chat/VoiceInputButton";
+import {
+  getSampleQueries,
+  getSampleQueriesHeading,
+  isWelcomeMessage,
+} from "@/lib/welcomeLocalization";
 
 export const ChatPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -84,7 +81,7 @@ export const ChatPage: React.FC = () => {
 
   // If initial query provided via URL param, execute automatically if messages empty/new
   useEffect(() => {
-    if (initialQuery && messages.length === 1 && messages[0].content === MANDATORY_INITIAL_QUESTION) {
+    if (initialQuery && messages.length === 1 && isWelcomeMessage(messages[0].content)) {
       handleSendMessage(initialQuery);
     }
   }, [initialQuery]);
@@ -271,7 +268,7 @@ export const ChatPage: React.FC = () => {
                     </div>
 
                     {/* Assistant Citations & Grounding Header — ONLY when based on RAG citations */}
-                    {msg.role === "assistant" && !msg.out_of_scope_detected && msg.content !== MANDATORY_INITIAL_QUESTION && (
+                    {msg.role === "assistant" && !msg.out_of_scope_detected && !isWelcomeMessage(msg.content) && (
                       <div className="space-y-2 pt-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           {/* Grounding Confidence Badge ONLY when RAG data retrieval citations exist */}
@@ -352,10 +349,10 @@ export const ChatPage: React.FC = () => {
               {messages.length === 1 && (
                 <div className="pt-2">
                   <span className="text-[11px] text-slate-500 font-medium block mb-1.5">
-                    Suggested example formulations:
+                    {getSampleQueriesHeading(selectedLanguage)}
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {SAMPLE_QUERIES.map((sq, i) => (
+                    {getSampleQueries(selectedLanguage).map((sq, i) => (
                       <button
                         key={i}
                         type="button"
@@ -419,10 +416,17 @@ export const ChatPage: React.FC = () => {
                 disabled={isSending}
                 className="flex-1 h-11 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 dark:text-white"
               />
+
+              {/* Voice Speech-to-Text Input Button */}
+              <VoiceInputButton
+                onTranscript={(transcript) => setInput(transcript)}
+                disabled={isSending}
+              />
+
               <Button
                 type="submit"
                 disabled={!input.trim() || isSending}
-                className="h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm"
+                className="h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm shrink-0"
               >
                 {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
