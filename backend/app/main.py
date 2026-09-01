@@ -1,0 +1,129 @@
+"""
+backend/app/main.py
+
+FastAPI application entrypoint for IP-SAKTI Sahayak.
+"""
+
+from contextlib import asynccontextmanager
+from typing import Any, Dict
+from fastapi import Depends, FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config import settings
+from app.database import get_db
+from app.middleware.rate_limit import RateLimitMiddleware
+
+# Sentry Monitoring Initialization
+if settings.SENTRY_DSN:
+    try:
+        import sentry_sdk
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+            environment=settings.ENVIRONMENT,
+        )
+    except Exception as e:
+        print(f"Sentry init notice: {e}")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application startup and shutdown hooks."""
+    try:
+        from app.database import engine
+        from app.models.base import Base
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            # Safe column additions for PostgreSQL / SQLite
+            try:
+                await conn.execute(
+                    text("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS product_context_json JSONB;")
+                )
+            except Exception:
+                pass
+            try:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS classification_state VARCHAR(50) DEFAULT 'COLLECTING_PRODUCT_INFORMATION';"
+                    )
+                )
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"[Lifespan Startup Notice]: {e}")
+    yield
+
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    description="Backend API for IP-SAKTI Sahayak (SIH 2026 Problem Statement 26045)",
+    version="1.0.0",
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
+    lifespan=lifespan,
+)
+
+# Mount Rate Limiting Middleware
+app.add_middleware(RateLimitMiddleware, max_requests_per_minute=120)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health", status_code=status.HTTP_200_OK, tags=["System"])
+async def health_check() -> Dict[str, Any]:
+    """
+    Health check endpoint returning system status and service connectivity info.
+    """
+    return {
+        "status": "healthy",
+        "app_name": settings.APP_NAME,
+        "environment": settings.ENVIRONMENT,
+        "database": "configured" if settings.DATABASE_URL else "unconfigured",
+        "redis": "configured" if settings.REDIS_URL else "unconfigured",
+        "storage": "configured" if settings.S3_ENDPOINT else "local_or_unconfigured",
+        "llm_provider": settings.LLM_PROVIDER,
+        "qdrant": "configured" if settings.QDRANT_URL else "unconfigured",
+    }
+
+
+@app.get("/health/ready", status_code=status.HTTP_200_OK, tags=["System"])
+async def readiness_check(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+    """
+    Readiness probe verifying live database connection.
+    """
+    try:
+        await db.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error: {str(e)}"
+
+    return {
+        "status": "ready" if db_status == "connected" else "degraded",
+        "database": db_status,
+        "environment": settings.ENVIRONMENT,
+    }
+
+
+# Import and mount /api/v1 router
+from app.api.v1.router import api_v1_router
+app.include_router(api_v1_router, prefix="/api/v1")
+
+
+@app.get("/", tags=["System"])
+async def root() -> Dict[str, str]:
+    return {
+        "message": "IP-SAKTI Sahayak API is operational",
+        "version": "1.0.0",
+        "docs": "/docs" if settings.DEBUG else "disabled",
+    }
