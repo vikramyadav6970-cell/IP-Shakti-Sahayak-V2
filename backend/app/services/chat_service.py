@@ -58,7 +58,12 @@ class ChatService:
         # Initialize AI providers
         self.dense_provider = get_embedding_provider()
         self.sparse_provider = BM25SparseProvider()
-        self.qdrant_manager = QdrantManager(in_memory=True)
+        qdrant_in_memory = not bool(settings.QDRANT_URL and settings.QDRANT_API_KEY)
+        self.qdrant_manager = QdrantManager(
+            url=settings.QDRANT_URL,
+            api_key=settings.QDRANT_API_KEY,
+            in_memory=qdrant_in_memory,
+        )
         self.retriever = HybridRetriever(self.qdrant_manager, self.dense_provider, self.sparse_provider)
         
         active_model = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-3.5-flash-lite"
@@ -217,6 +222,24 @@ class ChatService:
             intent=intent,
             top_k=4,
         )
+
+        # Terminal Logging: Vector DB retrieval results
+        print("\n" + "=" * 75)
+        print(" [VECTOR DB RETRIEVAL - QDRANT CLOUD]")
+        print(f" Query: '{core_question}'")
+        print(f" Jurisdiction: {req.jurisdiction} | Intent: {intent} | Hits Retrieved: {len(evidence_hits)}")
+        print("-" * 75)
+        if evidence_hits:
+            for idx, ev in enumerate(evidence_hits, 1):
+                print(f" [Hit #{idx}] Score: {ev.score:.4f} | Collection: {ev.target_collection}")
+                print(f"   * Document: {ev.doc_title}")
+                print(f"   * Section/Ref: {ev.section_ref or 'N/A'}")
+                print(f"   * Scope: {ev.document_type} ({ev.jurisdiction})")
+                snippet = ev.content.replace('\n', ' ')[:220]
+                print(f"   * Snippet: {snippet}...")
+        else:
+            print("   (No matching vector points retrieved for this query filter)")
+        print("=" * 75 + "\n")
 
         evidence_dicts = [e.to_dict() for e in evidence_hits]
         system_prompt = CONSULTATION_SYSTEM_PROMPT

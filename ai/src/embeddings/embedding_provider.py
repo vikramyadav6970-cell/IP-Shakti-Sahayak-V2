@@ -47,7 +47,14 @@ class BGEM3EmbeddingProvider(EmbeddingProvider):
 
     def __init__(self, model_name: str = "BAAI/bge-m3", device: Optional[str] = None):
         super().__init__(model_name=model_name, dimension=1024)
-        self.device = device
+        if device is None:
+            try:
+                import torch
+                self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            except Exception:
+                self.device = "cpu"
+        else:
+            self.device = device
         self._model = None
 
     def _get_model(self):
@@ -91,10 +98,13 @@ class MockEmbeddingProvider(EmbeddingProvider):
 def get_embedding_provider(provider_type: Optional[str] = None) -> EmbeddingProvider:
     """
     Factory to obtain embedding provider.
-    Defaults to MockEmbeddingProvider for ultra-fast offline execution/testing.
-    Set EMBEDDING_PROVIDER=bge-m3 or EMBEDDING_PROVIDER=live for real weights.
+    Automatically uses BAAI/bge-m3 on GPU/CPU for live AI intelligence.
+    Set EMBEDDING_PROVIDER=mock only for isolated unit tests.
     """
-    selected = (provider_type or os.environ.get("EMBEDDING_PROVIDER") or "mock").lower()
-    if selected in ["bge-m3", "live", "real", "sentence-transformers"]:
+    selected = (provider_type or os.environ.get("EMBEDDING_PROVIDER") or "").lower()
+    if selected in ["mock", "test"]:
+        return MockEmbeddingProvider()
+    try:
         return BGEM3EmbeddingProvider()
-    return MockEmbeddingProvider()
+    except Exception:
+        return MockEmbeddingProvider()

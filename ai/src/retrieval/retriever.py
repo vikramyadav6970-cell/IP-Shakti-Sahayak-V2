@@ -56,6 +56,16 @@ INTENT_COLLECTION_ROUTING: Dict[str, List[str]] = {
     "ALL": CANONICAL_COLLECTIONS,
 }
 
+# Intent to canonical IP domain metadata tag mapping
+INTENT_IP_DOMAINS: Dict[str, List[str]] = {
+    "PATENT": ["patents", "traditional_knowledge", "drugs_cosmetics", "herbal_standards"],
+    "ABS": ["biological_diversity", "traditional_knowledge"],
+    "TRADEMARK": ["trademarks", "general_ip"],
+    "FOOD_REGULATION": ["food_safety", "traditional_knowledge", "drugs_cosmetics"],
+    "FORMULATION": ["herbal_standards", "traditional_knowledge", "drugs_cosmetics"],
+    "EXPORT": ["export_control", "international_treaties", "traditional_knowledge", "patents", "trademarks"],
+}
+
 
 class HybridRetriever:
     """Executes multi-collection hybrid retrieval with metadata filtering."""
@@ -79,7 +89,7 @@ class HybridRetriever:
         target_collections: Optional[List[str]] = None,
     ) -> List[RetrievedEvidence]:
         """
-        Executes hybrid retrieval across routed collections with jurisdiction filtering.
+        Executes hybrid retrieval across routed collections with jurisdiction and domain filtering.
         """
         # 1. Determine collections to query
         if target_collections:
@@ -97,19 +107,21 @@ class HybridRetriever:
         dense_vec = self.dense_provider.embed(query)
         sparse_vec = self.sparse_provider.embed_sparse(query)
 
-        # 3. Build jurisdiction filter
+        # 3. Build robust metadata filters
         filters: Dict[str, Any] = {}
         if jurisdiction:
             jur_lower = jurisdiction.lower()
-            if jur_lower == "india":
-                filters["jurisdiction"] = "india"
+            if jur_lower in ["india", "in"]:
+                filters["jurisdiction"] = ["India", "india", "INDIA", "IN", "in", "International", "None"]
             elif jur_lower in ["international", "usa", "eu", "wipo"]:
-                # When searching international, accept both specific country and international
-                filters["jurisdiction"] = [jur_lower, "international"]
+                filters["jurisdiction"] = ["International", "international", "WIPO", "wipo", "India", "india"]
+
+        if intent and intent in INTENT_IP_DOMAINS:
+            filters["ip_domain"] = INTENT_IP_DOMAINS[intent]
 
         # 4. Search across target collections
         all_hits: List[RetrievedEvidence] = []
-        limit_per_col = max(2, top_k // len(collections) + 2)
+        limit_per_col = max(3, top_k // max(1, len(collections)) + 2)
 
         for col in collections:
             try:
@@ -119,19 +131,22 @@ class HybridRetriever:
                     sparse_indices=sparse_vec.indices,
                     sparse_values=sparse_vec.values,
                     limit=limit_per_col,
-                    filters=filters if col != "international_export" else None,
+                    filters=filters if col == "legal_statutory" else None,
                 )
 
                 for pt in scored_points:
                     payload = pt.payload or {}
+                    content_str = payload.get("chunk_text") or payload.get("content", "")
+                    title_str = payload.get("source_filename") or payload.get("doc_title", "")
+                    sec_str = payload.get("section_number") or payload.get("section_ref") or payload.get("article_ref")
                     evidence = RetrievedEvidence(
                         chunk_id=str(pt.id),
-                        content=payload.get("content", ""),
-                        doc_title=payload.get("doc_title", ""),
-                        section_ref=payload.get("section_ref") or payload.get("article_ref"),
+                        content=content_str,
+                        doc_title=title_str,
+                        section_ref=sec_str,
                         source_url=payload.get("source_url", ""),
-                        jurisdiction=payload.get("jurisdiction", jurisdiction).upper(),
-                        document_type=payload.get("document_type", "STATUTE"),
+                        jurisdiction=str(payload.get("jurisdiction", jurisdiction)).upper(),
+                        document_type=payload.get("doc_category") or payload.get("document_type", "STATUTE"),
                         target_collection=col,
                         verification_status=payload.get("verification_status", "VERIFIED_OFFICIAL_GAZETTE"),
                         score=float(pt.score or 0.0),
@@ -142,6 +157,36 @@ class HybridRetriever:
                 # If collection empty or error, continue to next
                 continue
 
-        # 5. Sort by relevance score descending and take top_k
+        # 5. Fallback: if collection routing or filters yielded 0 hits, query legal_statutory directly
+        if not all_hits:
+            try:
+                scored_points = self.qdrant.search_dense(
+                    collection_name="legal_statutory",
+                    vector=dense_vec,
+                    limit=top_k,
+                )
+                for pt in scored_points:
+                    payload = pt.payload or {}
+                    content_str = payload.get("chunk_text") or payload.get("content", "")
+                    title_str = payload.get("source_filename") or payload.get("doc_title", "")
+                    sec_str = payload.get("section_number") or payload.get("section_ref") or payload.get("article_ref")
+                    evidence = RetrievedEvidence(
+                        chunk_id=str(pt.id),
+                        content=content_str,
+                        doc_title=title_str,
+                        section_ref=sec_str,
+                        source_url=payload.get("source_url", ""),
+                        jurisdiction=str(payload.get("jurisdiction", jurisdiction)).upper(),
+                        document_type=payload.get("doc_category") or payload.get("document_type", "STATUTE"),
+                        target_collection="legal_statutory",
+                        verification_status=payload.get("verification_status", "VERIFIED_OFFICIAL_GAZETTE"),
+                        score=float(pt.score or 0.0),
+                        metadata=payload,
+                    )
+                    all_hits.append(evidence)
+            except Exception:
+                pass
+
+        # 6. Sort by relevance score descending and take top_k
         all_hits.sort(key=lambda x: x.score, reverse=True)
         return all_hits[:top_k]

@@ -1,0 +1,803 @@
+documents:
+- source_filename: The Patents Act, 1970, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Patents (Inventions)/
+  document_id: in-patents-act-1970
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 1970
+  amendment_year: 2005
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: patents rule 2003.pdf
+  folder_path: India/Patents Act and 2024 rules/
+  document_id: in-patents-rules-2003
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 2003
+  amendment_year: 2016
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-patents-act-1970
+  status: validated
+- source_filename: patents amendment rule 2024.pdf
+  folder_path: India/Patents Act and 2024 rules/
+  document_id: in-patents-amendment-rules-2024
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 2024
+  amendment_year: 2024
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-patents-act-1970
+  - in-patents-rules-2003
+  status: validated
+- source_filename: indian patent act 1970.pdf
+  folder_path: India/Patents Act and 2024 rules/
+  document_id: in-patents-act-1970-compilation
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 1970
+  amendment_year: 2006
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-patents-act-1970
+  status: validated
+- source_filename: The Trade Marks Act, 1999, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Trademarks/
+  document_id: in-trademarks-act-1999
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Geographical Indications of Goods (Registration and Protection)
+    Act, 1999, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Geographical Indications/
+  document_id: in-gi-act-1999
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - geographical_indications
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Designs Act, 2000, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Industrial Designs/
+  document_id: in-designs-act-2000
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 2000
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Copyright Act, 1957, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Copyright and Related Rights (Neighboring
+    Rights)/
+  document_id: in-copyright-act-1957
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1957
+  amendment_year: 2012
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Protection of Plant Varieties and Farmers' Rights Act, 2001,
+    India.pdf
+  folder_path: India/India-IP/Main IP Laws/Plant Variety Protection/
+  document_id: in-ppvfr-act-2001
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - plant_variety_protection
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  - biodiversity_agent
+  enactment_year: 2001
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Semiconductor Integrated Circuits Layout-Design Act, 2000,
+    India.pdf
+  folder_path: India/India-IP/Main IP Laws/Industrial Designs/
+  document_id: in-semiconductor-act-2000
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 2000
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Biological Diversity Act, 2002, India.pdf
+  folder_path: India/India-IP/Main IP Laws/Traditional Knowledge (TK)/
+  document_id: in-biological-diversity-act-2002
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  - biodiversity_agent
+  enactment_year: 2002
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Biological Diversity Act 2023.pdf
+  folder_path: India/Biological diversity Act/
+  document_id: in-biological-diversity-amendment-act-2023
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  - biodiversity_agent
+  enactment_year: 2023
+  amendment_year: 2023
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: The Biological Diversity Rules, 2024.pdf
+  folder_path: India/Biological diversity Act/
+  document_id: in-biological-diversity-rules-2024
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  - biodiversity_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  - in-biological-diversity-amendment-act-2023
+  status: validated
+- source_filename: Bio-piracy of Traditional Knowledge.pdf
+  folder_path: India/Bio-Privacy/
+  document_id: in-biopiracy-tk-paper-2018
+  jurisdiction: India
+  country_code: IN
+  doc_category: secondary_literature
+  ip_domain:
+  - traditional_knowledge
+  - patents
+  - biological_diversity
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 2018
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 4
+  cross_reference_ids: []
+  status: validated
+- source_filename: in197en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
+    (TK)/
+  document_id: in-tk-rules-in197en-2004
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - traditional_knowledge
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2004
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: in199en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
+    (TK)/
+  document_id: in-tk-rules-in199en-2010
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - traditional_knowledge
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2010
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: in200en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
+    (TK)/
+  document_id: in-tk-rules-in200en-2014
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - traditional_knowledge
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2014
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: in201en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
+    (TK)/
+  document_id: in-tk-rules-in201en-2014
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - traditional_knowledge
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2014
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: in203en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
+    (TK)/
+  document_id: in-tk-rules-in203en-2015
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - traditional_knowledge
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2015
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-biological-diversity-act-2002
+  status: validated
+- source_filename: in043en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Copyright and Related
+    Rights (Neighboring Rights)/
+  document_id: in-copyright-rules-in043en-1958
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1958
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-copyright-act-1957
+  status: validated
+- source_filename: in085en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Copyright and Related
+    Rights (Neighboring Rights)/
+  document_id: in-copyright-rules-in085en-2013
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 2013
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-copyright-act-1957
+  status: validated
+- source_filename: in015en_1.pdf
+  folder_path: India/India-IP/Implementing RulesRegulations/Geographical Indications/
+  document_id: in-gi-rules-in015en-2002
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - geographical_indications
+  agent_scope:
+  - ip_agent
+  enactment_year: 2002
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-gi-act-1999
+  status: validated
+- source_filename: 2016DrugsandCosmeticsAct1940Rules1945.pdf
+  folder_path: India/Drugs & cosmetic act/
+  document_id: in-drugs-cosmetics-act-rules-2016
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - drugs_cosmetics
+  - herbal_pharmacopoeia
+  agent_scope:
+  - regulatory_agent
+  - pharma_reference_agent
+  enactment_year: 1940
+  amendment_year: 2016
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Drugs_And_Magic_Remedies_Objectionable_Advertisements_Act_1954.PDF
+  folder_path: India/The Drugs And Magic Remedies (Objectionable Advertisements)/
+  document_id: in-drugs-magic-remedies-act-1954
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - drugs_cosmetics
+  - food_regulation
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 1954
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Gazette_Notification_Ayurveda_Aahara_09_05_2022.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
+  document_id: in-fssai-ayurveda-aahara-gazette-2022
+  jurisdiction: India
+  country_code: IN
+  doc_category: regulatory_notification
+  ip_domain:
+  - food_regulation
+  - drugs_cosmetics
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 2022
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ayurveda-Aahara-covered-under-the-FSS-Ayurveda-Aahara-Regulations.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
+  document_id: in-fssai-ayurveda-aahara-regulations-2022
+  jurisdiction: India
+  country_code: IN
+  doc_category: regulatory_notification
+  ip_domain:
+  - food_regulation
+  - drugs_cosmetics
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 2022
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-fssai-ayurveda-aahara-gazette-2022
+  status: validated
+- source_filename: Introduction-of-new-Kind-of-Business-KoB-for-Ayurveda-Aahara-under-FoSCoS-for-License.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
+  document_id: in-fssai-foscos-kob-circular-2022
+  jurisdiction: India
+  country_code: IN
+  doc_category: regulatory_notification
+  ip_domain:
+  - food_regulation
+  - drugs_cosmetics
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 2022
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - in-fssai-ayurveda-aahara-gazette-2022
+  status: validated
+- source_filename: WHO HERBAL MONOGRAPHS.pdf
+  folder_path: herbs and drugs/
+  document_id: intl-who-herbal-monographs-vol1
+  jurisdiction: International
+  country_code: null
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  - patent_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: API-Vol-1.pdf
+  folder_path: herbs and drugs/
+  document_id: in-ayurvedic-pharmacopoeia-vol1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  - patent_agent
+  enactment_year: 2001
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: API-II-Vol-1 FORMULATIONS.pdf
+  folder_path: herbs and drugs/
+  document_id: in-ayurvedic-pharmacopoeia-vol2-formulations
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  - patent_agent
+  enactment_year: 2007
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - in-ayurvedic-pharmacopoeia-vol1
+  status: validated
+- source_filename: national essential drug list by AYUSH.pdf
+  folder_path: herbs and drugs/
+  document_id: in-ayush-national-essential-drug-list
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - drugs_cosmetics
+  agent_scope:
+  - pharma_reference_agent
+  - regulatory_agent
+  enactment_year: 2013
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: cbd-en.pdf
+  folder_path: International/Convention on Biological Diversity/
+  document_id: intl-cbd-convention-1992
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - biological_diversity
+  - traditional_knowledge
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 1992
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: nagoya-protocol-en.pdf
+  folder_path: International/Nagoya Protocol/
+  document_id: intl-nagoya-protocol-2010
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - biological_diversity
+  - traditional_knowledge
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2010
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - intl-cbd-convention-1992
+  status: validated
+- source_filename: 31bis_trips_e.pdf
+  folder_path: International/Trips/
+  document_id: intl-trips-article-31bis-2005
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - patents
+  - general_ip
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  enactment_year: 2005
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: pct.pdf
+  folder_path: International/PCT/
+  document_id: intl-patent-cooperation-treaty-1970
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - patents
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1970
+  amendment_year: 2001
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The PCT now has 159 Contracting States.pdf
+  folder_path: International/PCT/
+  document_id: intl-pct-contracting-states-2024
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - patents
+  agent_scope:
+  - patent_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 3
+  cross_reference_ids:
+  - intl-patent-cooperation-treaty-1970
+  status: validated
+- source_filename: madrid_marks.pdf
+  folder_path: International/Madrid System/
+  document_id: intl-madrid-agreement-marks-1891
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 1891
+  amendment_year: 1979
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: trt_madridp_gp_001en.pdf
+  folder_path: International/Madrid System/
+  document_id: intl-madrid-protocol-1989
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 1989
+  amendment_year: 2006
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids:
+  - intl-madrid-agreement-marks-1891
+  status: validated
+- source_filename: trt_madrid_gp_001en.pdf
+  folder_path: International/Madrid System/
+  document_id: intl-madrid-guide-provisions-2007
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2007
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids:
+  - intl-madrid-protocol-1989
+  status: validated
+- source_filename: trt_gratk_001en.pdf
+  folder_path: International/Wipo Gratk Treaty/
+  document_id: intl-wipo-gratk-treaty-2024
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - traditional_knowledge
+  - patents
+  - biological_diversity
+  agent_scope:
+  - ip_agent
+  - patent_agent
+  - biodiversity_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: profile_IN.xlsx
+  folder_path: India/India-IP/
+  document_id: in-wipo-profile-india-2024
+  jurisdiction: India
+  country_code: IN
+  doc_category: reference_dataset
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - ip_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 3
+  cross_reference_ids: []
+  status: validated
+- source_filename: CountryListInTreaty.xlsx
+  folder_path: International/Wipo Gratk Treaty/
+  document_id: intl-wipo-gratk-signatories-2024
+  jurisdiction: International
+  country_code: null
+  doc_category: reference_dataset
+  ip_domain:
+  - traditional_knowledge
+  - general_ip
+  agent_scope:
+  - ip_agent
+  - biodiversity_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 3
+  cross_reference_ids:
+  - intl-wipo-gratk-treaty-2024
+  status: validated

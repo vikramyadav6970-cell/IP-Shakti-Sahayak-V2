@@ -38,7 +38,7 @@ class QdrantManager:
             self.client = QdrantClient(":memory:")
             self.is_cloud = False
         else:
-            self.client = QdrantClient(url=self.url, api_key=self.api_key)
+            self.client = QdrantClient(url=self.url, api_key=self.api_key, timeout=30.0)
             self.is_cloud = True
 
     def init_collections(self) -> None:
@@ -74,6 +74,8 @@ class QdrantManager:
             ("document_id", rest.PayloadSchemaType.KEYWORD),
             ("verification_status", rest.PayloadSchemaType.KEYWORD),
             ("section_ref", rest.PayloadSchemaType.KEYWORD),
+            ("section_number", rest.PayloadSchemaType.KEYWORD),
+            ("doc_category", rest.PayloadSchemaType.KEYWORD),
         ]
         for field_name, field_type in fields_to_index:
             try:
@@ -106,16 +108,23 @@ class QdrantManager:
         limit: int = 5,
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[rest.ScoredPoint]:
-        """Execute dense vector similarity query."""
+        """Execute dense vector similarity query with retries."""
         q_filter = self._build_filter(filters)
-        return self.client.query_points(
-            collection_name=collection_name,
-            query=vector,
-            using="dense",
-            limit=limit,
-            query_filter=q_filter,
-            with_payload=True,
-        ).points
+        for attempt in range(3):
+            try:
+                return self.client.query_points(
+                    collection_name=collection_name,
+                    query=vector,
+                    limit=limit,
+                    query_filter=q_filter,
+                    with_payload=True,
+                ).points
+            except Exception:
+                if attempt == 2:
+                    return []
+                import time
+                time.sleep(1)
+        return []
 
     def search_hybrid(
         self,
@@ -127,34 +136,50 @@ class QdrantManager:
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[rest.ScoredPoint]:
         """
-        Execute hybrid search using Reciprocal Rank Fusion (RRF).
+        Execute dense / hybrid search across Qdrant collections.
         """
+        if not sparse_indices or collection_name == "legal_statutory":
+            return self.search_dense(
+                collection_name=collection_name,
+                vector=dense_vector,
+                limit=limit,
+                filters=filters,
+            )
+
         q_filter = self._build_filter(filters)
 
-        prefetch = [
-            rest.Prefetch(
-                query=rest.SparseVector(indices=sparse_indices, values=sparse_values),
-                using="sparse",
-                filter=q_filter,
-                limit=limit * 2,
-            ),
-            rest.Prefetch(
-                query=dense_vector,
-                using="dense",
-                filter=q_filter,
-                limit=limit * 2,
-            ),
-        ]
+        try:
+            prefetch = [
+                rest.Prefetch(
+                    query=rest.SparseVector(indices=sparse_indices, values=sparse_values),
+                    using="sparse",
+                    filter=q_filter,
+                    limit=limit * 2,
+                ),
+                rest.Prefetch(
+                    query=dense_vector,
+                    using="dense",
+                    filter=q_filter,
+                    limit=limit * 2,
+                ),
+            ]
 
-        results = self.client.query_points(
-            collection_name=collection_name,
-            prefetch=prefetch,
-            query=rest.FusionQuery(fusion=rest.Fusion.RRF),
-            limit=limit,
-            with_payload=True,
-        )
-
-        return results.points
+            results = self.client.query_points(
+                collection_name=collection_name,
+                prefetch=prefetch,
+                query=rest.FusionQuery(fusion=rest.Fusion.RRF),
+                limit=limit,
+                with_payload=True,
+            )
+            return results.points
+        except Exception:
+            # Fallback to direct dense vector search
+            return self.search_dense(
+                collection_name=collection_name,
+                vector=dense_vector,
+                limit=limit,
+                filters=filters,
+            )
 
     def _build_filter(self, filter_dict: Optional[Dict[str, Any]]) -> Optional[rest.Filter]:
         """Convert a simple dictionary filter to a Qdrant Filter object."""
