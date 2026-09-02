@@ -26,11 +26,16 @@ if db_url.startswith("postgresql"):
         "prepared_statement_cache_size": 0,
         "timeout": 30,
         "command_timeout": 30,
+        "server_settings": {
+            "tcp_keepalives_idle": "60",
+            "tcp_keepalives_interval": "10",
+            "tcp_keepalives_count": "5",
+        },
     }
     engine_kwargs.update({
         "pool_size": 5,
         "max_overflow": 10,
-        "pool_recycle": 180,
+        "pool_recycle": 60,
         "pool_timeout": 30,
         "pool_pre_ping": True,
         "connect_args": connect_args,

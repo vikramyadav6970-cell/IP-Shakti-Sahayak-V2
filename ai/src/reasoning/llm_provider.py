@@ -49,6 +49,20 @@ class LLMProvider(ABC):
         return self.generate(system_prompt, user_prompt, **kwargs)
 
 
+_GEMINI_HTTP_CLIENT = None
+
+
+def _get_gemini_client():
+    global _GEMINI_HTTP_CLIENT
+    if _GEMINI_HTTP_CLIENT is None:
+        try:
+            import httpx
+            _GEMINI_HTTP_CLIENT = httpx.Client(timeout=45.0)
+        except Exception:
+            _GEMINI_HTTP_CLIENT = None
+    return _GEMINI_HTTP_CLIENT
+
+
 class GeminiProvider(LLMProvider):
     """Google Gemini provider implementation (dynamically driven by LLM_MODEL in .env)."""
 
@@ -61,7 +75,7 @@ class GeminiProvider(LLMProvider):
         super().__init__(model_name=model, api_key=key)
 
     def _generate_rest(self, system_prompt: str, user_prompt: str, **kwargs: Any) -> str:
-        """Call Google Gemini REST API directly with zero dependency overhead."""
+        """Call Google Gemini REST API directly with connection pooling."""
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
         
         payload: dict[str, Any] = {
@@ -79,6 +93,24 @@ class GeminiProvider(LLMProvider):
             payload["system_instruction"] = {
                 "parts": [{"text": system_prompt}]
             }
+
+        client = _get_gemini_client()
+        if client:
+            try:
+                resp = client.post(url, json=payload)
+                if resp.status_code == 200:
+                    resp_data = resp.json()
+                    candidates = resp_data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        text_parts = [p.get("text", "") for p in parts if "text" in p]
+                        output_text = "".join(text_parts)
+                        print("\n===== LLM RESPONSE =====")
+                        print(output_text)
+                        print("========================\n")
+                        return output_text
+            except Exception:
+                pass
 
         req = urllib.request.Request(
             url,

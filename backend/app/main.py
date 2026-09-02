@@ -4,6 +4,7 @@ backend/app/main.py
 FastAPI application entrypoint for IP-SAKTI Sahayak.
 """
 
+import os
 from contextlib import asynccontextmanager
 from typing import Any, Dict
 from fastapi import Depends, FastAPI, status
@@ -14,6 +15,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.database import get_db
 from app.middleware.rate_limit import RateLimitMiddleware
+
+# HF Hub Token configuration for models & embeddings
+if settings.HF_TOKEN:
+    os.environ["HF_TOKEN"] = settings.HF_TOKEN
+    os.environ["HUGGINGFACE_HUB_TOKEN"] = settings.HF_TOKEN
 
 # Sentry Monitoring Initialization
 if settings.SENTRY_DSN:
@@ -37,7 +43,11 @@ async def lifespan(app: FastAPI):
         from app.models.base import Base
 
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+            try:
+                await conn.run_sync(Base.metadata.create_all)
+            except Exception as dbe:
+                print(f"[Lifespan Schema Init Notice]: {dbe}")
+
             # Safe column additions for PostgreSQL / SQLite
             try:
                 await conn.execute(
@@ -53,6 +63,25 @@ async def lifespan(app: FastAPI):
                 )
             except Exception:
                 pass
+        # Check Embedding Provider Configuration
+        embedding_prov = (os.environ.get("EMBEDDING_PROVIDER") or "bge-m3").lower()
+        if embedding_prov in ["mock", "test"] and settings.ENVIRONMENT != "test":
+            print("\n" + "!" * 80)
+            print(" ⚠️  CRITICAL CONFIGURATION WARNING: RUNNING WITH MOCK EMBEDDINGS!")
+            print(" Vector searches against Qdrant will use synthetic hash vectors and produce 0 hits.")
+            print(" To enable real AI vector retrieval, set EMBEDDING_PROVIDER=bge-m3 in your .env file.")
+            print("!" * 80 + "\n")
+        else:
+            print("\n" + "=" * 80)
+            print(" [AI RUNTIME READY] Dense Embeddings: BAAI/bge-m3 (1024-dim) | Qdrant: Connected")
+            print("=" * 80 + "\n")
+            # Pre-warm embedding model and Qdrant client in memory
+            try:
+                from app.services.chat_service import get_shared_retriever
+                get_shared_retriever()
+                print(" [AI RUNTIME READY] Embedding model & vector retriever pre-warmed successfully in memory.")
+            except Exception as e_warm:
+                print(f"[AI Pre-warm Notice]: {e_warm}")
     except Exception as e:
         print(f"[Lifespan Startup Notice]: {e}")
     yield

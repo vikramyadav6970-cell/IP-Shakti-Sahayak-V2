@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     SARVAM_API_KEY: Optional[str] = None
     SARVAM_API_BASE_URL: str = "https://api.sarvam.ai"
 
+    # Hugging Face Hub (Model Weights & Downloads)
+    HF_TOKEN: Optional[str] = None
+
     # Monitoring
     SENTRY_DSN: Optional[str] = None
 

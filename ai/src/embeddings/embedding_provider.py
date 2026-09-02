@@ -39,6 +39,10 @@ class EmbeddingProvider(ABC):
         return [{} for _ in texts]
 
 
+_GLOBAL_MODEL = None
+_GLOBAL_PROVIDER = None
+
+
 class BGEM3EmbeddingProvider(EmbeddingProvider):
     """
     BAAI/bge-m3 embedding provider via sentence-transformers.
@@ -55,19 +59,25 @@ class BGEM3EmbeddingProvider(EmbeddingProvider):
                 self.device = "cpu"
         else:
             self.device = device
-        self._model = None
 
     def _get_model(self):
-        if self._model is None:
+        global _GLOBAL_MODEL
+        if _GLOBAL_MODEL is None:
             from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(self.model_name, device=self.device)
-        return self._model
+            hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_HUB_TOKEN")
+            _GLOBAL_MODEL = SentenceTransformer(self.model_name, device=self.device, token=hf_token)
+        return _GLOBAL_MODEL
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
         if not texts:
             return []
         model = self._get_model()
-        embeddings = model.encode(texts, normalize_embeddings=True)
+        try:
+            import torch
+            with torch.inference_mode():
+                embeddings = model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
+        except Exception:
+            embeddings = model.encode(texts, normalize_embeddings=True, show_progress_bar=False)
         return [vec.tolist() for vec in embeddings]
 
 
@@ -97,14 +107,17 @@ class MockEmbeddingProvider(EmbeddingProvider):
 
 def get_embedding_provider(provider_type: Optional[str] = None) -> EmbeddingProvider:
     """
-    Factory to obtain embedding provider.
+    Factory to obtain embedding provider with global singleton caching.
     Automatically uses BAAI/bge-m3 on GPU/CPU for live AI intelligence.
     Set EMBEDDING_PROVIDER=mock only for isolated unit tests.
     """
+    global _GLOBAL_PROVIDER
     selected = (provider_type or os.environ.get("EMBEDDING_PROVIDER") or "").lower()
     if selected in ["mock", "test"]:
         return MockEmbeddingProvider()
-    try:
-        return BGEM3EmbeddingProvider()
-    except Exception:
-        return MockEmbeddingProvider()
+    if _GLOBAL_PROVIDER is None:
+        try:
+            _GLOBAL_PROVIDER = BGEM3EmbeddingProvider()
+        except Exception:
+            _GLOBAL_PROVIDER = MockEmbeddingProvider()
+    return _GLOBAL_PROVIDER

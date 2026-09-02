@@ -4,7 +4,6 @@ import {
   Scale,
   ShieldAlert,
   Sparkles,
-  UserCheck,
   LogIn,
   LogOut,
   User,
@@ -41,21 +40,17 @@ export const Layout: React.FC = () => {
               <Scale className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
-                  IP-SAKTI
-                </span>
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">
-                  Sahayak
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-none">
+              <span className="text-base font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+                IP-SAKTI
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">Sahayak</span>
+              </span>
+              <p className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold tracking-wider">
                 Ministry of Ayush
               </p>
             </div>
           </Link>
 
-          {/* Navigation Links — ONLY visible when authenticated */}
+          {/* Navigation Links — ONLY when logged in */}
           {isAuthenticated ? (
             <nav className="hidden md:flex items-center gap-1">
               <Link
@@ -69,20 +64,6 @@ export const Layout: React.FC = () => {
                 <span className="flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
                   Assistant
-                </span>
-              </Link>
-
-              <Link
-                to="/abs"
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                  location.pathname === "/abs"
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold shadow-xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <UserCheck className="w-4 h-4 text-emerald-600" />
-                  ABS Compliance
                 </span>
               </Link>
 

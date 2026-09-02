@@ -5,6 +5,7 @@ Hybrid retriever orchestrating collection routing, multi-collection query execut
 jurisdiction filtering, and evidence payload ranking.
 """
 
+import concurrent.futures
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -158,21 +159,21 @@ class HybridRetriever:
         if intent and intent in INTENT_IP_DOMAINS:
             filters["ip_domain"] = INTENT_IP_DOMAINS[intent]
 
-        # 4. Search across target collections
+        # 4. Search across target collections in parallel
         all_hits: List[RetrievedEvidence] = []
         limit_per_col = max(3, top_k // max(1, len(collections)) + 2)
 
-        for col in collections:
+        def _fetch_collection(col_name: str) -> List[RetrievedEvidence]:
+            hits = []
             try:
                 scored_points = self.qdrant.search_hybrid(
-                    collection_name=col,
+                    collection_name=col_name,
                     dense_vector=dense_vec,
                     sparse_indices=sparse_vec.indices,
                     sparse_values=sparse_vec.values,
                     limit=limit_per_col,
-                    filters=filters if col == "legal_statutory" else None,
+                    filters=filters if col_name == "legal_statutory" else None,
                 )
-
                 for pt in scored_points:
                     payload = pt.payload or {}
                     content_str = payload.get("chunk_text") or payload.get("content", "")
@@ -186,14 +187,24 @@ class HybridRetriever:
                         source_url=payload.get("source_url", ""),
                         jurisdiction=str(payload.get("jurisdiction", jurisdiction)).upper(),
                         document_type=payload.get("doc_category") or payload.get("document_type", "STATUTE"),
-                        target_collection=col,
+                        target_collection=col_name,
                         verification_status=payload.get("verification_status", "VERIFIED_OFFICIAL_GAZETTE"),
                         score=float(pt.score or 0.0),
                         metadata=payload,
                     )
-                    all_hits.append(evidence)
+                    hits.append(evidence)
             except Exception:
-                continue
+                pass
+            return hits
+
+        if len(collections) > 1:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=min(4, len(collections))) as executor:
+                results = executor.map(_fetch_collection, collections)
+                for res in results:
+                    all_hits.extend(res)
+        else:
+            for col in collections:
+                all_hits.extend(_fetch_collection(col))
 
         # 5. Fallback: if domain filters yielded 0 hits, retry with only jurisdiction filter
         if not all_hits:

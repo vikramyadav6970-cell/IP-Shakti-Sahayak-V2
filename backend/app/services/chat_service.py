@@ -1,14 +1,9 @@
-"""
-backend/app/services/chat_service.py
-
-Service orchestrating RAG consultation, jurisdiction guardrails, conversational product classification,
-structured product context extraction, citation persistence, and feedback.
-"""
-
+import asyncio
 import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 import uuid
@@ -20,9 +15,11 @@ ai_path = str(Path(__file__).resolve().parent.parent.parent.parent / "ai")
 if ai_path not in sys.path:
     sys.path.insert(0, ai_path)
 
+from src.citations.citation_validator import CitationValidator
 from src.classification.intent_classifier import IntentClassifier
 from src.classification.jurisdiction_classifier import JurisdictionClassifier
 from src.classification.product_classifier import CATEGORIES_REGISTRY, normalize_category_key, FormulationInput, ProductClassifier
+from src.confidence.confidence_scorer import ConfidenceScorer
 from src.embeddings.embedding_provider import get_embedding_provider
 from src.embeddings.sparse_provider import BM25SparseProvider
 from src.prompts.templates import CONSULTATION_SYSTEM_PROMPT, build_user_prompt
@@ -47,6 +44,28 @@ from app.schemas.chat import (
 )
 from app.services.translation_service import translation_service
 
+# Shared Singleton Instances for Fast In-Memory Reuse across requests
+_SHARED_RETRIEVER: Optional[HybridRetriever] = None
+_SHARED_QDRANT_MGR: Optional[QdrantManager] = None
+_SHARED_SPARSE_PROV: Optional[BM25SparseProvider] = None
+
+
+def get_shared_retriever() -> HybridRetriever:
+    global _SHARED_RETRIEVER, _SHARED_QDRANT_MGR, _SHARED_SPARSE_PROV
+    if _SHARED_RETRIEVER is None:
+        dense_provider = get_embedding_provider()
+        if _SHARED_SPARSE_PROV is None:
+            _SHARED_SPARSE_PROV = BM25SparseProvider()
+        if _SHARED_QDRANT_MGR is None:
+            qdrant_in_memory = not bool(settings.QDRANT_URL and settings.QDRANT_API_KEY)
+            _SHARED_QDRANT_MGR = QdrantManager(
+                url=settings.QDRANT_URL,
+                api_key=settings.QDRANT_API_KEY,
+                in_memory=qdrant_in_memory,
+            )
+        _SHARED_RETRIEVER = HybridRetriever(_SHARED_QDRANT_MGR, dense_provider, _SHARED_SPARSE_PROV)
+    return _SHARED_RETRIEVER
+
 
 class ChatService:
     """Consultation query orchestration & interactive product classification."""
@@ -55,16 +74,9 @@ class ChatService:
         self.session = session
         self.chat_repo = ChatRepository(session)
 
-        # Initialize AI providers
-        self.dense_provider = get_embedding_provider()
-        self.sparse_provider = BM25SparseProvider()
-        qdrant_in_memory = not bool(settings.QDRANT_URL and settings.QDRANT_API_KEY)
-        self.qdrant_manager = QdrantManager(
-            url=settings.QDRANT_URL,
-            api_key=settings.QDRANT_API_KEY,
-            in_memory=qdrant_in_memory,
-        )
-        self.retriever = HybridRetriever(self.qdrant_manager, self.dense_provider, self.sparse_provider)
+        # Initialize shared AI providers (reusing singleton models & client connections)
+        self.retriever = get_shared_retriever()
+        self.dense_provider = self.retriever.dense_provider
         
         active_model = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-3.5-flash-lite"
         active_key = os.environ.get("GEMINI_API_KEY") or settings.GEMINI_API_KEY
@@ -75,6 +87,8 @@ class ChatService:
         )
 
     async def execute_chat(self, user: User, req: ChatRequest) -> ChatResponse:
+        t_total_start = time.perf_counter()
+
         # 1. Resolve or prepare Conversation session
         conversation = None
         is_new_conv = False
@@ -98,7 +112,8 @@ class ChatService:
         if req.active_intent and not conversation.active_intent:
             conversation.active_intent = req.active_intent
 
-        # 2. Multilingual Processing: Detect Language & Translate Input if Indic
+        # 2. Multilingual Processing & Guardrails
+        t_trans_guard_start = time.perf_counter()
         input_lang = translation_service.normalize_language_code(req.language)
         if input_lang == "auto":
             detected_language = translation_service.detect_language(req.question)
@@ -152,7 +167,7 @@ class ChatService:
             core_question = translated_q
             is_translated = True
 
-        # 3. Check Jurisdiction Guardrails (evaluated on English query)
+        # Check Jurisdiction Guardrails (evaluated on English query)
         detected_jur, is_out_scope, out_explanation = JurisdictionClassifier.classify(
             core_question, current_active=req.jurisdiction
         )
@@ -204,7 +219,10 @@ class ChatService:
                 is_translated=is_translated,
             )
 
-        # 4. Parse existing prior product context if provided or from conversation record
+        t_trans_guard_ms = (time.perf_counter() - t_trans_guard_start) * 1000
+
+        # 3. Parse existing prior product context
+        t_context_start = time.perf_counter()
         prev_context_data: Dict[str, Any] = {}
         if req.active_product_context:
             try:
@@ -214,20 +232,25 @@ class ChatService:
         elif conversation.product_context_json:
             prev_context_data = conversation.product_context_json
 
-        # 5. Classify query intent & retrieve relevant legal evidence (core English query)
         intent = req.active_intent.value if req.active_intent else IntentClassifier.classify(core_question)
-        evidence_hits = self.retriever.retrieve(
+        t_context_ms = (time.perf_counter() - t_context_start) * 1000
+
+        # 4. Parallel Hybrid Retrieval across Qdrant Collections
+        t_retrieval_start = time.perf_counter()
+        evidence_hits = await asyncio.to_thread(
+            self.retriever.retrieve,
             query=core_question,
             jurisdiction=req.jurisdiction,
             intent=intent,
             top_k=4,
         )
+        t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
 
-        # Terminal Logging: Vector DB retrieval results
+        # Terminal Logging: Vector DB retrieval results (with ASCII-safe snippet printing)
         print("\n" + "=" * 75)
         print(" [VECTOR DB RETRIEVAL - QDRANT CLOUD]")
         print(f" Query: '{core_question}'")
-        print(f" Jurisdiction: {req.jurisdiction} | Intent: {intent} | Hits Retrieved: {len(evidence_hits)}")
+        print(f" Jurisdiction: {req.jurisdiction} | Intent: {intent} | Hits Retrieved: {len(evidence_hits)} (in {t_retrieval_ms:.1f}ms)")
         print("-" * 75)
         if evidence_hits:
             for idx, ev in enumerate(evidence_hits, 1):
@@ -235,8 +258,8 @@ class ChatService:
                 print(f"   * Document: {ev.doc_title}")
                 print(f"   * Section/Ref: {ev.section_ref or 'N/A'}")
                 print(f"   * Scope: {ev.document_type} ({ev.jurisdiction})")
-                snippet = ev.content.replace('\n', ' ')[:220]
-                print(f"   * Snippet: {snippet}...")
+                clean_snippet = ev.content.replace('\n', ' ')[:220].encode('ascii', errors='replace').decode('ascii')
+                print(f"   * Snippet: {clean_snippet}...")
         else:
             print("   (No matching vector points retrieved for this query filter)")
         print("=" * 75 + "\n")
@@ -260,19 +283,19 @@ class ChatService:
                 "(e.g., Section 3(p), Section 3(e), Form 25-D), and brief bullet points so that the output translates cleanly within character limits."
             )
 
-        # 6. Generate answer via LLM Provider
+        # 5. Generate answer via LLM Provider
+        t_llm_start = time.perf_counter()
         is_generation_error = False
         try:
-            answer_text = self.llm_provider.generate(system_prompt, user_prompt)
-            print("\n===== LLM RESPONSE =====")
-            print(answer_text)
-            print("========================\n")
+            answer_text = await asyncio.to_thread(self.llm_provider.generate, system_prompt, user_prompt)
         except Exception as err:
             print(f"\n[LLM Generation Notice/Error]: {err}")
             is_generation_error = True
             answer_text = "I am unable to answer that at this moment. Please try again in a few moments."
+        t_llm_ms = (time.perf_counter() - t_llm_start) * 1000
 
-        # 6. Extract embedded [[PRODUCT_CONTEXT:{...}]] tag if present (supporting multiline & markdown)
+        # 6. Extract embedded [[PRODUCT_CONTEXT:{...}]] tag
+        t_extract_start = time.perf_counter()
         product_context_data: Optional[ProductContextData] = None
         product_classification_meta: Optional[ProductClassificationMeta] = None
 
@@ -326,7 +349,7 @@ class ChatService:
                         patent_eligibility=cat_registry_info["patent_eligibility"],
                         patent_reasoning=cat_registry_info["patent_reasoning"],
                         abs_requirement=cat_registry_info["abs_requirement"],
-                        confidence=0.96,
+                        confidence=0.92,
                     )
 
                 # Clean the response text for user display
@@ -390,7 +413,7 @@ class ChatService:
                     patent_eligibility=cat_info["patent_eligibility"],
                     patent_reasoning=cat_info["patent_reasoning"],
                     abs_requirement=cat_info["abs_requirement"],
-                    confidence=0.96,
+                    confidence=0.92,
                 )
 
         # 7. Persist conversation, user message, bot message, and citations
@@ -404,6 +427,20 @@ class ChatService:
             jurisdiction=req.jurisdiction,
         )
         await self.chat_repo.add_message(user_msg)
+
+        # 7. Validate Citations and Compute Dynamic Multi-Factor Confidence Score
+        validated_citations, citation_ratio = CitationValidator.validate_citations(
+            response_text=answer_text,
+            retrieved_evidence=evidence_hits,
+            jurisdiction=req.jurisdiction,
+        )
+
+        confidence_assessment = ConfidenceScorer.calculate_confidence(
+            response_text=answer_text,
+            evidence_hits=evidence_hits,
+            validated_citations=validated_citations,
+            citation_ratio=citation_ratio,
+        )
 
         # 8. Persist Citations ONLY if actual evidence was retrieved from RAG
         persisted_citations: List[CitationRead] = []
@@ -441,7 +478,7 @@ class ChatService:
                     )
                 )
 
-        # 8. Clean Product Context tag & Translate Output to Indic Language if required
+        # 9. Clean Product Context tag & Translate Output to Indic Language if required
         clean_answer_text = re.sub(
             r"\[\[PRODUCT_CONTEXT:\s*(?:```json)?\s*\{[\s\S]*?\}\s*(?:```)?\s*\]\]", "", answer_text, flags=re.DOTALL
         ).strip()
@@ -461,14 +498,19 @@ class ChatService:
                     f"*(Note: Translation to your language was temporarily unavailable; showing advisory in English.)*"
                 )
 
+        t_extract_ms = (time.perf_counter() - t_extract_start) * 1000
+
+        # 10. Database persistence & DPDP audit logging
+        t_db_start = time.perf_counter()
+
         if is_generation_error:
             confidence_score = 0.0
             confidence_label = "LOW"
             requires_human_review = True
         elif len(persisted_citations) > 0:
-            confidence_score = 0.96
-            confidence_label = "HIGH"
-            requires_human_review = False
+            confidence_score = confidence_assessment.composite_score
+            confidence_label = confidence_assessment.confidence_label
+            requires_human_review = confidence_assessment.requires_human_review
         else:
             # For pure product intake, questions, or conversational turns without RAG evidence
             confidence_score = None
@@ -499,14 +541,14 @@ class ChatService:
             )
             await self.chat_repo.add_citation(db_cit)
 
-        # 9. Persist structured product context on conversation record
+        # Persist structured product context on conversation record
         if product_context_data:
             conversation.product_context_json = product_context_data.model_dump()
             conversation.classification_state = product_context_data.state
             if product_context_data.product_name:
                 conversation.title = product_context_data.product_name
 
-        # 10. Audit logging (DPDP compliance)
+        # Audit logging (DPDP compliance)
         audit = AuditLog(
             user_id=user.id,
             action="CHAT_QUERY",
@@ -526,6 +568,22 @@ class ChatService:
         await self.chat_repo.add_audit_log(audit)
 
         await self.session.commit()
+        t_db_ms = (time.perf_counter() - t_db_start) * 1000
+
+        t_total_sec = time.perf_counter() - t_total_start
+
+        # Terminal Performance Breakdown
+        print("\n" + "=" * 78)
+        print(" [AI PIPELINE STEP-BY-STEP LATENCY BREAKDOWN]")
+        print(f"   * [1/6] Multilingual & Guardrails   : {t_trans_guard_ms:6.1f} ms")
+        print(f"   * [2/6] Intent & Context Resolution : {t_context_ms:6.1f} ms")
+        print(f"   * [3/6] Hybrid Parallel Retrieval   : {t_retrieval_ms:6.1f} ms ({len(evidence_hits)} hits from Qdrant)")
+        print(f"   * [4/6] Gemini LLM Reasoning (AI)  : {t_llm_ms:6.1f} ms")
+        print(f"   * [5/6] Context & Citation Parsing  : {t_extract_ms:6.1f} ms")
+        print(f"   * [6/6] Database Commit & Audit Log : {t_db_ms:6.1f} ms")
+        print(" " + "-" * 76)
+        print(f" >>> TOTAL TURN-AROUND LATENCY       : {t_total_sec:6.3f} s")
+        print("=" * 78 + "\n")
 
         return ChatResponse(
             conversation_id=conversation.id,
@@ -548,51 +606,68 @@ class ChatService:
         convs = await self.chat_repo.list_conversations(user.id)
         summaries = []
         for c in convs:
-            p_json = c.product_context_json or {}
+            try:
+                p_json = c.product_context_json or {}
 
-            # Determine product name
-            prod_name = (
-                p_json.get("product_name")
-                or (c.title if c.title and not c.title.startswith("Please provide") else None)
-                or (p_json.get("description")[:40] + "..." if p_json.get("description") else None)
-                or "Ayurvedic Formulation"
-            )
-
-            # Determine category details
-            cat_raw = p_json.get("category")
-            cat_name = p_json.get("category_name")
-            regulatory_pathway = p_json.get("regulatory_pathway")
-            patent_eligibility = p_json.get("patent_eligibility")
-
-            if cat_raw and not cat_name:
-                cat_key = normalize_category_key(cat_raw)
-                cat_info = CATEGORIES_REGISTRY.get(cat_key)
-                if cat_info:
-                    cat_name = cat_info["name"]
-                    if not regulatory_pathway:
-                        regulatory_pathway = cat_info["regulatory_pathway"]
-                    if not patent_eligibility:
-                        patent_eligibility = cat_info["patent_eligibility"]
-
-            summaries.append(
-                ConversationSummaryRead(
-                    id=c.id,
-                    title=prod_name,
-                    active_classification_id=c.active_classification_id,
-                    active_intent=c.active_intent,
-                    product_name=prod_name,
-                    category=cat_raw,
-                    category_name=cat_name,
-                    dosage_form=p_json.get("dosage_form"),
-                    ingredients=p_json.get("ingredients") or [],
-                    patent_eligibility=patent_eligibility,
-                    regulatory_pathway=regulatory_pathway,
-                    classification_state=c.classification_state or p_json.get("state") or "COLLECTING_PRODUCT_INFORMATION",
-                    message_count=len(c.messages) if hasattr(c, "messages") and c.messages else 0,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
+                # Determine product name
+                prod_name = (
+                    p_json.get("product_name")
+                    or (c.title if c.title and not c.title.startswith("Please provide") else None)
+                    or (p_json.get("description")[:40] + "..." if p_json.get("description") else None)
+                    or "Ayurvedic Formulation"
                 )
-            )
+
+                # Determine category details
+                cat_raw = p_json.get("category")
+                cat_name = p_json.get("category_name")
+                regulatory_pathway = p_json.get("regulatory_pathway")
+                patent_eligibility = p_json.get("patent_eligibility")
+
+                if cat_raw and not cat_name:
+                    cat_key = normalize_category_key(cat_raw)
+                    cat_info = CATEGORIES_REGISTRY.get(cat_key)
+                    if cat_info:
+                        cat_name = cat_info["name"]
+                        if not regulatory_pathway:
+                            regulatory_pathway = cat_info["regulatory_pathway"]
+                        if not patent_eligibility:
+                            patent_eligibility = cat_info["patent_eligibility"]
+
+                msg_count = len(c.messages) if ("messages" in c.__dict__ and c.messages) else 0
+
+                summaries.append(
+                    ConversationSummaryRead(
+                        id=c.id,
+                        title=prod_name,
+                        active_classification_id=c.active_classification_id,
+                        active_intent=c.active_intent,
+                        product_name=prod_name,
+                        category=cat_raw,
+                        category_name=cat_name,
+                        dosage_form=p_json.get("dosage_form"),
+                        ingredients=p_json.get("ingredients") or [],
+                        patent_eligibility=patent_eligibility,
+                        regulatory_pathway=regulatory_pathway,
+                        classification_state=c.classification_state or p_json.get("state") or "COLLECTING_PRODUCT_INFORMATION",
+                        message_count=msg_count,
+                        created_at=c.created_at,
+                        updated_at=c.updated_at,
+                    )
+                )
+            except Exception as ex:
+                print(f"[Conversation Summary Format Notice]: {ex}")
+                summaries.append(
+                    ConversationSummaryRead(
+                        id=c.id,
+                        title=c.title or "Ayurvedic Consultation",
+                        active_classification_id=c.active_classification_id,
+                        active_intent=c.active_intent,
+                        classification_state=c.classification_state or "COLLECTING_PRODUCT_INFORMATION",
+                        message_count=0,
+                        created_at=c.created_at,
+                        updated_at=c.updated_at,
+                    )
+                )
         return summaries
 
     async def get_conversation_details(self, user: User, conv_id: uuid.UUID) -> ConversationRead:
@@ -626,7 +701,9 @@ class ChatService:
 
         # Map messages with citations
         msg_reads = []
-        for m in conv.messages:
+        raw_messages = conv.messages if ("messages" in conv.__dict__ and conv.messages) else []
+        for m in raw_messages:
+            raw_citations = m.citations if ("citations" in m.__dict__ and m.citations) else []
             cit_reads = [
                 CitationRead(
                     id=c.id,
@@ -636,7 +713,7 @@ class ChatService:
                     jurisdiction=c.jurisdiction,
                     document_type=c.document_type,
                 )
-                for c in m.citations
+                for c in raw_citations
             ]
             msg_reads.append(
                 MessageRead(
