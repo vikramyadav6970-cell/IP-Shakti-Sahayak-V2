@@ -283,11 +283,21 @@ def chunk_document_adaptively(file_path: Path, doc_entry: Dict[str, Any], analys
                 sec_num = None
                 sec_title = None
 
-                sec_match = re.search(r"(?:Section\s+(\d+[A-Z]?)|Rule\s+(\d+[A-Z]?)|Article\s+(\d+[A-Z]?))", seg, re.IGNORECASE)
+                sec_match = re.search(
+                    r"(?:Section\s+([0-9]+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*)|Rule\s+([0-9]+[A-Za-z]?(?:\s*\([0-9a-zA-Z]+\))*)|Article\s+([0-9]+(?:\s*(?:bis|ter|quater|quinquies|[a-zA-Z]))*(?:\s*\([0-9a-zA-Z]+\))*))",
+                    seg,
+                    re.IGNORECASE,
+                )
                 if sec_match:
                     num = sec_match.group(1) or sec_match.group(2) or sec_match.group(3)
-                    prefix = "Section" if "Section" in sec_match.group(0) else ("Rule" if "Rule" in sec_match.group(0) else "Article")
-                    sec_num = f"{prefix} {num}"
+                    matched_text = sec_match.group(0).strip()
+                    if matched_text.lower().startswith("section"):
+                        prefix = "Section"
+                    elif matched_text.lower().startswith("rule"):
+                        prefix = "Rule"
+                    else:
+                        prefix = "Article"
+                    sec_num = f"{prefix} {num}".strip()
 
                 # Extract first line as title candidate
                 first_line = seg.split("\n")[0].strip()

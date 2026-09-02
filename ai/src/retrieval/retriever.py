@@ -59,12 +59,13 @@ INTENT_COLLECTION_ROUTING: Dict[str, List[str]] = {
 
 # Intent to canonical IP domain metadata tag mapping
 INTENT_IP_DOMAINS: Dict[str, List[str]] = {
-    "PATENT": ["patents", "traditional_knowledge", "drugs_cosmetics", "herbal_standards"],
-    "ABS": ["biological_diversity", "traditional_knowledge"],
-    "TRADEMARK": ["trademarks", "general_ip"],
-    "FOOD_REGULATION": ["food_safety", "traditional_knowledge", "drugs_cosmetics"],
-    "FORMULATION": ["herbal_standards", "traditional_knowledge", "drugs_cosmetics"],
-    "EXPORT": ["export_control", "international_treaties", "traditional_knowledge", "patents", "trademarks"],
+    "PATENT": ["patents", "traditional_knowledge", "drugs_cosmetics", "herbal_standards", "general_ip", "international_treaties"],
+    "ABS": ["biological_diversity", "traditional_knowledge", "international_treaties", "general_ip"],
+    "TRADEMARK": ["trademarks", "general_ip", "international_treaties"],
+    "FOOD_REGULATION": ["food_safety", "traditional_knowledge", "drugs_cosmetics", "herbal_standards"],
+    "FORMULATION": ["herbal_standards", "traditional_knowledge", "drugs_cosmetics", "patents"],
+    "EXPORT": ["export_control", "international_treaties", "traditional_knowledge", "patents", "trademarks", "general_ip", "copyright", "geographical_indications", "industrial_designs"],
+    "CASE_LAW": ["patents", "trademarks", "copyright", "industrial_designs", "geographical_indications", "traditional_knowledge", "general_ip", "drugs_cosmetics"],
 }
 
 
