@@ -685,7 +685,7 @@ def validate_document_retrieval(
 # ==============================================================================
 def run_pipeline(target_doc_id: Optional[str] = None, force_reindex: bool = False):
     registry_path = ai_dir / "ingestion_config" / "document_registry.yaml"
-    dataset_dir = ai_dir / "DataSet"
+    dataset_dir = ai_dir / "NewDataSet" if (ai_dir / "NewDataSet").exists() else (ai_dir / "DataSet")
 
     with open(registry_path, "r", encoding="utf-8") as f:
         registry = yaml.safe_load(f)
@@ -719,11 +719,12 @@ def run_pipeline(target_doc_id: Optional[str] = None, force_reindex: bool = Fals
             print(f"[{idx}/{len(docs)}] Skipping already validated: {source_fn} ({doc_id})")
             continue
 
-        # Locate file on disk
+        # Locate file on disk (check NewDataSet and DataSet)
         full_file_path = dataset_dir / folder_path / source_fn
         if not full_file_path.exists():
-            # Try recursive search if folder_path has slight variation
             matches = list(dataset_dir.rglob(source_fn))
+            if not matches and (ai_dir / "DataSet").exists():
+                matches = list((ai_dir / "DataSet").rglob(source_fn))
             if matches:
                 full_file_path = matches[0]
             else:

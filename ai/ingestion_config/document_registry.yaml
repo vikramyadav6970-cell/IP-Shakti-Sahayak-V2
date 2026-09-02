@@ -1,201 +1,153 @@
 documents:
-- source_filename: The Patents Act, 1970, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Patents (Inventions)/
-  document_id: in-patents-act-1970
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - patents
-  - traditional_knowledge
-  agent_scope:
-  - ip_agent
-  - patent_agent
-  enactment_year: 1970
-  amendment_year: 2005
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: patents rule 2003.pdf
-  folder_path: India/Patents Act and 2024 rules/
-  document_id: in-patents-rules-2003
-  jurisdiction: India
-  country_code: IN
-  doc_category: implementing_rules
-  ip_domain:
-  - patents
-  agent_scope:
-  - ip_agent
-  - patent_agent
-  enactment_year: 2003
-  amendment_year: 2016
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 2
-  cross_reference_ids:
-  - in-patents-act-1970
-  status: validated
-- source_filename: patents amendment rule 2024.pdf
-  folder_path: India/Patents Act and 2024 rules/
-  document_id: in-patents-amendment-rules-2024
-  jurisdiction: India
-  country_code: IN
-  doc_category: implementing_rules
-  ip_domain:
-  - patents
-  agent_scope:
-  - ip_agent
-  - patent_agent
-  enactment_year: 2024
-  amendment_year: 2024
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - in-patents-act-1970
-  - in-patents-rules-2003
-  status: validated
-- source_filename: indian patent act 1970.pdf
-  folder_path: India/Patents Act and 2024 rules/
-  document_id: in-patents-act-1970-compilation
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - patents
-  agent_scope:
-  - ip_agent
-  - patent_agent
-  enactment_year: 1970
-  amendment_year: 2006
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - in-patents-act-1970
-  status: validated
-- source_filename: The Trade Marks Act, 1999, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Trademarks/
-  document_id: in-trademarks-act-1999
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - trademarks
-  agent_scope:
-  - ip_agent
-  enactment_year: 1999
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Geographical Indications of Goods (Registration and Protection)
-    Act, 1999, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Geographical Indications/
-  document_id: in-gi-act-1999
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - geographical_indications
-  - traditional_knowledge
-  agent_scope:
-  - ip_agent
-  enactment_year: 1999
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Designs Act, 2000, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Industrial Designs/
-  document_id: in-designs-act-2000
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - industrial_designs
-  agent_scope:
-  - ip_agent
-  enactment_year: 2000
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Copyright Act, 1957, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Copyright and Related Rights (Neighboring
-    Rights)/
-  document_id: in-copyright-act-1957
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - copyright
-  agent_scope:
-  - ip_agent
-  enactment_year: 1957
-  amendment_year: 2012
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Protection of Plant Varieties and Farmers' Rights Act, 2001,
-    India.pdf
-  folder_path: India/India-IP/Main IP Laws/Plant Variety Protection/
-  document_id: in-ppvfr-act-2001
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - plant_variety_protection
-  - traditional_knowledge
-  agent_scope:
-  - ip_agent
-  - biodiversity_agent
-  enactment_year: 2001
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Semiconductor Integrated Circuits Layout-Design Act, 2000,
-    India.pdf
-  folder_path: India/India-IP/Main IP Laws/Industrial Designs/
-  document_id: in-semiconductor-act-2000
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - industrial_designs
-  agent_scope:
-  - ip_agent
-  enactment_year: 2000
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 2
-  cross_reference_ids: []
-  status: validated
-- source_filename: The Biological Diversity Act, 2002, India.pdf
-  folder_path: India/India-IP/Main IP Laws/Traditional Knowledge (TK)/
-  document_id: in-biological-diversity-act-2002
+- source_filename: Bio-piracy of Traditional Knowledge.pdf
+  folder_path: India/Bio-Privacy
+  document_id: in-bio-piracy-of-traditional-knowledge
   jurisdiction: India
   country_code: IN
   doc_category: primary_law
   ip_domain:
   - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: 2016DrugsandCosmeticsAct1940Rules1945.pdf
+  folder_path: India/Drugs & cosmetic act
+  document_id: in-2016drugsandcosmeticsact1940rules1945
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - drugs_cosmetics
   - traditional_knowledge
   agent_scope:
-  - ip_agent
+  - regulatory_agent
+  enactment_year: 2016
+  amendment_year: 1945
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ayurveda-Aahara-covered-under-the-FSS-Ayurveda-Aahara-Regulations.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations
+  document_id: in-ayurveda-aahara-covered-under-the-fss-ayurveda-aahara-reg
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - food_regulation
+  - traditional_knowledge
+  agent_scope:
+  - regulatory_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Gazette_Notification_Ayurveda_Aahara_09_05_2022.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations
+  document_id: in-gazette-notification-ayurveda-aahara-09-05-2022
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - food_regulation
+  - traditional_knowledge
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 2022
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Introduction-of-new-Kind-of-Business-KoB-for-Ayurveda-Aahara-under-FoSCoS-for-License.pdf
+  folder_path: India/FSSAI Ayurvedic- Adhar Regulations
+  document_id: in-introduction-of-new-kind-of-business-kob-for-ayurveda-aah
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - food_regulation
+  - traditional_knowledge
+  agent_scope:
+  - regulatory_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Corrigendum_to_Biological_Diversity_Amendment_Act,_2023,_dated_09.08.2023_-_corrigendum_1_(1).pdf
+  folder_path: India/India-IP/ABS/ACT's
+  document_id: in-corrigendum-to-biological-diversity-amendment-act-2023-da
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2023
+  amendment_year: 2023
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Notification_S.O_No._295(E)_dated_18th_January,_2024,_Biological_Diversity_Amendment_Act,_2023_enfocement_date_i.e_01.04.2024.pdf
+  folder_path: India/India-IP/ABS/ACT's
+  document_id: in-notification-s-o-no-295-e-dated-18th-january-2024-biologi
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2024
+  amendment_year: 2024
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Biological_Diversity_(Amendment)_Act,_2023_-_2023-10.pdf
+  folder_path: India/India-IP/ABS/ACT's
+  document_id: in-the-biological-diversity-amendment-act-2023-2023-10
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2023
+  amendment_year: 2023
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Biological_Diversity_Act,_2002.pdf
+  folder_path: India/India-IP/ABS/ACT's
+  document_id: in-the-biological-diversity-act-2002
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - biological_diversity
+  agent_scope:
   - biodiversity_agent
   enactment_year: 2002
   amendment_year: null
@@ -204,176 +156,421 @@ documents:
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: Biological Diversity Act 2023.pdf
-  folder_path: India/Biological diversity Act/
-  document_id: in-biological-diversity-amendment-act-2023
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - biological_diversity
-  - traditional_knowledge
-  agent_scope:
-  - ip_agent
-  - biodiversity_agent
-  enactment_year: 2023
-  amendment_year: 2023
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
-  status: validated
-- source_filename: The Biological Diversity Rules, 2024.pdf
-  folder_path: India/Biological diversity Act/
-  document_id: in-biological-diversity-rules-2024
+- source_filename: ABS Regulations 2025.pdf
+  folder_path: India/India-IP/ABS/Regulations
+  document_id: in-abs-regulations-2025
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
   - biological_diversity
-  - traditional_knowledge
   agent_scope:
-  - ip_agent
   - biodiversity_agent
-  enactment_year: 2024
+  enactment_year: 2025
   amendment_year: null
   is_current_version: true
   source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
-  - in-biological-diversity-amendment-act-2023
-  status: validated
-- source_filename: Bio-piracy of Traditional Knowledge.pdf
-  folder_path: India/Bio-Privacy/
-  document_id: in-biopiracy-tk-paper-2018
-  jurisdiction: India
-  country_code: IN
-  doc_category: secondary_literature
-  ip_domain:
-  - traditional_knowledge
-  - patents
-  - biological_diversity
-  agent_scope:
-  - ip_agent
-  - patent_agent
-  enactment_year: 2018
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 4
+  retrieval_priority: 2
   cross_reference_ids: []
   status: validated
-- source_filename: in197en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
-    (TK)/
-  document_id: in-tk-rules-in197en-2004
+- source_filename: Exemption_of_Crops_listed_in_the_Annex_I_of_the_International_Treaty_on_Plant_Genetic_Resources_for_Food_and_Agriculture_(ITPGRFA)_from_seeking_approval_of_NBA_under_Section_3_and_.pdf
+  folder_path: India/India-IP/ABS/Regulations
+  document_id: in-exemption-of-crops-listed-in-the-annex-i-of-the-internati
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
-  - traditional_knowledge
   - biological_diversity
   agent_scope:
   - biodiversity_agent
-  - ip_agent
-  enactment_year: 2004
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
+  cross_reference_ids: []
   status: validated
-- source_filename: in199en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
-    (TK)/
-  document_id: in-tk-rules-in199en-2010
+- source_filename: Guidelines for International Collaboration Research Projects involving
+    Transfer or exchange of Biological Resources.pdf
+  folder_path: India/India-IP/ABS/Regulations
+  document_id: in-guidelines-for-international-collaboration-research-proje
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
-  - traditional_knowledge
   - biological_diversity
   agent_scope:
   - biodiversity_agent
-  - ip_agent
-  enactment_year: 2010
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
-  status: validated
-- source_filename: in200en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
-    (TK)/
-  document_id: in-tk-rules-in200en-2014
+  cross_reference_ids: []
+  status: ingested
+- source_filename: Guidelines on Access to Biological Resources and Associated Knowledge
+    and Benefits Sharing Regulations, 2014.pdf
+  folder_path: India/India-IP/ABS/Regulations
+  document_id: in-guidelines-on-access-to-biological-resources-and-associat
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
-  - traditional_knowledge
   - biological_diversity
   agent_scope:
   - biodiversity_agent
-  - ip_agent
   enactment_year: 2014
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
+  cross_reference_ids: []
   status: validated
-- source_filename: in201en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
-    (TK)/
-  document_id: in-tk-rules-in201en-2014
+- source_filename: Chhattisgarh_Biological_Diversity_Rules,_2015.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-chhattisgarh-biological-diversity-rules-2015
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
-  - traditional_knowledge
   - biological_diversity
   agent_scope:
   - biodiversity_agent
-  - ip_agent
-  enactment_year: 2014
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 2
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
-  status: validated
-- source_filename: in203en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Traditional Knowledge
-    (TK)/
-  document_id: in-tk-rules-in203en-2015
-  jurisdiction: India
-  country_code: IN
-  doc_category: implementing_rules
-  ip_domain:
-  - traditional_knowledge
-  - biological_diversity
-  agent_scope:
-  - biodiversity_agent
-  - ip_agent
   enactment_year: 2015
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-biological-diversity-act-2002
+  cross_reference_ids: []
   status: validated
-- source_filename: in043en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Copyright and Related
-    Rights (Neighboring Rights)/
-  document_id: in-copyright-rules-in043en-1958
+- source_filename: G.S.R.261_(E),_[15_04_2004]_-_Biological_Diversity_Rules,_2004.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-g-s-r-261-e-15-04-2004-biological-diversity-rules-2004
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2004
+  amendment_year: 2004
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Biological_Diversity_(Amendment)_Rules,_2025.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-the-biological-diversity-amendment-rules-2025
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2025
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Biological_Diversity_Rules_2024.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-the-biological-diversity-rules-2024
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2024
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Rajasthan_Biological_Diversity_Rules,_2010_-_1.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-the-rajasthan-biological-diversity-rules-2010-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2010
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "The_Rajasthan_Biological_Diversity_Rules,_2010_-_\u0930\u093E\u091C\
+    \u0938\u094D\u0925\u093E\u0928_\u091C\u0948\u0935_\u0935\u093F\u0935\u093F\u0927\
+    \u0924\u093E_\u0928\u093F\u092F\u092E,_2010.pdf"
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-the-rajasthan-biological-diversity-rules-2010-2010
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2010
+  amendment_year: 2010
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: tamil_nadu_biological_diversity_rules_2017.pdf
+  folder_path: India/India-IP/ABS/Rules
+  document_id: in-tamil-nadu-biological-diversity-rules-2017
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: 2017
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Act,1983_-_1983-23.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1983-1983-23
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1983
+  amendment_year: 1983
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Act,_1983,_23_of_1983_(Rep.,_Act_19_of_1988).pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1983-23-of-1983-rep-act-19-of
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1983
+  amendment_year: 1988
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Copyright_(Amendment)_Act,_1984,_65_of_1984_(Rep.,_Act_19_of_1988).pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1984-65-of-1984-rep-act-19-of
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1984
+  amendment_year: 1988
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Copyright_(Amendment)_Act,_1984_-_1984-65.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1984-1984-65
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1984
+  amendment_year: 1984
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Act,_1984_-_1984-65_1.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1984-1984-65-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1984
+  amendment_year: 1984
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Act,_1994,_38_of_1994_(Rep.,_Act_30_of_2001).pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1994-38-of-1994-rep-act-30-of
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1994
+  amendment_year: 2001
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Copyright_(Amendment)_Act,_1994_-_1994-38.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1994-1994-38
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1994
+  amendment_year: 1994
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Act,_1999,_49_of_1999_(Rep.,_Act_4_of_2018).pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1999-49-of-1999-rep-act-4-of
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: 2018
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Copyright_(Amendment)_Act,_1999_-_1999-49.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-1999-1999-49
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: 1999
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_(Amendment)_Ordinance,_1991._-_9.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-ordinance-1991-9
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1991
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_Act,_1957.pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-act-1957
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 1957
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_Amendment)_Act_2012,_27_of_2012,_(Rep.,_Act,_04_of_2018).pdf
+  folder_path: India/India-IP/Copyright/ACT's
+  document_id: in-the-copyright-amendment-act-2012-27-of-2012-rep-act-04-of
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: 2018
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Copyright_(Amendment)_Rules,_2016.pdf
+  folder_path: India/India-IP/Copyright/Rules
+  document_id: in-the-copyright-amendment-rules-2016
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - copyright
+  agent_scope:
+  - ip_agent
+  enactment_year: 2016
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Copyright_Rules,_1958.pdf
+  folder_path: India/India-IP/Copyright/Rules
+  document_id: in-the-copyright-rules-1958
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
@@ -386,13 +583,11 @@ documents:
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-copyright-act-1957
+  cross_reference_ids: []
   status: validated
-- source_filename: in085en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Copyright and Related
-    Rights (Neighboring Rights)/
-  document_id: in-copyright-rules-in085en-2013
+- source_filename: The_Copyright_Rules,_2013_-_copyright_2013searchable.pdf
+  folder_path: India/India-IP/Copyright/Rules
+  document_id: in-the-copyright-rules-2013-copyright-2013searchable
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
@@ -401,136 +596,227 @@ documents:
   agent_scope:
   - ip_agent
   enactment_year: 2013
-  amendment_year: null
+  amendment_year: 2013
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-copyright-act-1957
+  cross_reference_ids: []
   status: validated
-- source_filename: in015en_1.pdf
-  folder_path: India/India-IP/Implementing RulesRegulations/Geographical Indications/
-  document_id: in-gi-rules-in015en-2002
+- source_filename: Indian_Patents_and_Designs_(Amendment)_Ordinance,_1968_-_8.pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-indian-patents-and-designs-amendment-ordinance-1968-8
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1968
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Designs_Act,_2000.pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-designs-act-2000
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 2000
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1920,_29_of_1920_(Rep.,_Act_1_of_1938).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1920-29-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1920
+  amendment_year: 1938
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1930,_7_of_1938_(Rep.,_by_Sec_2_and_Sch,_Act_1_of_1938).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1930-7-of-19
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1930
+  amendment_year: 1938
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1939,_12_of_1939_(Rep.,_Act_25_of_1942).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1939-12-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1939
+  amendment_year: 1942
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1950,_32_of_1950_(Rep.,_Act_36_of_1957).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1950-32-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1950
+  amendment_year: 1957
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1968,_44_of_1968_(Rep.,_Act_56_of_1974).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1968-44-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1968
+  amendment_year: 1974
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act_1952,_70_of_1952,_(Rep.,_Act_36_of_1957).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1952-70-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: 1957
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Extension_of_Time)_(Amendment)_Act,_1947,_37_of_1947_(Rep.,_Act_40_of_1949).pdf
+  folder_path: India/India-IP/Designs/ACT's
+  document_id: in-the-indian-patents-and-designs-extension-of-time-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1947
+  amendment_year: 1949
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Design_Rules,_2001.pdf
+  folder_path: India/India-IP/Designs/Rules
+  document_id: in-the-design-rules-2001
   jurisdiction: India
   country_code: IN
   doc_category: implementing_rules
   ip_domain:
-  - geographical_indications
+  - industrial_designs
   agent_scope:
   - ip_agent
-  enactment_year: 2002
+  enactment_year: 2001
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - in-gi-act-1999
+  cross_reference_ids: []
   status: validated
-- source_filename: 2016DrugsandCosmeticsAct1940Rules1945.pdf
-  folder_path: India/Drugs & cosmetic act/
-  document_id: in-drugs-cosmetics-act-rules-2016
+- source_filename: The_Designs(Amendment)_Rules,_2008.pdf
+  folder_path: India/India-IP/Designs/Rules
+  document_id: in-the-designs-amendment-rules-2008
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 2008
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Designs_(Amendment)_Rules,_2014.pdf
+  folder_path: India/India-IP/Designs/Rules
+  document_id: in-the-designs-amendment-rules-2014
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 2014
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Geographical_Indications_of_Goods_(Registration_and_Protection)_Act,_1999.pdf
+  folder_path: India/India-IP/Geographical Indications/ACT's
+  document_id: in-the-geographical-indications-of-goods-registration-and-pr
   jurisdiction: India
   country_code: IN
   doc_category: primary_law
   ip_domain:
-  - drugs_cosmetics
-  - herbal_pharmacopoeia
-  agent_scope:
-  - regulatory_agent
-  - pharma_reference_agent
-  enactment_year: 1940
-  amendment_year: 2016
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The_Drugs_And_Magic_Remedies_Objectionable_Advertisements_Act_1954.PDF
-  folder_path: India/The Drugs And Magic Remedies (Objectionable Advertisements)/
-  document_id: in-drugs-magic-remedies-act-1954
-  jurisdiction: India
-  country_code: IN
-  doc_category: primary_law
-  ip_domain:
-  - drugs_cosmetics
-  - food_regulation
-  agent_scope:
-  - regulatory_agent
-  enactment_year: 1954
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 2
-  cross_reference_ids: []
-  status: validated
-- source_filename: Gazette_Notification_Ayurveda_Aahara_09_05_2022.pdf
-  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
-  document_id: in-fssai-ayurveda-aahara-gazette-2022
-  jurisdiction: India
-  country_code: IN
-  doc_category: regulatory_notification
-  ip_domain:
-  - food_regulation
-  - drugs_cosmetics
-  agent_scope:
-  - regulatory_agent
-  enactment_year: 2022
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: Ayurveda-Aahara-covered-under-the-FSS-Ayurveda-Aahara-Regulations.pdf
-  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
-  document_id: in-fssai-ayurveda-aahara-regulations-2022
-  jurisdiction: India
-  country_code: IN
-  doc_category: regulatory_notification
-  ip_domain:
-  - food_regulation
-  - drugs_cosmetics
-  agent_scope:
-  - regulatory_agent
-  enactment_year: 2022
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - in-fssai-ayurveda-aahara-gazette-2022
-  status: validated
-- source_filename: Introduction-of-new-Kind-of-Business-KoB-for-Ayurveda-Aahara-under-FoSCoS-for-License.pdf
-  folder_path: India/FSSAI Ayurvedic- Adhar Regulations/
-  document_id: in-fssai-foscos-kob-circular-2022
-  jurisdiction: India
-  country_code: IN
-  doc_category: regulatory_notification
-  ip_domain:
-  - food_regulation
-  - drugs_cosmetics
-  agent_scope:
-  - regulatory_agent
-  enactment_year: 2022
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 2
-  cross_reference_ids:
-  - in-fssai-ayurveda-aahara-gazette-2022
-  status: validated
-- source_filename: WHO HERBAL MONOGRAPHS.pdf
-  folder_path: herbs and drugs/
-  document_id: intl-who-herbal-monographs-vol1
-  jurisdiction: International
-  country_code: null
-  doc_category: herbal_pharmacopoeia
-  ip_domain:
-  - herbal_pharmacopoeia
+  - geographical_indications
   - traditional_knowledge
   agent_scope:
-  - pharma_reference_agent
-  - patent_agent
+  - ip_agent
   enactment_year: 1999
   amendment_year: null
   is_current_version: true
@@ -538,57 +824,415 @@ documents:
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: API-Vol-1.pdf
-  folder_path: herbs and drugs/
-  document_id: in-ayurvedic-pharmacopoeia-vol1
+- source_filename: The_Geographical_Indications_of_Goods_(Forms_&_making_an_appeal_and_fees_therefore)_Rules,_2013_-_GI_2013_(1).pdf
+  folder_path: India/India-IP/Geographical Indications/Rules
+  document_id: in-the-geographical-indications-of-goods-forms-making-an-app
   jurisdiction: India
   country_code: IN
-  doc_category: herbal_pharmacopoeia
+  doc_category: implementing_rules
   ip_domain:
-  - herbal_pharmacopoeia
+  - geographical_indications
   - traditional_knowledge
   agent_scope:
-  - pharma_reference_agent
+  - ip_agent
+  enactment_year: 2013
+  amendment_year: 2013
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Geographical_Indications_of_Goods_(registration_and_Protection)_Rules,_2002.pdf
+  folder_path: India/India-IP/Geographical Indications/Rules
+  document_id: in-the-geographical-indications-of-goods-registration-and-pr
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - geographical_indications
+  - traditional_knowledge
+  agent_scope:
+  - ip_agent
+  enactment_year: 2002
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Indian_Patents_and_Designs_(Amendment)_Ordinance,_1968_-_8.pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-indian-patents-and-designs-amendment-ordinance-1968-8
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
   - patent_agent
-  enactment_year: 2001
+  - ip_agent
+  enactment_year: 1968
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: API-II-Vol-1 FORMULATIONS.pdf
-  folder_path: herbs and drugs/
-  document_id: in-ayurvedic-pharmacopoeia-vol2-formulations
+- source_filename: The_Indian_Patents_and_Design_(Amendment)_Act_1953,_55_of_1953,_(Rep.,_Act_36_of_1957).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-design-amendment-act-1953-55-of-19
   jurisdiction: India
   country_code: IN
-  doc_category: herbal_pharmacopoeia
+  doc_category: primary_law
   ip_domain:
-  - herbal_pharmacopoeia
+  - patents
   - traditional_knowledge
   agent_scope:
-  - pharma_reference_agent
   - patent_agent
-  enactment_year: 2007
+  - ip_agent
+  enactment_year: 1953
+  amendment_year: 1957
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1920,_29_of_1920_(Rep.,_Act_1_of_1938).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1920-29-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1920
+  amendment_year: 1938
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1930,_7_of_1938_(Rep.,_by_Sec_2_and_Sch,_Act_1_of_1938).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1930-7-of-19
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1930
+  amendment_year: 1938
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1939,_12_of_1939_(Rep.,_Act_25_of_1942).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1939-12-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1939
+  amendment_year: 1942
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1950,_32_of_1950_(Rep.,_Act_36_of_1957).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1950-32-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1950
+  amendment_year: 1957
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act,_1968,_44_of_1968_(Rep.,_Act_56_of_1974).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1968-44-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1968
+  amendment_year: 1974
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Indian_Patents_and_Designs_(Amendment)_Act_1952,_70_of_1952,_(Rep.,_Act_36_of_1957).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-amendment-act-1952-70-of-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: 1957
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Extension_of_Time)_(Amendment)_Act,_1947,_37_of_1947_(Rep.,_Act_40_of_1949).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-indian-patents-and-designs-extension-of-time-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1947
+  amendment_year: 1949
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Act,_1999,_17_of_1999,_(Rep.,_23_of_2016).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-amendment-act-1999-17-of-1999-rep-23-of-2016
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: 2016
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Patents_(Amendment)_Act,_2002_-_2002-38.pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-amendment-act-2002-2002-38
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2002
+  amendment_year: 2002
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Act,_2005,_15_of_2005,_(Rep.,_Act_23_of_2016).pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-amendment-act-2005-15-of-2005-rep-act-23-of-2
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2005
+  amendment_year: 2016
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: The_Patents_(Amendment)_Ordinance,_1994._-_13.pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-amendment-ordinance-1994-13
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1994
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 1
-  cross_reference_ids:
-  - in-ayurvedic-pharmacopoeia-vol1
+  cross_reference_ids: []
   status: validated
-- source_filename: national essential drug list by AYUSH.pdf
-  folder_path: herbs and drugs/
-  document_id: in-ayush-national-essential-drug-list
+- source_filename: The_Patents_(Amendment)_Ordinance,_1999._-_3.pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-amendment-ordinance-1999-3
   jurisdiction: India
   country_code: IN
-  doc_category: herbal_pharmacopoeia
+  doc_category: primary_law
   ip_domain:
-  - herbal_pharmacopoeia
-  - drugs_cosmetics
+  - patents
+  - traditional_knowledge
   agent_scope:
-  - pharma_reference_agent
-  - regulatory_agent
+  - patent_agent
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_Act,_1970.pdf
+  folder_path: India/India-IP/Patents (Inventions)/ACT's
+  document_id: in-the-patents-act-1970
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1970
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Corrigendum_The_Patents_(Amendment)_Rules,_2019.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-corrigendum-the-patents-amendment-rules-2019
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2019
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Patents_(2nd_Amendment)_Rules,_2020.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-patents-2nd-amendment-rules-2020
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2020
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Patents_Amendment_Rules_2020.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-patents-amendment-rules-2020
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2020
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Indian_Patents_and_Designs_(Temporary_Rules)_Amendment_Act,_1920,_28_of_1920_(Rep.,_Act_12_of_1927).pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-indian-patents-and-designs-temporary-rules-amendment
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 1920
+  amendment_year: 1927
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Rules,_2013.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2013
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
   enactment_year: 2013
   amendment_year: null
   is_current_version: true
@@ -596,34 +1240,224 @@ documents:
   retrieval_priority: 2
   cross_reference_ids: []
   status: validated
-- source_filename: cbd-en.pdf
-  folder_path: International/Convention on Biological Diversity/
-  document_id: intl-cbd-convention-1992
-  jurisdiction: International
-  country_code: null
-  doc_category: international_treaty
+- source_filename: The_Patents_(Amendment)_Rules,_2014.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2014
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
   ip_domain:
-  - biological_diversity
+  - patents
   - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2014
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Rules,_2016.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2016
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2016
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Rules,_2017.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2017
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2017
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_Rules,_2019.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2019
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2019
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_rules,_2006_-_patent2006_searchable.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2006-patent2006-searchable
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2006
+  amendment_year: 2006
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_(Amendment)_rules,_2012.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-amendment-rules-2012
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Patents_Rules,_2003.pdf
+  folder_path: India/India-IP/Patents (Inventions)/Rules
+  document_id: in-the-patents-rules-2003
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  agent_scope:
+  - patent_agent
+  - ip_agent
+  enactment_year: 2003
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Protection_of_Plant_Varieties_and_Farmers_Rights_Act,_2001.pdf
+  folder_path: India/India-IP/Plant Variety Protection/ACT's
+  document_id: in-the-protection-of-plant-varieties-and-farmers-rights-act
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
   agent_scope:
   - biodiversity_agent
   - ip_agent
-  enactment_year: 1992
+  enactment_year: 2001
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: nagoya-protocol-en.pdf
-  folder_path: International/Nagoya Protocol/
-  document_id: intl-nagoya-protocol-2010
-  jurisdiction: International
-  country_code: null
-  doc_category: international_treaty
+- source_filename: Protection_of_Plant_Varieties_and_Farmers'_Rights_(Amendment)_Regulations,_2013.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Regulations
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
   ip_domain:
+  - plant_variety_protection
   - biological_diversity
-  - traditional_knowledge
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2013
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protection_of_Plant_Varieties_and_Farmers_Rights_(Criteria_for_Distinctiveness,_Uniformity_and_Stability_for_Registration)_Regulations._2009_-_ppvfr_regulation_2009_sw.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Regulations
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-criteria
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2009
+  amendment_year: 2009
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protection_of_Plant_Varieties_and_Farmers_Rights_Regulations_2006_-_regulation_2006_s.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Regulations
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-regulati
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2006
+  amendment_year: 2006
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Plant_Varieties_Protection_Appellate_Tribunal_(Applications_and_Appeals)_Rules,_2010.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-plant-varieties-protection-appellate-tribunal-application
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
   agent_scope:
   - biodiversity_agent
   - ip_agent
@@ -631,23 +1465,3401 @@ documents:
   amendment_year: null
   is_current_version: true
   source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - intl-cbd-convention-1992
+  retrieval_priority: 2
+  cross_reference_ids: []
   status: validated
-- source_filename: 31bis_trips_e.pdf
-  folder_path: International/Trips/
-  document_id: intl-trips-article-31bis-2005
+- source_filename: Protection_of_Plant_Varieties_and_Farmers'_Rights_(Amendment)_Rules,_2009.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2009
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protection_of_Plant_Varieties_and_Farmers'_Rights_(Amendment)_Rules,_2012.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protection_of_Plant_Varieties_and_Farmers'_Rights_(Amendment)_Rules,_2012_1.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protection_of_Plant_Varieties_and_Farmers'_Rights_(Use_of_Denomination_of_Registered_Variety)_Rules,_2012.pdf
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-use-of-d
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Varieties_and_Farmers\u2018_Rights_(Third_Amendment)_Rules.2009,.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-third-am
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2009
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Varieties_and_Farmers\u2019_Rights_(Amendment)_Rules,_2008.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2008
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Varieties_and_Farmers\u2019_Rights_(Amendment)_Rules,_2015.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-amendmen
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2015
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Varieties_and_Farmers\u2019_Rights_(Second_Amendment)_Rules,_2012.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-second-a
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2012
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Varieties_and_Farmers\u201D_Rights_(Second_Amendment)_Rules_2009.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-varieties-and-farmers-rights-second-a
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2009
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: "Protection_of_Plant_Vhrieties_and_Farmers\u2019_Rights_Rules,_2003.pdf"
+  folder_path: India/India-IP/Plant Variety Protection/Rules
+  document_id: in-protection-of-plant-vhrieties-and-farmers-rights-rules-20
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - plant_variety_protection
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  - ip_agent
+  enactment_year: 2003
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_(Amendment)_Act,_1941,_27_of_1941_(Rep.,_Act_06_of_1954).pdf
+  folder_path: India/India-IP/Trademarks/ACT's
+  document_id: in-the-trade-marks-amendment-act-1941-27-of-1941-rep-act-06
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 1941
+  amendment_year: 1954
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_Act,_1999.pdf
+  folder_path: India/India-IP/Trademarks/ACT's
+  document_id: in-the-trade-marks-act-1999
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_(Removal_of_Difficulties)_Order,_2004_-_ocr8p-fmlte.pdf
+  folder_path: India/India-IP/Trademarks/Regulations
+  document_id: in-the-trade-marks-removal-of-difficulties-order-2004-ocr8p
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2004
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Intellectual_Property_Appellate_Board_(Procedure)_Rules,_2003.pdf
+  folder_path: India/India-IP/Trademarks/Rules
+  document_id: in-the-intellectual-property-appellate-board-procedure-rules
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2003
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_(Amendment)_Rules,_2013.pdf
+  folder_path: India/India-IP/Trademarks/Rules
+  document_id: in-the-trade-marks-amendment-rules-2013
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2013
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_(Applications_and_appeals_to_the_Intellectual_Property_Appellate_Board)_Rules,_2003.pdf
+  folder_path: India/India-IP/Trademarks/Rules
+  document_id: in-the-trade-marks-applications-and-appeals-to-the-intellect
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2003
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_Rules,_2002.pdf
+  folder_path: India/India-IP/Trademarks/Rules
+  document_id: in-the-trade-marks-rules-2002
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2002
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Trade_Marks_Rules,_2017.pdf
+  folder_path: India/India-IP/Trademarks/Rules
+  document_id: in-the-trade-marks-rules-2017
+  jurisdiction: India
+  country_code: IN
+  doc_category: implementing_rules
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: 2017
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Academy of General Edu., Manipal & Anr. v. B. Malini Mallya.pdf
+  folder_path: India/Judgements
+  document_id: in-academy-of-general-edu-manipal-anr-v-b-malini-mallya
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: B.N. Firos v. State of Kerala & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-b-n-firos-v-state-of-kerala-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Bajaj Auto Limited v. TVS Motor Company Limited.pdf
+  folder_path: India/Judgements
+  document_id: in-bajaj-auto-limited-v-tvs-motor-company-limited
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Biswanath Prasad Radhey Shyam v. Hindustan Metal Industries.pdf
+  folder_path: India/Judgements
+  document_id: in-biswanath-prasad-radhey-shyam-v-hindustan-metal-industrie
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Cipla Ltd. v. Union of India and Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-cipla-ltd-v-union-of-india-and-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Cycle Corporation of India Ltd. v. T.I. Raleigh Industries Pvt.
+    Ltd. and Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-cycle-corporation-of-india-ltd-v-t-i-raleigh-industries-p
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Dabur India Ltd. v. K.R. Industries.pdf
+  folder_path: India/Judgements
+  document_id: in-dabur-india-ltd-v-k-r-industries
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Dhariwal Industries Ltd. & Anr. v. Ms M.S.S. Food Products.pdf
+  folder_path: India/Judgements
+  document_id: in-dhariwal-industries-ltd-anr-v-ms-m-s-s-food-products
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Eastern Book Company & Ors. v. D.B. Modak & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-eastern-book-company-ors-v-d-b-modak-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Exphar SA & Anr. v. Eupharma Laboratories Ltd. & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-exphar-sa-anr-v-eupharma-laboratories-ltd-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Gramophone Company of India Ltd. v. Birendra Bahadur Pandey & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-gramophone-company-of-india-ltd-v-birendra-bahadur-pandey
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Indian Performing Right Society Ltd. v. Eastern India Motion Pictures
+    Association.pdf
+  folder_path: India/Judgements
+  document_id: in-indian-performing-right-society-ltd-v-eastern-india-motio
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Indian Performing Rights Society Ltd. v. Sanjay Dalia & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-indian-performing-rights-society-ltd-v-sanjay-dalia-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Infosys Technologies Ltd. v. Jupiter Infosys Ltd. and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-infosys-technologies-ltd-v-jupiter-infosys-ltd-and-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: International Confederation of Societies of Authors and Composers
+    (CISAC) v. Aditya Pandey & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-international-confederation-of-societies-of-authors-and-c
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: J. Mitra & Co. Pvt. Ltd. v. Asst. Controller of Patents & Desig.
+    & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-j-mitra-co-pvt-ltd-v-asst-controller-of-patents-desig-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Jagatjit Industries Ltd. v. The Intellectual Property Appellate
+    Board & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-jagatjit-industries-ltd-v-the-intellectual-property-appel
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: K Narayanan and Anr. v. S. Murali.pdf
+  folder_path: India/Judgements
+  document_id: in-k-narayanan-and-anr-v-s-murali
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Kabushiki Kaisha Toshiba v. Toshiba Appliances Co. and Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-kabushiki-kaisha-toshiba-v-toshiba-appliances-co-and-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Krishika Lulla & Ors. v. Shyam Vithalrao Devkatta & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-krishika-lulla-ors-v-shyam-vithalrao-devkatta-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Lal Babu Priyadarshi v. Amritpal Singh.pdf
+  folder_path: India/Judgements
+  document_id: in-lal-babu-priyadarshi-v-amritpal-singh
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Laxman Prasad v. Prodigy Electronics Ltd. and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-laxman-prasad-v-prodigy-electronics-ltd-and-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Laxmikant V. Patel v. Chetanbhai Shah and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-laxmikant-v-patel-v-chetanbhai-shah-and-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: MS Knit Pro International v. The State of NCT of Delhi & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-knit-pro-international-v-the-state-of-nct-of-delhi-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Monsanto Company by their Patent Agent, De Penning and De Penning
+    v. Coramandal Indag Products (P) Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-monsanto-company-by-their-patent-agent-de-penning-and-de
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Monsanto Technology LLC thru the Authorised Representative Ms.
+    Natalia Voruz & Ors. v. Nuziveedu Seeds Ltd. thru the Director & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-monsanto-technology-llc-thru-the-authorised-representativ
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ms Entertainment Network (India) Ltd. v. Ms Super Cassette Industries
+    Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-entertainment-network-india-ltd-v-ms-super-cassette-in
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ms Gomzi Active v. Ms Reebok India Co. and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-gomzi-active-v-ms-reebok-india-co-and-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ms. Godrej Sara Lee Limited v. Reckitt Benckiser Australia Pty.
+    Ltd. and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-godrej-sara-lee-limited-v-reckitt-benckiser-australia
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ms. Nandhini Deluxe v. Ms. Karnataka Co-operative Milk Producers
+    Federation Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-nandhini-deluxe-v-ms-karnataka-co-operative-milk-produ
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Ms. Satyam Infoway Ltd. v. Ms. Siffynet Solutions Pvt. Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-ms-satyam-infoway-ltd-v-ms-siffynet-solutions-pvt-ltd
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Neon Laboratories Ltd. v. Medical Technologies Ltd. & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-neon-laboratories-ltd-v-medical-technologies-ltd-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Niranjan Shankar Golikari v. The Century Spinning and Mfg. Co.
+    Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-niranjan-shankar-golikari-v-the-century-spinning-and-mfg
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Novartis AG v. Union of India & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-novartis-ag-v-union-of-india-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Parle Products (P) Ltd. v. J. P. & Co. Mysore.pdf
+  folder_path: India/Judgements
+  document_id: in-parle-products-p-ltd-v-j-p-co-mysore
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Patel Field Marshal Agencies and Anr. v. P.M. Diesels Ltd. and
+    Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-patel-field-marshal-agencies-and-anr-v-p-m-diesels-ltd-an
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Power Control Appliances and Ors. v. Sumeet Machines Pvt. Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-power-control-appliances-and-ors-v-sumeet-machines-pvt-lt
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: R. G. Anand v. Ms. Delux Films & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-r-g-anand-v-ms-delux-films-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Royal Orchid Hotels Ltd. v. Kamat Hotels (India) Ltd. & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-royal-orchid-hotels-ltd-v-kamat-hotels-india-ltd-ors
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: S. D. Containers Indore v. Ms. Mold Tek Packaging Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-s-d-containers-indore-v-ms-mold-tek-packaging-ltd
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Satnam Overseas v. Sant Ram & Co. & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-satnam-overseas-v-sant-ram-co-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Skyline Education Institute (India) Private Ltd. v. S.L. Vaswani
+    and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-skyline-education-institute-india-private-ltd-v-s-l-vaswa
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Star India Private Limited v. Department of Industrial Policy and
+    Promotion & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-star-india-private-limited-v-department-of-industrial-pol
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: State of Andhra Pradesh v. Nagoti Venkataramana.pdf
+  folder_path: India/Judgements
+  document_id: in-state-of-andhra-pradesh-v-nagoti-venkataramana
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Super Cassettes Industries Ltd. v. Music Broadcast Pvt. Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-super-cassettes-industries-ltd-v-music-broadcast-pvt-ltd
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Superintendence Company of India (P) Ltd. v. Krishan Murgai.pdf
+  folder_path: India/Judgements
+  document_id: in-superintendence-company-of-india-p-ltd-v-krishan-murgai
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: T.V. Venugopal v. Ushodaya Enterprises Ltd. & Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-t-v-venugopal-v-ushodaya-enterprises-ltd-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Registrar of Trade Marks v. Ashok Chandra Rakhit Ltd.pdf
+  folder_path: India/Judgements
+  document_id: in-the-registrar-of-trade-marks-v-ashok-chandra-rakhit-ltd
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Toyota Jidosha Kabushiki Kaisha v. Ms Prius Auto Industries Ltd.
+    and Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-toyota-jidosha-kabushiki-kaisha-v-ms-prius-auto-industrie
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Union of India v. Board of Control for Cricket in India & Ors.pdf
+  folder_path: India/Judgements
+  document_id: in-union-of-india-v-board-of-control-for-cricket-in-india-or
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Vishnudas Trading as Vishnudas Kishendas v. The Vazir Sultan Tobacco
+    Co. Ltd., Hyderabad and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-vishnudas-trading-as-vishnudas-kishendas-v-the-vazir-sult
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: Wockhardt Limited v. Torrent Pharmaceuticals Ltd. and Anr.pdf
+  folder_path: India/Judgements
+  document_id: in-wockhardt-limited-v-torrent-pharmaceuticals-ltd-and-anr
+  jurisdiction: India
+  country_code: IN
+  doc_category: case_law
+  ip_domain:
+  - patents
+  - traditional_knowledge
+  - case_law
+  agent_scope:
+  - case_law_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 2
+  cross_reference_ids: []
+  status: validated
+- source_filename: The_Drugs_And_Magic_Remedies_Objectionable_Advertisements_Act_1954.PDF
+  folder_path: India/The Drugs And Magic Remedies (Objectionable Advertisements)
+  document_id: in-the-drugs-and-magic-remedies-objectionable-advertisements
+  jurisdiction: India
+  country_code: IN
+  doc_category: primary_law
+  ip_domain:
+  - drugs_cosmetics
+  - traditional_knowledge
+  agent_scope:
+  - regulatory_agent
+  enactment_year: 1954
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-2-monographs2 (1).pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-2-monographs2-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-2-monographs2.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-2-monographs2
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-ii-part-2-index_contents_preface1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-ii-part-2-index-contents-preface1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-ii-vol-2.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-ii-vol-2
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-part-1-vol-6-monographs.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-part-1-vol-6-monographs
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-part-i-vol-7-metals-minerals.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-part-i-vol-7-metals-minerals
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-part-ii_appendix-1-to-71.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-part-ii-appendix-1-to-71
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-vol-1-monographs1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-vol-1-monographs1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-vol-2-monographs1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-vol-2-monographs1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-vol-3-monographs.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-vol-3-monographs
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-vol-4-monographs.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-vol-4-monographs
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: api-vol-5-monographs.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-api-vol-5-monographs
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-1-5.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-1-5
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-6.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-6
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-7-8.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-7-8
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-8.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-8
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-9-10-11.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-9-10-11
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-9_bibliography.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-9-bibliography
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-vol-1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-vol-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-vol-2-3-4.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-vol-2-3-4
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: appendix-vol-5.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-appendix-vol-5
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: ingredients-of-api-2-2-with-original-api-references.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-ingredients-of-api-2-2-with-original-api-references
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: monographs-api-part-2-vol-2.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/API-Volumes
+  document_id: in-monographs-api-part-2-vol-2
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: slokas-vol-1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: slokas-vol-21.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-21
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: slokas-vol-3.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-3
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: slokas-vol-4-1.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-4-1
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: slokas-vol-4-2.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-4-2
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: slokas-vol-4-3.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-4-3
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: slokas-vol-5.pdf
+  folder_path: India/TKDL-prior-art Pointer/The Ayurvedic Pharmacopoeia of India (
+    API )- All Volumes/Shlokas
+  document_id: in-slokas-vol-5
+  jurisdiction: India
+  country_code: IN
+  doc_category: herbal_pharmacopoeia
+  ip_domain:
+  - herbal_pharmacopoeia
+  - traditional_knowledge
+  agent_scope:
+  - pharma_reference_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: Agreement Establishing the World Trade Organization.pdf
+  folder_path: India/Treaties
+  document_id: in-agreement-establishing-the-world-trade-organization
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Agreement on South Asian Free Trade Area (SAFTA).pdf
+  folder_path: India/Treaties
+  document_id: in-agreement-on-south-asian-free-trade-area-safta
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Agreement on Trade-Related Aspects of Intellectual Property Rights.pdf
+  folder_path: India/Treaties
+  document_id: in-agreement-on-trade-related-aspects-of-intellectual-proper
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Agreement on the Global System of Trade Preferences among Developing
+    Countries (with Annexes and Schedules of Concessions) of 13 April 1988.pdf
+  folder_path: India/Treaties
+  document_id: in-agreement-on-the-global-system-of-trade-preferences-among
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1988
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Amendment to the First Agreement on Trade Negotiations among Developing
+    Member Countries of the Economic and Social Commission for Asia and the Pacific
+    (Bangkok Agreement).pdf
+  folder_path: India/Treaties
+  document_id: in-amendment-to-the-first-agreement-on-trade-negotiations-am
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Berne Convention for the Protection of Literary and Artistic Works.pdf
+  folder_path: India/Treaties
+  document_id: in-berne-convention-for-the-protection-of-literary-and-artis
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Budapest Treaty on the International Recognition of the Deposit
+    of Microorganisms for the Purposes of Patent Procedure (as amended on September
+    26, 1980).pdf
+  folder_path: India/Treaties
+  document_id: in-budapest-treaty-on-the-international-recognition-of-the-d
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1980
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Cartagena Protocol on Biosafety to the Convention on Biological
+    Diversity.pdf
+  folder_path: India/Treaties
+  document_id: in-cartagena-protocol-on-biosafety-to-the-convention-on-biol
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Charter of the South Asian Association for Regional Cooperation.pdf
+  folder_path: India/Treaties
+  document_id: in-charter-of-the-south-asian-association-for-regional-coope
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Comprehensive Economic Cooperation Agreement between the Government
+    of Malaysia and the Government of the Republic of India.pdf
+  folder_path: India/Treaties
+  document_id: in-comprehensive-economic-cooperation-agreement-between-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Comprehensive Economic Cooperation and Partnership Agreement (CECPA)
+    between the Republic of Mauritius and the Republic of India.pdf
+  folder_path: India/Treaties
+  document_id: in-comprehensive-economic-cooperation-and-partnership-agreem
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Comprehensive Economic Partnership Agreement between Japan and
+    the Republic of India.pdf
+  folder_path: India/Treaties
+  document_id: in-comprehensive-economic-partnership-agreement-between-japa
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Comprehensive Economic Partnership Agreement between the Government
+    of the Republic of India and the Government of the UAE.pdf
+  folder_path: India/Treaties
+  document_id: in-comprehensive-economic-partnership-agreement-between-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Comprehensive Economic Partnership Agreement between the Republic
+    of Korea and the Republic of India.pdf
+  folder_path: India/Treaties
+  document_id: in-comprehensive-economic-partnership-agreement-between-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention Establishing the World Intellectual Property Organization.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-establishing-the-world-intellectual-property-o
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention concerning the Protection of the World Cultural and
+    Natural Heritage of 16 November 1972.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-concerning-the-protection-of-the-world-cultura
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1972
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention for the Protection of Cultural Property in the Event
+    of Armed Conflict of 14 May 1954.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-for-the-protection-of-cultural-property-in-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1954
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention for the Protection of Producers of Phonograms Against
+    Unauthorized Duplication of Their Phonograms.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-for-the-protection-of-producers-of-phonograms
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention for the Safeguarding of the Intangible Cultural Heritage.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-for-the-safeguarding-of-the-intangible-cultura
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention on Biological Diversity (with annexes).pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-biological-diversity-with-annexes
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: ingested
+- source_filename: Convention on International Civil Aviation (Ninth Edition 2006).pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-international-civil-aviation-ninth-edition
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 2006
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention on the Means of Prohibiting and Preventing the Illicit
+    Import, Export and Transfer of Ownership of Cultural Property of 14 November 1970.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-the-means-of-prohibiting-and-preventing-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1970
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention on the Protection and Promotion of the Diversity of
+    Cultural Expressions.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-the-protection-and-promotion-of-the-diversi
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention on the Recognition and Enforcement of Foreign Arbitral
+    Awards of 10 June 1958.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-the-recognition-and-enforcement-of-foreign
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1958
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Convention on the Rights of Persons with Disabilities.pdf
+  folder_path: India/Treaties
+  document_id: in-convention-on-the-rights-of-persons-with-disabilities
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: First Agreement on Trade Negotiations among Developing Member Countries
+    of the Economic and Social Commission for Asia and the Pacific (Bangkok Agreement).pdf
+  folder_path: India/Treaties
+  document_id: in-first-agreement-on-trade-negotiations-among-developing-me
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Geneva Convention for the Amelioration of the Condition of Wounded,
+    Sick and Shipwrecked Members of Armed Forces at Sea of August 12, 1949.pdf
+  folder_path: India/Treaties
+  document_id: in-geneva-convention-for-the-amelioration-of-the-condition-o
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1949
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Geneva Convention for the Amelioration of the Condition of the
+    Wounded and Sick in Armed Forces in the Field of August 12, 1949.pdf
+  folder_path: India/Treaties
+  document_id: in-geneva-convention-for-the-amelioration-of-the-condition-o
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1949
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Geneva Convention relative to the Protection of Civilian Persons
+    in Time of War of August 12, 1949.pdf
+  folder_path: India/Treaties
+  document_id: in-geneva-convention-relative-to-the-protection-of-civilian
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1949
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: International Covenant on Economic, Social and Cultural Rights.pdf
+  folder_path: India/Treaties
+  document_id: in-international-covenant-on-economic-social-and-cultural-ri
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: International Plant Protection Convention (1997).pdf
+  folder_path: India/Treaties
+  document_id: in-international-plant-protection-convention-1997
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1997
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: International Treaty on Plant Genetic Resources for Food and Agriculture.pdf
+  folder_path: India/Treaties
+  document_id: in-international-treaty-on-plant-genetic-resources-for-food
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Kyoto Protocol to the United Nations Framework Convention on Climate
+    Change.pdf
+  folder_path: India/Treaties
+  document_id: in-kyoto-protocol-to-the-united-nations-framework-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Locarno Agreement Establishing an International Classification
+    for Industrial Designs (as amended on September 28, 1979).pdf
+  folder_path: India/Treaties
+  document_id: in-locarno-agreement-establishing-an-international-classific
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1979
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Marrakesh Treaty to Facilitate Access to Published Works for Persons
+    Who Are Blind, Visually Impaired, or Otherwise Print Disabled.pdf
+  folder_path: India/Treaties
+  document_id: in-marrakesh-treaty-to-facilitate-access-to-published-works
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Nagoya - Kuala Lumpur Supplementary Protocol on Liability and Redress
+    to the Cartagena Protocol on Biosafety.pdf
+  folder_path: India/Treaties
+  document_id: in-nagoya-kuala-lumpur-supplementary-protocol-on-liability-a
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Nagoya Protocol on Access to Genetic Resources and the Fair and
+    Equitable Sharing of Benefits Arising from their Utilization to the Convention
+    on Biological Diversity.pdf
+  folder_path: India/Treaties
+  document_id: in-nagoya-protocol-on-access-to-genetic-resources-and-the-fa
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Nairobi Treaty on the Protection of the Olympic Symbol.pdf
+  folder_path: India/Treaties
+  document_id: in-nairobi-treaty-on-the-protection-of-the-olympic-symbol
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Nice Agreement Concerning the International Classification of Goods
+    and Services for the Purposes of the Registration of Marks (as amended on September
+    28, 1979).pdf
+  folder_path: India/Treaties
+  document_id: in-nice-agreement-concerning-the-international-classificatio
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1979
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Nice Agreement Concerning the International Classification of Goods
+    and Services for the Purposes of the Registration of Marks.pdf
+  folder_path: India/Treaties
+  document_id: in-nice-agreement-concerning-the-international-classificatio
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Paris Agreement.pdf
+  folder_path: India/Treaties
+  document_id: in-paris-agreement
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Paris Convention for the Protection of Industrial Property.pdf
+  folder_path: India/Treaties
+  document_id: in-paris-convention-for-the-protection-of-industrial-propert
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Patent Cooperation Treaty (PCT) (as modified on October 3, 2001).pdf
+  folder_path: India/Treaties
+  document_id: in-patent-cooperation-treaty-pct-as-modified-on-october-3-20
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 2001
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol 1 annexed to the Universal Copyright Convention as revised
+    at Paris on 24 July 1971 concerning the Application of that Convention to Works
+    of Stateless Persons and Refugees.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-1-annexed-to-the-universal-copyright-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1971
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol 1 annexed to the Universal Copyright Convention concerning
+    the Application of that Convention to the Works of Stateless Persons and Refugees
+    of 6 September 1952.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-1-annexed-to-the-universal-copyright-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol 2 annexed to the Universal Copyright Convention as revised
+    at Paris on 24 July 1971 concerning the Application of that Convention to the
+    Works of certain International Organizations.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-2-annexed-to-the-universal-copyright-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1971
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol 2 annexed to the Universal Copyright Convention concerning
+    the Application of that Convention to the Works of certain International Organizations
+    of 6 September 1952.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-2-annexed-to-the-universal-copyright-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol 3 annexed to the Universal Copyright Convention concerning
+    the Effective Date of instruments of Ratification or Acceptance of or Accession
+    to that Convention of 6 September 1952.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-3-annexed-to-the-universal-copyright-convention
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol Relating to the Madrid Agreement Concerning the International
+    Registration of Marks (as amended on November 12, 2007).pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-relating-to-the-madrid-agreement-concerning-the
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 2007
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol to the Convention for the Protection of Cultural Property
+    in the Event of Armed conflict.pdf
+  folder_path: India/Treaties
+  document_id: in-protocol-to-the-convention-for-the-protection-of-cultural
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Stockholm Convention on Persistent Organic Pollutants.pdf
+  folder_path: India/Treaties
+  document_id: in-stockholm-convention-on-persistent-organic-pollutants
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Strasbourg Agreement Concerning the International Patent Classification
+    (as amended on September 28, 1979).pdf
+  folder_path: India/Treaties
+  document_id: in-strasbourg-agreement-concerning-the-international-patent
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1979
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: United Nations Convention on the Law of the Sea.pdf
+  folder_path: India/Treaties
+  document_id: in-united-nations-convention-on-the-law-of-the-sea
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: United Nations Convention to Combat Desertification in Those Countries
+    Experiencing Serious Drought and or Desertification, Particularly in Africa.pdf
+  folder_path: India/Treaties
+  document_id: in-united-nations-convention-to-combat-desertification-in-th
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: United Nations Framework Convention on Climate Change.pdf
+  folder_path: India/Treaties
+  document_id: in-united-nations-framework-convention-on-climate-change
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Universal Copyright Convention as revised on 24 July 1971 (with
+    Appendix Declaration relating to Article XVII and Resolution concerning Article
+    XI).pdf
+  folder_path: India/Treaties
+  document_id: in-universal-copyright-convention-as-revised-on-24-july-1971
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1971
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Universal Copyright Convention of 6 September 1952.pdf
+  folder_path: India/Treaties
+  document_id: in-universal-copyright-convention-of-6-september-1952
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1952
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Vienna Agreement Establishing an International Classification of
+    the Figurative Elements of Marks.pdf
+  folder_path: India/Treaties
+  document_id: in-vienna-agreement-establishing-an-international-classifica
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Vienna Convention for the Protection of the Ozone Layer of 22 March
+    1985.pdf
+  folder_path: India/Treaties
+  document_id: in-vienna-convention-for-the-protection-of-the-ozone-layer-o
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: 1985
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: WHO Framework Convention on Tobacco Control.pdf
+  folder_path: India/Treaties
+  document_id: in-who-framework-convention-on-tobacco-control
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: WIPO Copyright Treaty (WCT).pdf
+  folder_path: India/Treaties
+  document_id: in-wipo-copyright-treaty-wct
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: WIPO Performances and Phonograms Treaty (WPPT).pdf
+  folder_path: India/Treaties
+  document_id: in-wipo-performances-and-phonograms-treaty-wppt
+  jurisdiction: International
+  country_code: IN
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Budapest Treaty on the International Recognition of the Deposit
+    of Microorganisms for the Purposes of Patent Procedure (as amended on September
+    26, 1980).pdf
+  folder_path: International/Budapest Treaty
+  document_id: intl-budapest-treaty-on-the-international-recognition-of-the
   jurisdiction: International
   country_code: null
   doc_category: international_treaty
   ip_domain:
-  - patents
   - general_ip
   agent_scope:
+  - international_agent
+  enactment_year: 1980
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Regulations under the Budapest Treaty on the International Recognition
+    of the Deposit of Microorganisms for the Purposes of Patent Procedure (as in force
+    from January 1, 2023).pdf
+  folder_path: International/Budapest Treaty
+  document_id: intl-regulations-under-the-budapest-treaty-on-the-internatio
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  enactment_year: 2023
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: cbd-en.pdf
+  folder_path: International/Convention on Biological Diversity
+  document_id: intl-cbd-en
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Administrative Instructions for the Application of the Hague Agreement
+    (as in force on July 17, 2025).pdf
+  folder_path: International/Hague System
+  document_id: intl-administrative-instructions-for-the-application-of-the
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
   - ip_agent
-  - patent_agent
-  enactment_year: 2005
+  enactment_year: 2025
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Agreed Statements by the Diplomatic Conference regarding the Geneva
+    Act and the Regulations under the Geneva Act.pdf
+  folder_path: International/Hague System
+  document_id: intl-agreed-statements-by-the-diplomatic-conference-regardin
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Complementary Act of Stockholm (1967) (as amended on September
+    28, 1979).pdf
+  folder_path: International/Hague System
+  document_id: intl-complementary-act-of-stockholm-1967-as-amended-on-septe
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1967
+  amendment_year: 1979
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Geneva Act (1999).pdf
+  folder_path: International/Hague System
+  document_id: intl-geneva-act-1999
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Protocol to the Hague Act (1960).pdf
+  folder_path: International/Hague System
+  document_id: intl-protocol-to-the-hague-act-1960
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1960
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: Regulations Under the Geneva Act (1999) of the Hague Agreement
+    Concerning the International Registration of Industrial Designs (as in force on
+    July 1, 2026).pdf
+  folder_path: International/Hague System
+  document_id: intl-regulations-under-the-geneva-act-1999-of-the-hague-agre
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1999
+  amendment_year: 2026
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The Hague Act (1960).pdf
+  folder_path: International/Hague System
+  document_id: intl-the-hague-act-1960
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - industrial_designs
+  agent_scope:
+  - ip_agent
+  enactment_year: 1960
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: madrid_marks.pdf
+  folder_path: International/Madrid System
+  document_id: intl-madrid-marks
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: trt_madrid_gp_001en.pdf
+  folder_path: International/Madrid System
+  document_id: intl-trt-madrid-gp-001en
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: trt_madridp_gp_001en.pdf
+  folder_path: International/Madrid System
+  document_id: intl-trt-madridp-gp-001en
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - trademarks
+  agent_scope:
+  - ip_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: nagoya-protocol-en.pdf
+  folder_path: International/Nagoya Protocol
+  document_id: intl-nagoya-protocol-en
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - biological_diversity
+  agent_scope:
+  - biodiversity_agent
+  enactment_year: null
+  amendment_year: null
+  is_current_version: true
+  source_language: en
+  retrieval_priority: 1
+  cross_reference_ids: []
+  status: validated
+- source_filename: The PCT now has 159 Contracting States.pdf
+  folder_path: International/PCT
+  document_id: intl-the-pct-now-has-159-contracting-states
+  jurisdiction: International
+  country_code: null
+  doc_category: international_treaty
+  ip_domain:
+  - general_ip
+  agent_scope:
+  - international_agent
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
@@ -655,149 +4867,88 @@ documents:
   cross_reference_ids: []
   status: validated
 - source_filename: pct.pdf
-  folder_path: International/PCT/
-  document_id: intl-patent-cooperation-treaty-1970
+  folder_path: International/PCT
+  document_id: intl-pct
   jurisdiction: International
   country_code: null
   doc_category: international_treaty
   ip_domain:
-  - patents
+  - general_ip
   agent_scope:
-  - patent_agent
-  - ip_agent
-  enactment_year: 1970
-  amendment_year: 2001
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids: []
-  status: validated
-- source_filename: The PCT now has 159 Contracting States.pdf
-  folder_path: International/PCT/
-  document_id: intl-pct-contracting-states-2024
-  jurisdiction: International
-  country_code: null
-  doc_category: international_treaty
-  ip_domain:
-  - patents
-  agent_scope:
-  - patent_agent
-  enactment_year: 2024
+  - international_agent
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
-  retrieval_priority: 3
-  cross_reference_ids:
-  - intl-patent-cooperation-treaty-1970
+  retrieval_priority: 1
+  cross_reference_ids: []
   status: validated
-- source_filename: madrid_marks.pdf
-  folder_path: International/Madrid System/
-  document_id: intl-madrid-agreement-marks-1891
+- source_filename: 31bis_trips_e.pdf
+  folder_path: International/Trips
+  document_id: intl-31bis-trips-e
   jurisdiction: International
   country_code: null
   doc_category: international_treaty
   ip_domain:
-  - trademarks
+  - general_ip
   agent_scope:
-  - ip_agent
-  enactment_year: 1891
-  amendment_year: 1979
+  - international_agent
+  enactment_year: null
+  amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: trt_madridp_gp_001en.pdf
-  folder_path: International/Madrid System/
-  document_id: intl-madrid-protocol-1989
+- source_filename: CountryListInTreaty.xlsx
+  folder_path: International/Wipo Gratk Treaty
+  document_id: intl-countrylistintreaty
   jurisdiction: International
   country_code: null
-  doc_category: international_treaty
+  doc_category: reference_dataset
   ip_domain:
-  - trademarks
+  - general_ip
   agent_scope:
-  - ip_agent
-  enactment_year: 1989
-  amendment_year: 2006
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 1
-  cross_reference_ids:
-  - intl-madrid-agreement-marks-1891
-  status: validated
-- source_filename: trt_madrid_gp_001en.pdf
-  folder_path: International/Madrid System/
-  document_id: intl-madrid-guide-provisions-2007
-  jurisdiction: International
-  country_code: null
-  doc_category: international_treaty
-  ip_domain:
-  - trademarks
-  agent_scope:
-  - ip_agent
-  enactment_year: 2007
+  - international_agent
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 2
-  cross_reference_ids:
-  - intl-madrid-protocol-1989
+  cross_reference_ids: []
   status: validated
 - source_filename: trt_gratk_001en.pdf
-  folder_path: International/Wipo Gratk Treaty/
-  document_id: intl-wipo-gratk-treaty-2024
+  folder_path: International/Wipo Gratk Treaty
+  document_id: intl-trt-gratk-001en
   jurisdiction: International
   country_code: null
   doc_category: international_treaty
   ip_domain:
-  - traditional_knowledge
-  - patents
-  - biological_diversity
+  - general_ip
   agent_scope:
-  - ip_agent
-  - patent_agent
-  - biodiversity_agent
-  enactment_year: 2024
+  - international_agent
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 1
   cross_reference_ids: []
   status: validated
-- source_filename: profile_IN.xlsx
-  folder_path: India/India-IP/
-  document_id: in-wipo-profile-india-2024
+- source_filename: Research Data.pdf
+  folder_path: Research
+  document_id: in-research-data
   jurisdiction: India
   country_code: IN
-  doc_category: reference_dataset
+  doc_category: secondary_literature
   ip_domain:
-  - general_ip
+  - traditional_knowledge
+  - research_prior_art
   agent_scope:
-  - ip_agent
-  enactment_year: 2024
+  - research_agent
+  enactment_year: null
   amendment_year: null
   is_current_version: true
   source_language: en
   retrieval_priority: 3
   cross_reference_ids: []
-  status: validated
-- source_filename: CountryListInTreaty.xlsx
-  folder_path: International/Wipo Gratk Treaty/
-  document_id: intl-wipo-gratk-signatories-2024
-  jurisdiction: International
-  country_code: null
-  doc_category: reference_dataset
-  ip_domain:
-  - traditional_knowledge
-  - general_ip
-  agent_scope:
-  - ip_agent
-  - biodiversity_agent
-  enactment_year: 2024
-  amendment_year: null
-  is_current_version: true
-  source_language: en
-  retrieval_priority: 3
-  cross_reference_ids:
-  - intl-wipo-gratk-treaty-2024
   status: validated
