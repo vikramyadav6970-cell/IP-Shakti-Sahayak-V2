@@ -8,6 +8,11 @@ ai/DataSet/**
 **/DataSet/
 **/DataSet/**
 DataSet/
+ai/NewDataSet/
+ai/NewDataSet/**
+**/NewDataSet/
+**/NewDataSet/**
+NewDataSet/
 
 # Environment Variables & API Secrets (Always keep .env.example tracked)
 .env
