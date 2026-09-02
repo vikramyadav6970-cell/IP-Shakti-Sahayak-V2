@@ -252,12 +252,18 @@ class HybridRetriever:
         for hit in qualified_hits:
             # Create a normalized content fingerprint (first 120 non-whitespace chars)
             norm_prefix = re.sub(r"\s+", "", hit.content[:120].lower())
+            
+            # Scope section uniqueness to document identity + doc category + section ref + jurisdiction
+            # This ensures cross-Act provisions (e.g. Patents vs TM) and complementary Case Law + Statute pairs coexist freely
+            doc_id = hit.metadata.get("document_id") or hit.doc_title
+            doc_type = hit.document_type
             sec_name = hit.section_ref.strip().lower() if hit.section_ref else None
-            sec_key = (sec_name, hit.jurisdiction) if sec_name else None
+            sec_key = (doc_id, doc_type, sec_name, hit.jurisdiction) if sec_name else None
 
-            # Skip if identical content or duplicate specific statutory section already present
+            # Skip if identical verbatim content already present
             if norm_prefix and norm_prefix in seen_content_prefixes:
                 continue
+            # Skip if same specific section within the same document already present
             if sec_key and sec_key in seen_section_keys:
                 continue
 
