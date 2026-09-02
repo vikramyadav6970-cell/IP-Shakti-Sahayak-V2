@@ -5,6 +5,7 @@ Hybrid retriever orchestrating collection routing, multi-collection query execut
 jurisdiction filtering, and evidence payload ranking.
 """
 
+import re
 import concurrent.futures
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -242,4 +243,31 @@ class HybridRetriever:
         # 6. Apply Minimum Relevance Score Gate (Discard weak/irrelevant noise)
         qualified_hits = [h for h in all_hits if h.score >= MIN_RELEVANCE_SCORE]
         qualified_hits.sort(key=lambda x: x.score, reverse=True)
-        return qualified_hits[:top_k]
+
+        # 7. Deduplicate near-identical statutory content to prevent duplicate crowding
+        deduped_hits: List[RetrievedEvidence] = []
+        seen_section_keys = set()
+        seen_content_prefixes = set()
+
+        for hit in qualified_hits:
+            # Create a normalized content fingerprint (first 120 non-whitespace chars)
+            norm_prefix = re.sub(r"\s+", "", hit.content[:120].lower())
+            sec_name = hit.section_ref.strip().lower() if hit.section_ref else None
+            sec_key = (sec_name, hit.jurisdiction) if sec_name else None
+
+            # Skip if identical content or duplicate specific statutory section already present
+            if norm_prefix and norm_prefix in seen_content_prefixes:
+                continue
+            if sec_key and sec_key in seen_section_keys:
+                continue
+
+            deduped_hits.append(hit)
+            if norm_prefix:
+                seen_content_prefixes.add(norm_prefix)
+            if sec_key:
+                seen_section_keys.add(sec_key)
+
+            if len(deduped_hits) >= top_k:
+                break
+
+        return deduped_hits
