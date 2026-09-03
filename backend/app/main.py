@@ -97,10 +97,12 @@ app = FastAPI(
 # Mount Rate Limiting Middleware
 app.add_middleware(RateLimitMiddleware, max_requests_per_minute=120)
 
-# Configure CORS
+# Configure CORS (Support all Vercel domains, Render domains, local ports, and configured origins)
+cors_origins_list = settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else [settings.CORS_ORIGINS]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=cors_origins_list,
+    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.onrender\.com|http://localhost:\d+|http://127\.0\.0\.1:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

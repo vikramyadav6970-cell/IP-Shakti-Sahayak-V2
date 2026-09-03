@@ -93,6 +93,32 @@ class ChatRequest(BaseModel):
                 raise ValueError("Either 'question' or 'query' field is required.")
             data["question"] = q_val
             data["query"] = q_val
+
+            # Sanitize conversation_id if invalid/empty/mock
+            conv_id = data.get("conversation_id")
+            if conv_id is not None:
+                try:
+                    if isinstance(conv_id, str):
+                        data["conversation_id"] = uuid.UUID(conv_id)
+                except Exception:
+                    data["conversation_id"] = None
+
+            # Sanitize active_classification_id if invalid/empty/mock
+            class_id = data.get("active_classification_id")
+            if class_id is not None:
+                try:
+                    if isinstance(class_id, str):
+                        data["active_classification_id"] = uuid.UUID(class_id)
+                except Exception:
+                    data["active_classification_id"] = None
+
+            # Sanitize active_intent
+            intent_val = data.get("active_intent")
+            if intent_val:
+                try:
+                    data["active_intent"] = DeclaredIntentEnum(intent_val)
+                except Exception:
+                    data["active_intent"] = None
         return data
 
 
