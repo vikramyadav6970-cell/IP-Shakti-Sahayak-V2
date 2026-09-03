@@ -544,11 +544,8 @@ export const ChatPage: React.FC = () => {
                           </span>
                         ))}
 
-                      {/* Escalation Prompt Chip / Action (Only for low-score RAG responses or statutory review flags, never for system/network errors) */}
-                      {!msg.id?.startsWith("err-") &&
-                        (msg.confidence_label === "LOW" ||
-                          (msg.confidence_score !== undefined && msg.confidence_score < 0.6) ||
-                          (msg.requires_human_review && (msg.citations?.length || 0) > 0)) && (
+                      {/* Escalation Prompt Chip / Action - Always accessible to consult accredited IP Facilitator */}
+                      {!msg.id?.startsWith("err-") && (
                         <button
                           type="button"
                           onClick={() => {
@@ -558,16 +555,16 @@ export const ChatPage: React.FC = () => {
                           style={{
                             backgroundColor: "#FEF3C7",
                             color: "#92400E",
-                            fontSize: "10px",
-                            padding: "3px 8px",
-                            borderRadius: "6px",
+                            fontSize: "11px",
+                            padding: "4px 10px",
+                            borderRadius: "7px",
                             border: "1px solid #FCD34D",
                           }}
-                          className="inline-flex items-center gap-1 font-semibold hover:bg-amber-200 transition-colors shadow-2xs"
+                          className="inline-flex items-center gap-1.5 font-semibold hover:bg-amber-200 transition-colors shadow-xs cursor-pointer"
                           title="Escalate to Human IP Facilitator"
                         >
-                          <HelpCircle className="w-2.5 h-2.5" />
-                          <span>Ask Human Expert</span>
+                          <HelpCircle className="w-3 h-3" />
+                          <span>Ask IP Facilitator / Human Expert</span>
                         </button>
                       )}
 
