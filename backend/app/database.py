@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from app.config import settings
 
+from sqlalchemy.pool import NullPool
+
 # Format connection URL for asyncpg if postgresql://
 db_url = settings.DATABASE_URL
 if db_url.startswith("postgresql://"):
@@ -35,14 +37,21 @@ if db_url.startswith("postgresql"):
     if is_cloud_db and "sslmode" not in db_url and "ssl=" not in db_url:
         connect_args["ssl"] = "require"
 
-    engine_kwargs.update({
-        "pool_size": 10,
-        "max_overflow": 20,
-        "pool_recycle": 180,
-        "pool_timeout": 60,
-        "pool_pre_ping": True,
-        "connect_args": connect_args,
-    })
+    if is_cloud_db:
+        # For Supabase / PgBouncer Transaction Poolers, use NullPool to eliminate DuplicatePreparedStatementError
+        engine_kwargs.update({
+            "poolclass": NullPool,
+            "connect_args": connect_args,
+        })
+    else:
+        engine_kwargs.update({
+            "pool_size": 10,
+            "max_overflow": 20,
+            "pool_recycle": 180,
+            "pool_timeout": 60,
+            "pool_pre_ping": True,
+            "connect_args": connect_args,
+        })
 
 engine = create_async_engine(db_url, **engine_kwargs)
 
