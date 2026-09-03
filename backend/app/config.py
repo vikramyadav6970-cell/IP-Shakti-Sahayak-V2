@@ -5,7 +5,7 @@ Pydantic-Settings configuration for IP-SAKTI Sahayak backend.
 Reads configuration from environment variables and .env file.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Union
 import os
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="development", description="development | staging | production")
     DEBUG: bool = True
     PORT: int = 8000
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: Union[str, List[str]] = [
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
@@ -97,11 +97,14 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(cls, v):
         if isinstance(v, str):
-            import json
-            try:
-                return json.loads(v)
-            except Exception:
-                return [i.strip() for i in v.split(",") if i.strip()]
+            v_clean = v.strip()
+            if v_clean.startswith("[") and v_clean.endswith("]"):
+                import json
+                try:
+                    return json.loads(v_clean)
+                except Exception:
+                    pass
+            return [i.strip() for i in v_clean.split(",") if i.strip()]
         return v
 
 
