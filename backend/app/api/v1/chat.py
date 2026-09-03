@@ -21,7 +21,7 @@ from app.schemas.chat import (
     FeedbackRead,
     VoiceChatResponse,
 )
-from app.security.dependencies import get_current_user
+from app.security.dependencies import get_current_user, get_optional_current_user
 from app.services.chat_service import ChatService
 from app.services.voice_service import voice_service
 
@@ -36,7 +36,7 @@ router = APIRouter(prefix="/chat", tags=["Chat & Consultation"])
 )
 async def chat(
     req: ChatRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -63,7 +63,7 @@ async def voice_chat(
     active_product_context: Optional[str] = Form(None),
     speaker: Optional[str] = Form(None),
     pace: float = Form(1.0),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """

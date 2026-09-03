@@ -84,6 +84,46 @@ async def get_current_user(
     return user
 
 
+async def get_optional_current_user(
+    auth: Optional[HTTPAuthorizationCredentials] = Depends(http_bearer),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """
+    Resolves the authenticated User if a valid JWT token is provided.
+    If no token is provided, returns a persistent Guest User so that
+    anonymous visitors and evaluators can test the AI consultation seamlessly.
+    """
+    if auth and auth.credentials:
+        try:
+            payload = decode_token(auth.credentials)
+            if payload.get("type") == "access" and payload.get("sub"):
+                user_repo = UserRepository(db)
+                user = await user_repo.get_by_id(uuid.UUID(payload["sub"]))
+                if user and user.is_active:
+                    return user
+        except Exception:
+            pass
+
+    # Ensure a Guest user account exists for unauthenticated consultation
+    user_repo = UserRepository(db)
+    guest_email = "guest@ipsakti.gov.in"
+    guest_user = await user_repo.get_by_email(guest_email)
+    if not guest_user:
+        guest_user = User(
+            id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
+            email=guest_email,
+            name="Guest Innovator",
+            role=RoleEnum.USER,
+            hashed_password="guest_no_direct_login_allowed",
+            is_active=True,
+        )
+        try:
+            await user_repo.create(guest_user)
+        except Exception:
+            guest_user = await user_repo.get_by_email(guest_email) or guest_user
+    return guest_user
+
+
 def require_roles(*allowed_roles: RoleEnum) -> Callable:
     """
     Factory creating a dependency that gates endpoints to specific RBAC roles.
