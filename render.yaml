@@ -5,7 +5,7 @@ services:
   - type: web
     name: ip-sakti-backend
     env: docker
-    plan: standard # Minimum 2GB RAM recommended for BAAI/bge-m3 dense model & PyTorch
+    plan: free # Runs smoothly within Render's free 512MB RAM tier using HuggingFace Serverless Embeddings
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
@@ -18,7 +18,9 @@ services:
       - key: PORT
         value: "8000"
       - key: EMBEDDING_PROVIDER
-        value: bge-m3
+        value: remote
+      - key: HF_TOKEN
+        sync: false # Set your free Hugging Face token in Render Dashboard
       - key: DATABASE_URL
         sync: false # Set in Render Dashboard (e.g. postgresql+asyncpg://...)
       - key: QDRANT_URL

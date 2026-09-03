@@ -120,35 +120,50 @@ class RemoteEmbeddingProvider(EmbeddingProvider):
         if not texts:
             return []
         import httpx
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "x-wait-for-model": "true",
+            "x-use-cache": "true",
+        }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
 
-        payload = {"inputs": texts} if "huggingface" in self.endpoint_url else {"texts": texts}
-        try:
-            with httpx.Client(timeout=30.0) as client:
-                res = client.post(self.endpoint_url, headers=headers, json=payload)
-                if res.status_code == 200:
-                    data = res.json()
-                    # Handle both HF feature extraction format and custom API format
-                    if isinstance(data, dict) and "embeddings" in data:
-                        return data["embeddings"]
-                    if isinstance(data, list):
-                        # If list of vectors
-                        if len(data) > 0 and isinstance(data[0], list):
-                            # If 3D token-level [batch, seq, dim], mean pool to 2D
-                            if len(data[0]) > 0 and isinstance(data[0][0], list):
-                                pooled = []
-                                for token_seq in data:
-                                    dim = len(token_seq[0])
-                                    mean_vec = [sum(token[i] for token in token_seq) / len(token_seq) for i in range(dim)]
-                                    # Normalize
-                                    norm = math.sqrt(sum(x * x for x in mean_vec)) or 1.0
-                                    pooled.append([x / norm for x in mean_vec])
-                                return pooled
-                            return data
-        except Exception as e:
-            print(f"[Remote Embedding Notice]: {e}")
+        payload = {"inputs": texts, "options": {"wait_for_model": True, "use_cache": True}} if "huggingface" in self.endpoint_url else {"texts": texts}
+
+        for attempt in range(3):
+            try:
+                with httpx.Client(timeout=45.0) as client:
+                    res = client.post(self.endpoint_url, headers=headers, json=payload)
+                    if res.status_code == 200:
+                        data = res.json()
+                        # Handle both HF feature extraction format and custom API format
+                        if isinstance(data, dict) and "embeddings" in data:
+                            return data["embeddings"]
+                        if isinstance(data, list):
+                            # If list of vectors
+                            if len(data) > 0 and isinstance(data[0], list):
+                                # If 3D token-level [batch, seq, dim], mean pool to 2D
+                                if len(data[0]) > 0 and isinstance(data[0][0], list):
+                                    pooled = []
+                                    for token_seq in data:
+                                        dim = len(token_seq[0])
+                                        mean_vec = [sum(token[i] for token in token_seq) / len(token_seq) for i in range(dim)]
+                                        # Normalize
+                                        norm = math.sqrt(sum(x * x for x in mean_vec)) or 1.0
+                                        pooled.append([x / norm for x in mean_vec])
+                                    return pooled
+                                return data
+                    elif res.status_code == 503:
+                        # Model is warming up on HF serverless infrastructure
+                        import time
+                        time.sleep(2.0)
+                        continue
+                    else:
+                        print(f"[Remote Embedding Notice]: HTTP {res.status_code} - {res.text[:150]}")
+            except Exception as e:
+                print(f"[Remote Embedding Notice]: {e}")
+                import time
+                time.sleep(1.0)
         return [[0.0] * self.dimension for _ in texts]
 
 
