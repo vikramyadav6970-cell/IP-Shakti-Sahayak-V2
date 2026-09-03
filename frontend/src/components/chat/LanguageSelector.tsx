@@ -11,7 +11,7 @@ export interface LanguageOption {
 }
 
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-  { code: "auto", name: "Auto Detect", nativeName: "स्वतः पहचान", flag: "🌐" },
+  { code: "auto", name: "स्वतः पहचान", nativeName: "Auto Detect", flag: "🌐" },
   { code: "hi-IN", name: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳" },
   { code: "bn-IN", name: "Bengali", nativeName: "বাংলা", flag: "🇮🇳" },
   { code: "gu-IN", name: "Gujarati", nativeName: "ગુજરાતી", flag: "🇮🇳" },

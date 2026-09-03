@@ -16,7 +16,6 @@ import {
   Trash2,
   Languages,
   BookOpen,
-  Layers,
   Sparkles,
 } from "lucide-react";
 import { useJurisdiction } from "@/store/useJurisdictionStore";
@@ -43,7 +42,7 @@ export const ChatPage: React.FC = () => {
   const [input, setInput] = useState(initialQuery);
   const [escalateModalOpen, setEscalateModalOpen] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined);
-  const [showClassifierDrawer, setShowClassifierDrawer] = useState(false);
+  const [showClassifier, setShowClassifier] = useState(true);
   const [feedbackMap, setFeedbackMap] = useState<Record<string, number>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -131,7 +130,7 @@ export const ChatPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-[calc(100vh-8rem)] p-2 sm:p-4 rounded-2xl glass-page-bg transition-all"
+      className="h-full w-full p-2 sm:p-3 rounded-2xl glass-page-bg transition-all flex flex-col overflow-hidden min-h-0"
       style={{
         background: `
           radial-gradient(circle at 15% 15%, var(--bg-blob-1, #D7F5E5) 0%, transparent 45%),
@@ -141,21 +140,90 @@ export const ChatPage: React.FC = () => {
       }}
     >
       {/* Workspace: Collapsible Sidebar + Main Chat Panel */}
-      <div className="flex flex-col lg:flex-row gap-4 items-stretch max-w-7xl mx-auto h-[780px]">
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full flex-1 min-h-0 overflow-hidden">
         {/* =========================================================================
-            1. Collapsible Left Sidebar (Conversation History)
+            1. Collapsible Left Sidebar (30% Classifier Diagnostic + 70% History)
             ========================================================================= */}
         <aside
-          aria-label="Conversation History"
-          className={`shrink-0 flex flex-col justify-between transition-all duration-200 ease-in-out rounded-2xl p-2.5 ${
-            isSidebarCollapsed ? "w-full lg:w-14" : "w-full lg:w-48"
-          } glass-panel-card`}
+          aria-label="Sidebar Workspace"
+          className={`shrink-0 flex flex-col justify-between transition-all duration-200 ease-in-out rounded-2xl glass-panel-card h-full min-h-0 overflow-hidden ${
+            isSidebarCollapsed ? "w-12 p-2 items-center" : "w-full lg:w-64 xl:w-72 p-2.5"
+          }`}
         >
-          <div className="space-y-3 flex-1 flex flex-col overflow-hidden">
-            {/* Sidebar Header */}
-            <div className="flex items-center justify-between px-1.5 pt-1">
-              {!isSidebarCollapsed ? (
-                <>
+          {isSidebarCollapsed ? (
+            /* Collapsed Rail (Icon-only, clean without list or scrollbars) */
+            <div className="w-full flex flex-col items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setIsSidebarCollapsed(false)}
+                className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
+                style={{ color: "var(--accent-600, #059669)" }}
+                title="Expand Sidebar"
+              >
+                <PanelLeftOpen className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={startNewConsultation}
+                className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
+                style={{ color: "var(--accent-600, #059669)" }}
+                title="New Consultation"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            /* Expanded 30-70 Split Sidebar */
+            <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full gap-2">
+              {/* --- Upper Part: Product Classifier Diagnostic (Non-scrollable, fits naturally, shifts history dynamically) --- */}
+              {showClassifier ? (
+                <div className="shrink-0 flex flex-col pb-1">
+                  <div className="flex items-center justify-between px-1 pb-1 shrink-0">
+                    <span className="text-[11px] font-bold text-[#047857] flex items-center gap-1 uppercase tracking-tight">
+                      <Sparkles className="w-3 h-3 text-[#059669]" />
+                      Classifier
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowClassifier(false)}
+                      className="text-[10px] text-[#5C6B62] hover:text-[#047857] font-medium px-1.5 py-0.5 rounded hover:bg-white/80 transition-colors"
+                      title="Hide Classifier"
+                    >
+                      Hide
+                    </button>
+                  </div>
+                  <div className="w-full">
+                    <ProductClassificationPanel
+                      activeClassification={activeClassification}
+                      productContext={productContext}
+                      classificationState={classificationState}
+                      onStartDiagnostic={handleStartDiagnostic}
+                      onResetClassification={handleResetClassification}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between px-1 py-1 shrink-0 bg-white/50 rounded-lg border border-slate-200/50">
+                  <span className="text-[11px] font-semibold text-[#5C6B62] flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-[#059669]" />
+                    Classifier
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowClassifier(true)}
+                    className="text-[10px] text-[#047857] hover:underline font-semibold px-1.5 py-0.5 rounded hover:bg-white/80"
+                  >
+                    Show
+                  </button>
+                </div>
+              )}
+
+              {/* Subtle Divider */}
+              {showClassifier && <div className="border-t border-slate-200/60 my-0.5 shrink-0" />}
+
+              {/* --- Lower Part (~70% height): Conversation History --- */}
+              <div className="flex-1 flex flex-col min-h-0 overflow-hidden pt-0.5">
+                <div className="flex items-center justify-between px-1 pb-1.5 shrink-0">
                   <span
                     className="text-[12px] font-semibold tracking-tight uppercase"
                     style={{ color: "var(--text-secondary, #5C6B62)" }}
@@ -182,64 +250,29 @@ export const ChatPage: React.FC = () => {
                       <PanelLeftClose className="w-4 h-4" />
                     </button>
                   </div>
-                </>
-              ) : (
-                <div className="w-full flex flex-col items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsSidebarCollapsed(false)}
-                    className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
-                    style={{ color: "var(--accent-600, #059669)" }}
-                    title="Expand History Sidebar"
-                  >
-                    <PanelLeftOpen className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={startNewConsultation}
-                    className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
-                    style={{ color: "var(--accent-600, #059669)" }}
-                    title="New Consultation"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
                 </div>
-              )}
-            </div>
 
-            {/* Conversation List */}
-            <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar">
-              {conversations.length === 0 ? (
-                !isSidebarCollapsed && (
-                  <p
-                    className="text-[11px] px-2 py-4 text-center italic"
-                    style={{ color: "var(--text-muted, #8B978F)" }}
-                  >
-                    No prior sessions
-                  </p>
-                )
-              ) : (
-                conversations.map((conv) => {
-                  const isActive = conv.id === activeConversationId;
-                  return (
-                    <div
-                      key={conv.id}
-                      onClick={() => loadConversation(conv.id)}
-                      className={`group cursor-pointer transition-all ${
-                        isSidebarCollapsed
-                          ? "p-2 rounded-xl flex items-center justify-center"
-                          : "p-2 rounded-xl flex items-center justify-between gap-1.5"
-                      } ${isActive ? "glass-history-item-active" : "glass-history-item-inactive"}`}
-                      title={conv.title || conv.product_name || "Consultation"}
+                {/* Conversation List */}
+                <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar min-h-0">
+                  {conversations.length === 0 ? (
+                    <p
+                      className="text-[11px] px-2 py-4 text-center italic"
+                      style={{ color: "var(--text-muted, #8B978F)" }}
                     >
-                      {isSidebarCollapsed ? (
-                        <MessageSquare
-                          className={`w-4 h-4 ${
-                            isActive ? "text-[#047857]" : "text-[#5C6B62]"
+                      No prior sessions
+                    </p>
+                  ) : (
+                    conversations.map((conv) => {
+                      const isActive = conv.id === activeConversationId;
+                      return (
+                        <div
+                          key={conv.id}
+                          onClick={() => loadConversation(conv.id)}
+                          className={`group cursor-pointer transition-all p-2 rounded-xl flex items-center justify-between gap-1.5 ${
+                            isActive ? "glass-history-item-active" : "glass-history-item-inactive"
                           }`}
-                        />
-                      ) : (
-                        <>
+                          title={conv.title || conv.product_name || "Consultation"}
+                        >
                           <div className="flex items-center gap-2 truncate">
                             <MessageSquare
                               className={`w-3.5 h-3.5 shrink-0 ${
@@ -258,25 +291,13 @@ export const ChatPage: React.FC = () => {
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
-                        </>
-                      )}
-                    </div>
-                  );
-                })
-              )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-
-          {/* Classifier Drawer Trigger (Bottom of Sidebar) */}
-          {!isSidebarCollapsed && (
-            <button
-              type="button"
-              onClick={() => setShowClassifierDrawer(!showClassifierDrawer)}
-              className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-semibold bg-white/70 hover:bg-white border border-emerald-600/20 text-[#047857] shadow-2xs transition-all"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>{showClassifierDrawer ? "Hide Classifier" : "Show Classifier"}</span>
-            </button>
           )}
         </aside>
 
@@ -284,7 +305,7 @@ export const ChatPage: React.FC = () => {
             2. Main Chat Panel (Glass Card)
             ========================================================================= */}
         <main
-          className="flex-1 flex flex-col justify-between p-3 sm:p-5 glass-panel-card relative overflow-hidden"
+          className="flex-1 flex flex-col justify-between p-3 sm:p-4 glass-panel-card relative overflow-hidden h-full min-h-0"
           style={{
             background: "var(--glass-medium, rgba(255, 255, 255, 0.65))",
             backdropFilter: "blur(var(--blur-card, 16px))",
@@ -494,7 +515,7 @@ export const ChatPage: React.FC = () => {
                         />
                       )}
 
-                      {/* Citation Chips */}
+                      {/* Verified Statutory Citations (Fully Expanded by default, no hidden text) */}
                       {msg.citations &&
                         msg.citations.map((c, idx) => (
                           <span
@@ -503,22 +524,31 @@ export const ChatPage: React.FC = () => {
                               backgroundColor: "var(--chip-citation-bg, #ECFDF5)",
                               color: "var(--chip-citation-text, #047857)",
                               fontSize: "10px",
-                              padding: "3px 8px",
+                              padding: "4px 9px",
                               borderRadius: "6px",
-                              border: "1px solid rgba(16, 185, 129, 0.2)",
+                              border: "1px solid rgba(16, 185, 129, 0.25)",
                             }}
-                            className="inline-flex items-center gap-1 font-medium shadow-2xs"
-                            title={`${c.document_title} - ${c.section_ref}`}
+                            className="inline-flex items-start gap-1.5 font-medium shadow-2xs break-words max-w-full text-left leading-snug"
+                            title={`${c.document_title} - ${c.section_ref} (${c.jurisdiction || "Statutory Authority"})`}
                           >
-                            <BookOpen className="w-2.5 h-2.5" />
-                            <span>
-                              {c.document_title?.replace(".pdf", "")?.slice(0, 24)}, {c.section_ref}
+                            <BookOpen className="w-3 h-3 shrink-0 text-emerald-600 mt-0.5" />
+                            <span className="break-words">
+                              <span className="font-bold">{c.document_title?.replace(".pdf", "")}</span>
+                              <span className="text-[#059669] font-mono font-medium"> — {c.section_ref}</span>
+                              {c.jurisdiction && (
+                                <span className="ml-1 text-[9px] uppercase px-1 py-0.2 rounded bg-emerald-100/60 font-semibold">
+                                  {c.jurisdiction}
+                                </span>
+                              )}
                             </span>
                           </span>
                         ))}
 
-                      {/* Escalation Prompt Chip / Action */}
-                      {(msg.requires_human_review || msg.confidence_label === "LOW") && (
+                      {/* Escalation Prompt Chip / Action (Only for low-score RAG responses or statutory review flags, never for system/network errors) */}
+                      {!msg.id?.startsWith("err-") &&
+                        (msg.confidence_label === "LOW" ||
+                          (msg.confidence_score !== undefined && msg.confidence_score < 0.6) ||
+                          (msg.requires_human_review && (msg.citations?.length || 0) > 0)) && (
                         <button
                           type="button"
                           onClick={() => {
@@ -691,43 +721,34 @@ export const ChatPage: React.FC = () => {
               Statutory Notice: IP-SAKTI Sahayak provides verified legal/regulatory information, not legal advice. Official filings require review by a registered patent agent or legal counsel.
             </p>
           </div>
-
-          {/* Optional Slide-out Product Classifier Drawer */}
-          {showClassifierDrawer && (
-            <div className="absolute top-14 right-4 bottom-20 w-80 z-30 shadow-2xl rounded-2xl overflow-hidden glass-panel-card border border-emerald-500/20 bg-white/95 animate-in slide-in-from-right-4 duration-200">
-              <div className="p-3 border-b flex items-center justify-between bg-emerald-50/50">
-                <span className="text-xs font-bold text-[#047857] flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Product Diagnostic Panel
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowClassifierDrawer(false)}
-                  className="text-xs text-slate-400 hover:text-slate-700"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="p-3 h-[calc(100%-48px)] overflow-y-auto">
-                <ProductClassificationPanel
-                  activeClassification={activeClassification}
-                  productContext={productContext}
-                  classificationState={classificationState}
-                  onStartDiagnostic={handleStartDiagnostic}
-                  onResetClassification={handleResetClassification}
-                />
-              </div>
-            </div>
-          )}
         </main>
       </div>
 
-      {/* Human Facilitator Escalation Modal */}
-      <ExpertEscalationModal
-        isOpen={escalateModalOpen}
-        onClose={() => setEscalateModalOpen(false)}
-        messageId={selectedMessageId}
-      />
+      {/* Human Facilitator Escalation Modal with Autofilled Context */}
+      {(() => {
+        const targetAssistantMsg = selectedMessageId
+          ? messages.find((m) => m.id === selectedMessageId)
+          : messages.filter((m) => m.role === "assistant").slice(-1)[0];
+        const targetAssistantIdx = targetAssistantMsg ? messages.indexOf(targetAssistantMsg) : -1;
+        const targetUserMsg =
+          targetAssistantIdx > 0
+            ? messages[targetAssistantIdx - 1]
+            : messages.filter((m) => m.role === "user").slice(-1)[0];
+
+        return (
+          <ExpertEscalationModal
+            isOpen={escalateModalOpen}
+            onClose={() => setEscalateModalOpen(false)}
+            messageId={targetAssistantMsg?.id}
+            userQuery={targetUserMsg?.content}
+            assistantResponse={targetAssistantMsg?.content}
+            confidenceScore={targetAssistantMsg?.confidence_score}
+            confidenceLabel={targetAssistantMsg?.confidence_label}
+            productContext={productContext}
+            activeClassification={activeClassification}
+          />
+        );
+      })()}
     </div>
   );
 };

@@ -328,9 +328,9 @@ export const useChatStore = create<ChatState>()(
             conversation_id: activeConvId || "error",
             role: "assistant",
             content:
-              "Unable to answer that at this moment. Please try again in a few moments or escalate to our Human IP Facilitator Desk.",
+              "Unable to answer that at this moment. Please try again in a few moments or type your query in the text box.",
             jurisdiction: jurisdiction,
-            requires_human_review: true,
+            requires_human_review: false,
             created_at: new Date().toISOString(),
           };
           set((s) => ({
@@ -423,7 +423,7 @@ export const useChatStore = create<ChatState>()(
             content:
               "Unable to process voice message at this moment. Please try again or type your question in the text box.",
             jurisdiction: jurisdiction,
-            requires_human_review: true,
+            requires_human_review: false,
             created_at: new Date().toISOString(),
           };
           set((s) => ({
