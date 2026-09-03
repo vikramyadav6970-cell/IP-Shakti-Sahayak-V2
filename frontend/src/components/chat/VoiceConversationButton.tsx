@@ -17,7 +17,6 @@ import {
   Headphones,
   Square,
   Loader2,
-  Radio,
   Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -337,15 +336,20 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
         size="icon"
         onClick={handleButtonClick}
         disabled={disabled || (voiceState === "processing" && isSending)}
-        className={`h-11 w-11 rounded-xl transition-all relative shrink-0 ${
+        className={`h-10 w-10 rounded-full transition-all relative shrink-0 shadow-sm ${
           voiceState === "listening"
-            ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-500/25 ring-2 ring-rose-500 animate-pulse"
+            ? "bg-emerald-50/90 border border-[#059669] text-[#059669] ring-4 ring-[#10B981]/30 animate-pulse"
             : voiceState === "processing"
-            ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 hover:bg-amber-500/25 ring-2 ring-amber-500"
+            ? "bg-emerald-50/90 border border-[#059669] text-[#059669]"
             : voiceState === "speaking"
-            ? "bg-emerald-600 text-white hover:bg-emerald-700 shadow-md ring-2 ring-emerald-400"
-            : "text-slate-500 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+            ? "bg-emerald-50/90 border border-[#059669] text-[#059669] shadow-md"
+            : "bg-emerald-50/90 hover:bg-emerald-100/90 border border-[#059669] text-[#059669]"
         } ${className}`}
+        style={{
+          background: "rgba(236, 253, 245, 0.9)",
+          borderColor: "var(--accent-600, #059669)",
+          color: "var(--accent-600, #059669)",
+        }}
         title={
           voiceState === "listening"
             ? "Listening... Tap to stop recording."
@@ -356,22 +360,22 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
             : "Hands-Free Voice Conversation Mode"
         }
       >
-        {voiceState === "idle" && <Headphones className="w-5 h-5" />}
+        {voiceState === "idle" && <Headphones className="w-4 h-4 text-[#059669]" />}
 
         {voiceState === "listening" && (
           <div className="relative flex items-center justify-center">
-            <Radio className="w-5 h-5 text-rose-600 dark:text-rose-400 animate-ping absolute" />
-            <Square className="w-4 h-4 fill-rose-600 text-rose-600" />
+            <span className="absolute w-7 h-7 rounded-full bg-[#10B981]/30 animate-ping" />
+            <Square className="w-3.5 h-3.5 fill-[#059669] text-[#059669]" />
           </div>
         )}
 
-        {voiceState === "processing" && <Loader2 className="w-5 h-5 animate-spin" />}
+        {voiceState === "processing" && <Loader2 className="w-4 h-4 animate-spin text-[#059669]" />}
 
         {voiceState === "speaking" && (
           <div className="flex items-center justify-center gap-0.5">
-            <span className="w-1 h-3 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <span className="w-1 h-5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <span className="w-1 h-3 bg-white rounded-full animate-bounce" />
+            <span className="w-0.5 h-2.5 bg-[#059669] rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <span className="w-0.5 h-4 bg-[#059669] rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <span className="w-0.5 h-2.5 bg-[#059669] rounded-full animate-bounce" />
           </div>
         )}
       </Button>

@@ -2,31 +2,30 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import {
-  Sparkles,
   Send,
   Loader2,
   Scale,
   HelpCircle,
-  Layers,
   CheckCircle2,
   ThumbsUp,
   ThumbsDown,
-  Package,
   Plus,
+  PanelLeftClose,
+  PanelLeftOpen,
+  MessageSquare,
+  Trash2,
   Languages,
+  BookOpen,
+  Layers,
+  Sparkles,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { useJurisdiction } from "@/store/useJurisdictionStore";
-import { useChatStore } from "@/store/useChatStore";
+import { useChatStore, ChatMessage } from "@/store/useChatStore";
 import { chatService } from "@/services/chatService";
-import { CitationCard } from "@/components/chat/CitationCard";
 import { ConfidenceBadge } from "@/components/chat/ConfidenceBadge";
 import { JurisdictionOutGuardrail } from "@/components/chat/JurisdictionOutGuardrail";
 import { ExpertEscalationModal } from "@/components/chat/ExpertEscalationModal";
 import { ProductClassificationPanel } from "@/components/chat/ProductClassificationPanel";
-import { ProductHistorySidebar } from "@/components/chat/ProductHistorySidebar";
 import { LanguageSelector } from "@/components/chat/LanguageSelector";
 import { VoiceInputButton } from "@/components/chat/VoiceInputButton";
 import { VoiceConversationButton } from "@/components/chat/VoiceConversationButton";
@@ -44,11 +43,11 @@ export const ChatPage: React.FC = () => {
   const [input, setInput] = useState(initialQuery);
   const [escalateModalOpen, setEscalateModalOpen] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [showClassifierDrawer, setShowClassifierDrawer] = useState(false);
   const [feedbackMap, setFeedbackMap] = useState<Record<string, number>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { primary, active } = useJurisdiction();
+  const { primary, setPrimary, active } = useJurisdiction();
 
   // Zustand Store
   const {
@@ -57,12 +56,16 @@ export const ChatPage: React.FC = () => {
     activeClassification,
     classificationState,
     conversations,
+    activeConversationId,
     isSending,
     selectedLanguage,
+    isSidebarCollapsed,
     sendMessage,
     startNewConsultation,
-    toggleHistory,
+    loadConversation,
+    deleteConversation,
     fetchConversations,
+    setIsSidebarCollapsed,
     setActiveClassification,
     setProductContext,
     setClassificationState,
@@ -80,7 +83,7 @@ export const ChatPage: React.FC = () => {
     fetchConversations();
   }, [fetchConversations]);
 
-  // If initial query provided via URL param, execute automatically if messages empty/new
+  // Execute initial query if provided via URL params
   useEffect(() => {
     if (initialQuery && messages.length === 1 && isWelcomeMessage(messages[0].content)) {
       handleSendMessage(initialQuery);
@@ -119,332 +122,605 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const handleDeleteConversation = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (window.confirm("Delete this consultation session?")) {
+      await deleteConversation(id);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-emerald-600" />
-            IP & Regulatory AI Consultation
-          </h1>
-          <p className="text-xs text-slate-500">
-            Active Jurisdiction: <strong className="text-emerald-700 dark:text-emerald-400">{active}</strong>
-            {classificationState === "CLASSIFIED" && (activeClassification || productContext?.category) && (
-              <span className="ml-2 inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-                <CheckCircle2 className="w-3 h-3" />
-                Classified: {activeClassification?.category_name || productContext?.category}
-              </span>
-            )}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Language Selector (Powered by Sarvam AI) */}
-          <LanguageSelector />
-
-          {/* Product History Drawer Trigger */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => toggleHistory(true)}
-            className="text-xs gap-1.5 h-8 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 font-semibold"
-          >
-            <Package className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Product History ({conversations.length})</span>
-          </Button>
-
-          {/* New Product Consultation */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={startNewConsultation}
-            className="text-xs gap-1.5 h-8 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 font-semibold"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>New Product</span>
-          </Button>
-
-          {/* Toggle Classifier Panel */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="text-xs gap-1.5 h-8 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
-          >
-            <Layers className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{isSidebarOpen ? "Hide Classifier" : "Show Classifier"}</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Main 2-Column Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        {/* Left Column: Product Classifier Card & 6 Categories */}
-        {isSidebarOpen && (
-          <aside className="lg:col-span-4 h-[640px] overflow-hidden">
-            <ProductClassificationPanel
-              activeClassification={activeClassification}
-              productContext={productContext}
-              classificationState={classificationState}
-              onStartDiagnostic={handleStartDiagnostic}
-              onResetClassification={handleResetClassification}
-            />
-          </aside>
-        )}
-
-        {/* Right Column: Chat Consultation Interface */}
-        <section className={`${isSidebarOpen ? "lg:col-span-8" : "lg:col-span-12"} transition-all`}>
-          <Card className="h-[640px] flex flex-col justify-between p-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur shadow-sm">
-            {/* Messages List */}
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  {msg.role === "assistant" && (
-                    <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
-                      <Scale className="w-4 h-4" />
-                    </div>
-                  )}
-
-                  <div className={`space-y-2 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                    {/* Message Bubble */}
-                    <div
-                      className={`p-3.5 rounded-2xl text-sm leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-emerald-700 text-white rounded-br-sm"
-                          : "bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 rounded-bl-sm border border-slate-200/80 dark:border-slate-700/60"
-                      }`}
-                    >
-                      {msg.role === "user" ? (
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      ) : (
-                        <div className="space-y-2 text-slate-800 dark:text-slate-100">
-                          <ReactMarkdown
-                            components={{
-                              h1: ({ node, ...props }) => <h1 className="text-base font-bold text-emerald-800 dark:text-emerald-300 mt-2 mb-1" {...props} />,
-                              h2: ({ node, ...props }) => <h2 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 mt-2 mb-1" {...props} />,
-                              h3: ({ node, ...props }) => <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 mt-2 mb-1" {...props} />,
-                              h4: ({ node, ...props }) => <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1.5 mb-0.5" {...props} />,
-                              p: ({ node, ...props }) => <p className="mb-2 leading-relaxed text-sm last:mb-0" {...props} />,
-                              strong: ({ node, ...props }) => <strong className="font-semibold text-slate-900 dark:text-slate-50" {...props} />,
-                              ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-2 space-y-1 text-sm text-slate-700 dark:text-slate-200" {...props} />,
-                              ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-2 space-y-1 text-sm text-slate-700 dark:text-slate-200" {...props} />,
-                              li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
-                              hr: ({ node, ...props }) => <hr className="my-2.5 border-slate-300 dark:border-slate-700" {...props} />,
-                              blockquote: ({ node, ...props }) => (
-                                <blockquote className="pl-3 border-l-2 border-emerald-500 italic text-slate-600 dark:text-slate-400 my-2" {...props} />
-                              ),
-                            }}
-                          >
-                            {msg.content}
-                          </ReactMarkdown>
-                        </div>
-                      )}
-
-                      {/* If this turn classified a product, render a highlight badge inside the message */}
-                      {msg.product_classification && (
-                        <div className="mt-3 p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                          <div>
-                            <span className="font-bold text-emerald-950 dark:text-emerald-100">Statutory Categorization: </span>
-                            <span>{msg.product_classification.category_name} ({msg.product_classification.regulatory_pathway})</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Out of Scope Guardrail */}
-                      {msg.out_of_scope_detected && msg.jurisdiction && (
-                        <JurisdictionOutGuardrail
-                          detectedJurisdiction={msg.jurisdiction}
-                          query={messages[messages.indexOf(msg) - 1]?.content || ""}
-                          onSwitchAndRetry={() => {
-                            const lastUser = messages[messages.indexOf(msg) - 1]?.content;
-                            if (lastUser) handleSendMessage(lastUser);
-                          }}
-                        />
-                      )}
-                    </div>
-
-                    {/* Assistant Citations & Grounding Header — ONLY when based on RAG citations */}
-                    {msg.role === "assistant" && !msg.out_of_scope_detected && !isWelcomeMessage(msg.content) && (
-                      <div className="space-y-2 pt-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {/* Grounding Confidence Badge ONLY when RAG data retrieval citations exist */}
-                          {msg.citations && msg.citations.length > 0 && (
-                            <ConfidenceBadge
-                              score={msg.confidence_score}
-                              label={msg.confidence_label}
-                              requiresReview={msg.requires_human_review}
-                            />
-                          )}
-
-                          {/* Sarvam AI Translation Badge */}
-                          {msg.is_translated && (
-                            <Badge variant="outline" className="text-[10px] gap-1 px-2 py-0.5 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/40 font-medium">
-                              <Languages className="w-2.5 h-2.5" />
-                              Sarvam AI Translated
-                            </Badge>
-                          )}
-
-                          {/* Thumbs up / down feedback */}
-                          <div className="flex items-center gap-1 ml-auto">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedMessageId(msg.id);
-                                setEscalateModalOpen(true);
-                              }}
-                              className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 mr-2"
-                              title="Escalate to Human IP Facilitator"
-                            >
-                              <HelpCircle className="w-3.5 h-3.5" />
-                              <span className="hidden sm:inline">Ask Human Expert</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleFeedback(msg.id, 5)}
-                              aria-label="Helpful"
-                              className={`p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                                feedbackMap[msg.id] === 5 ? "text-emerald-600 font-bold" : "text-slate-400"
-                              }`}
-                            >
-                              <ThumbsUp className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleFeedback(msg.id, 1)}
-                              aria-label="Unhelpful"
-                              className={`p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                                feedbackMap[msg.id] === 1 ? "text-rose-600 font-bold" : "text-slate-400"
-                              }`}
-                            >
-                              <ThumbsDown className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Citations Grid ONLY when RAG data retrieval citations exist */}
-                        {msg.citations && msg.citations.length > 0 && (
-                          <div className="space-y-1.5 pt-1">
-                            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
-                              Statutory Citations ({msg.citations.length})
-                            </span>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {msg.citations.map((c, idx) => (
-                                <CitationCard key={c.id || idx} citation={c} />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {/* Sample Starters Hint (Only visible right at the beginning) */}
-              {messages.length === 1 && (
-                <div className="pt-2">
-                  <span className="text-[11px] text-slate-500 font-medium block mb-1.5">
-                    {getSampleQueriesHeading(selectedLanguage)}
+    <div
+      className="min-h-[calc(100vh-8rem)] p-2 sm:p-4 rounded-2xl glass-page-bg transition-all"
+      style={{
+        background: `
+          radial-gradient(circle at 15% 15%, var(--bg-blob-1, #D7F5E5) 0%, transparent 45%),
+          radial-gradient(circle at 85% 85%, var(--bg-blob-2, #DCF0E0) 0%, transparent 45%),
+          var(--bg-page, #F3F8F5)
+        `,
+      }}
+    >
+      {/* Workspace: Collapsible Sidebar + Main Chat Panel */}
+      <div className="flex flex-col lg:flex-row gap-4 items-stretch max-w-7xl mx-auto h-[780px]">
+        {/* =========================================================================
+            1. Collapsible Left Sidebar (Conversation History)
+            ========================================================================= */}
+        <aside
+          aria-label="Conversation History"
+          className={`shrink-0 flex flex-col justify-between transition-all duration-200 ease-in-out rounded-2xl p-2.5 ${
+            isSidebarCollapsed ? "w-full lg:w-14" : "w-full lg:w-48"
+          } glass-panel-card`}
+        >
+          <div className="space-y-3 flex-1 flex flex-col overflow-hidden">
+            {/* Sidebar Header */}
+            <div className="flex items-center justify-between px-1.5 pt-1">
+              {!isSidebarCollapsed ? (
+                <>
+                  <span
+                    className="text-[12px] font-semibold tracking-tight uppercase"
+                    style={{ color: "var(--text-secondary, #5C6B62)" }}
+                  >
+                    History
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {getSampleQueries(selectedLanguage).map((sq, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => handleSendMessage(sq)}
-                        className="p-2.5 text-left text-xs rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:border-emerald-500/40 transition-colors text-slate-700 dark:text-slate-300"
-                      >
-                        "{sq}"
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={startNewConsultation}
+                      className="p-1 rounded-lg hover:bg-white/80 transition-colors"
+                      style={{ color: "var(--accent-600, #059669)" }}
+                      title="Start New Consultation"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsSidebarCollapsed(true)}
+                      className="p-1 rounded-lg hover:bg-white/80 transition-colors"
+                      style={{ color: "var(--text-muted, #8B978F)" }}
+                      title="Collapse Sidebar"
+                    >
+                      <PanelLeftClose className="w-4 h-4" />
+                    </button>
                   </div>
+                </>
+              ) : (
+                <div className="w-full flex flex-col items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsSidebarCollapsed(false)}
+                    className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
+                    style={{ color: "var(--accent-600, #059669)" }}
+                    title="Expand History Sidebar"
+                  >
+                    <PanelLeftOpen className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={startNewConsultation}
+                    className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
+                    style={{ color: "var(--accent-600, #059669)" }}
+                    title="New Consultation"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
                 </div>
               )}
-
-              {/* Multilingual Loading Indicator */}
-              {isSending && (
-                <div className="flex gap-3 justify-start items-center">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-700 text-white flex items-center justify-center shrink-0">
-                    <Scale className="w-4 h-4" />
-                  </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-xs flex flex-col gap-1 text-slate-500">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                      <span className="font-medium text-slate-700 dark:text-slate-200">
-                        {selectedLanguage !== "en-IN" && selectedLanguage !== "en"
-                          ? "Processing multilingual formulation query..."
-                          : "Analyzing formulation & evaluating patentability..."}
-                      </span>
-                    </div>
-                    {selectedLanguage !== "en-IN" && selectedLanguage !== "en" && (
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 pl-6">
-                        <Languages className="w-3 h-3" />
-                        Sarvam AI Translation & Statutory RAG pipeline active
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Bar */}
+            {/* Conversation List */}
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar">
+              {conversations.length === 0 ? (
+                !isSidebarCollapsed && (
+                  <p
+                    className="text-[11px] px-2 py-4 text-center italic"
+                    style={{ color: "var(--text-muted, #8B978F)" }}
+                  >
+                    No prior sessions
+                  </p>
+                )
+              ) : (
+                conversations.map((conv) => {
+                  const isActive = conv.id === activeConversationId;
+                  return (
+                    <div
+                      key={conv.id}
+                      onClick={() => loadConversation(conv.id)}
+                      className={`group cursor-pointer transition-all ${
+                        isSidebarCollapsed
+                          ? "p-2 rounded-xl flex items-center justify-center"
+                          : "p-2 rounded-xl flex items-center justify-between gap-1.5"
+                      } ${isActive ? "glass-history-item-active" : "glass-history-item-inactive"}`}
+                      title={conv.title || conv.product_name || "Consultation"}
+                    >
+                      {isSidebarCollapsed ? (
+                        <MessageSquare
+                          className={`w-4 h-4 ${
+                            isActive ? "text-[#047857]" : "text-[#5C6B62]"
+                          }`}
+                        />
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-2 truncate">
+                            <MessageSquare
+                              className={`w-3.5 h-3.5 shrink-0 ${
+                                isActive ? "text-[#047857]" : "text-[#8B978F]"
+                              }`}
+                            />
+                            <span className="text-xs truncate font-medium">
+                              {conv.product_name || conv.title || "Session"}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteConversation(e, conv.id)}
+                            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-rose-600 transition-opacity"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Classifier Drawer Trigger (Bottom of Sidebar) */}
+          {!isSidebarCollapsed && (
+            <button
+              type="button"
+              onClick={() => setShowClassifierDrawer(!showClassifierDrawer)}
+              className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-semibold bg-white/70 hover:bg-white border border-emerald-600/20 text-[#047857] shadow-2xs transition-all"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{showClassifierDrawer ? "Hide Classifier" : "Show Classifier"}</span>
+            </button>
+          )}
+        </aside>
+
+        {/* =========================================================================
+            2. Main Chat Panel (Glass Card)
+            ========================================================================= */}
+        <main
+          className="flex-1 flex flex-col justify-between p-3 sm:p-5 glass-panel-card relative overflow-hidden"
+          style={{
+            background: "var(--glass-medium, rgba(255, 255, 255, 0.65))",
+            backdropFilter: "blur(var(--blur-card, 16px))",
+            WebkitBackdropFilter: "blur(var(--blur-card, 16px))",
+            border: "0.5px solid var(--glass-border, rgba(255, 255, 255, 0.85))",
+            borderRadius: "var(--radius-card, 16px)",
+            boxShadow: "var(--shadow-card, 0 12px 32px rgba(16, 60, 40, 0.10))",
+          }}
+        >
+          {/* Top Bar inside the Panel */}
+          <header className="flex items-center justify-between gap-3 pb-3 border-b border-white/60">
+            {/* Left: App Title & Diagnostic Status */}
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white shadow-sm"
+                style={{ background: "var(--accent-gradient)" }}
+              >
+                <Scale className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <h2
+                  className="text-sm font-medium tracking-tight"
+                  style={{ color: "var(--text-primary, #152018)" }}
+                >
+                  IP-SAKTI Sahayak
+                </h2>
+                {classificationState === "CLASSIFIED" && (activeClassification || productContext?.category) && (
+                  <span className="text-[10px] font-semibold text-[#047857] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {activeClassification?.category_name || productContext?.category}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Right: Jurisdiction Toggle Pill & Language Selector */}
+            <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <LanguageSelector />
+
+              {/* Jurisdiction Toggle Pill */}
+              <div
+                role="group"
+                aria-label="Jurisdiction Selector"
+                className="flex items-center p-0.5 rounded-full border shadow-2xs"
+                style={{
+                  background: "rgba(241, 247, 243, 0.8)",
+                  borderRadius: "var(--radius-pill, 20px)",
+                  borderColor: "rgba(220, 240, 224, 0.8)",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setPrimary("INDIA")}
+                  className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                    primary === "INDIA"
+                      ? "text-white font-semibold shadow-xs"
+                      : "text-[#5C6B62] hover:text-[#152018]"
+                  }`}
+                  style={
+                    primary === "INDIA"
+                      ? {
+                          background: "var(--accent-gradient)",
+                          boxShadow: "0 3px 8px rgba(5,150,105,0.35)",
+                        }
+                      : {}
+                  }
+                >
+                  India
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrimary("INTERNATIONAL")}
+                  className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                    primary === "INTERNATIONAL"
+                      ? "text-white font-semibold shadow-xs"
+                      : "text-[#5C6B62] hover:text-[#152018]"
+                  }`}
+                  style={
+                    primary === "INTERNATIONAL"
+                      ? {
+                          background: "var(--accent-gradient)",
+                          boxShadow: "0 3px 8px rgba(5,150,105,0.35)",
+                        }
+                      : {}
+                  }
+                >
+                  International
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Messages Feed */}
+          <div className="flex-1 overflow-y-auto space-y-4 py-4 pr-1">
+            {messages.map((msg: ChatMessage) => (
+              <div
+                key={msg.id}
+                className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {/* Assistant Avatar Indicator */}
+                {msg.role === "assistant" && (
+                  <div
+                    className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white shrink-0 shadow-xs mt-1"
+                    style={{ background: "var(--accent-gradient)" }}
+                  >
+                    <Scale className="w-3.5 h-3.5" />
+                  </div>
+                )}
+
+                <div
+                  className={`space-y-1.5 max-w-[80%] ${
+                    msg.role === "user" ? "items-end" : "items-start"
+                  }`}
+                >
+                  {/* Message Bubble */}
+                  <div
+                    className={`p-3.5 ${
+                      msg.role === "user"
+                        ? "glass-user-bubble ml-auto"
+                        : "glass-assistant-bubble"
+                    }`}
+                  >
+                    {msg.role === "user" ? (
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    ) : (
+                      <div className="space-y-2 text-[#152018]">
+                        <ReactMarkdown
+                          components={{
+                            h1: ({ node, ...props }) => (
+                              <h1 className="text-sm font-bold text-[#047857] mt-2 mb-1" {...props} />
+                            ),
+                            h2: ({ node, ...props }) => (
+                              <h2 className="text-sm font-bold text-[#047857] mt-2 mb-1" {...props} />
+                            ),
+                            h3: ({ node, ...props }) => (
+                              <h3 className="text-xs font-bold text-[#059669] mt-1.5 mb-1" {...props} />
+                            ),
+                            h4: ({ node, ...props }) => (
+                              <h4 className="text-xs font-semibold text-[#152018] mt-1 mb-0.5" {...props} />
+                            ),
+                            p: ({ node, ...props }) => (
+                              <p className="mb-1.5 leading-relaxed text-[13px] last:mb-0" {...props} />
+                            ),
+                            strong: ({ node, ...props }) => (
+                              <strong className="font-semibold text-[#152018]" {...props} />
+                            ),
+                            ul: ({ node, ...props }) => (
+                              <ul className="list-disc pl-4 mb-2 space-y-1 text-xs text-[#152018]" {...props} />
+                            ),
+                            ol: ({ node, ...props }) => (
+                              <ol className="list-decimal pl-4 mb-2 space-y-1 text-xs text-[#152018]" {...props} />
+                            ),
+                            li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                            hr: ({ node, ...props }) => (
+                              <hr className="my-2 border-slate-200" {...props} />
+                            ),
+                            blockquote: ({ node, ...props }) => (
+                              <blockquote
+                                className="pl-3 border-l-2 border-[#10B981] italic text-[#5C6B62] my-2 text-xs"
+                                {...props}
+                              />
+                            ),
+                          }}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+
+                    {/* Classified Product Callout */}
+                    {msg.product_classification && (
+                      <div className="mt-2.5 p-2 rounded-lg bg-[#ECFDF5] border border-[#10B981]/30 text-xs text-[#047857] flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0" />
+                        <div>
+                          <span className="font-bold">Statutory Categorization: </span>
+                          <span>
+                            {msg.product_classification.category_name} (
+                            {msg.product_classification.regulatory_pathway})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Out of Scope Guardrail */}
+                    {msg.out_of_scope_detected && msg.jurisdiction && (
+                      <JurisdictionOutGuardrail
+                        detectedJurisdiction={msg.jurisdiction}
+                        query={messages[messages.indexOf(msg) - 1]?.content || ""}
+                        onSwitchAndRetry={() => {
+                          const lastUser = messages[messages.indexOf(msg) - 1]?.content;
+                          if (lastUser) handleSendMessage(lastUser);
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  {/* Assistant Citation & Confidence Chip Row */}
+                  {msg.role === "assistant" && !msg.out_of_scope_detected && !isWelcomeMessage(msg.content) && (
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5 pl-1">
+                      {/* Confidence Chip */}
+                      {msg.citations && msg.citations.length > 0 && (
+                        <ConfidenceBadge
+                          score={msg.confidence_score}
+                          label={msg.confidence_label}
+                          requiresReview={msg.requires_human_review}
+                        />
+                      )}
+
+                      {/* Citation Chips */}
+                      {msg.citations &&
+                        msg.citations.map((c, idx) => (
+                          <span
+                            key={c.id || idx}
+                            style={{
+                              backgroundColor: "var(--chip-citation-bg, #ECFDF5)",
+                              color: "var(--chip-citation-text, #047857)",
+                              fontSize: "10px",
+                              padding: "3px 8px",
+                              borderRadius: "6px",
+                              border: "1px solid rgba(16, 185, 129, 0.2)",
+                            }}
+                            className="inline-flex items-center gap-1 font-medium shadow-2xs"
+                            title={`${c.document_title} - ${c.section_ref}`}
+                          >
+                            <BookOpen className="w-2.5 h-2.5" />
+                            <span>
+                              {c.document_title?.replace(".pdf", "")?.slice(0, 24)}, {c.section_ref}
+                            </span>
+                          </span>
+                        ))}
+
+                      {/* Escalation Prompt Chip / Action */}
+                      {(msg.requires_human_review || msg.confidence_label === "LOW") && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedMessageId(msg.id);
+                            setEscalateModalOpen(true);
+                          }}
+                          style={{
+                            backgroundColor: "#FEF3C7",
+                            color: "#92400E",
+                            fontSize: "10px",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            border: "1px solid #FCD34D",
+                          }}
+                          className="inline-flex items-center gap-1 font-semibold hover:bg-amber-200 transition-colors shadow-2xs"
+                          title="Escalate to Human IP Facilitator"
+                        >
+                          <HelpCircle className="w-2.5 h-2.5" />
+                          <span>Ask Human Expert</span>
+                        </button>
+                      )}
+
+                      {/* Translation Badge */}
+                      {msg.is_translated && (
+                        <span className="text-[10px] text-[#059669] flex items-center gap-0.5 font-medium ml-1">
+                          <Languages className="w-2.5 h-2.5" />
+                          Sarvam AI
+                        </span>
+                      )}
+
+                      {/* Thumbs Feedback */}
+                      <div className="flex items-center gap-1 ml-auto">
+                        <button
+                          type="button"
+                          onClick={() => handleFeedback(msg.id, 5)}
+                          aria-label="Helpful"
+                          className={`p-0.5 rounded hover:bg-white/80 ${
+                            feedbackMap[msg.id] === 5 ? "text-[#059669] font-bold" : "text-[#8B978F]"
+                          }`}
+                        >
+                          <ThumbsUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleFeedback(msg.id, 1)}
+                          aria-label="Unhelpful"
+                          className={`p-0.5 rounded hover:bg-white/80 ${
+                            feedbackMap[msg.id] === 1 ? "text-rose-600 font-bold" : "text-[#8B978F]"
+                          }`}
+                        >
+                          <ThumbsDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Sample Starters (Initial conversation only) */}
+            {messages.length === 1 && (
+              <div className="pt-2">
+                <span
+                  className="text-[11px] font-medium block mb-1.5"
+                  style={{ color: "var(--text-secondary, #5C6B62)" }}
+                >
+                  {getSampleQueriesHeading(selectedLanguage)}
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {getSampleQueries(selectedLanguage).map((sq, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSendMessage(sq)}
+                      className="p-2.5 text-left text-xs rounded-xl glass-history-item-inactive hover:bg-white transition-all text-[#152018]"
+                    >
+                      "{sq}"
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Loading Indicator */}
+            {isSending && (
+              <div className="flex gap-2.5 justify-start items-center">
+                <div
+                  className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white shrink-0 shadow-xs"
+                  style={{ background: "var(--accent-gradient)" }}
+                >
+                  <Scale className="w-3.5 h-3.5" />
+                </div>
+                <div className="p-3 rounded-2xl glass-assistant-bubble text-xs flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#059669]" />
+                  <span className="font-medium text-[#5C6B62]">
+                    Analyzing statutory grounding and evaluating compliance...
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* =========================================================================
+              3. Input Bar & Voice Controls (Pill Container)
+              ========================================================================= */}
+          <div className="space-y-2 pt-2">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage(input);
               }}
-              className="flex items-center gap-2 pt-3 border-t border-slate-200 dark:border-slate-800"
+              className="flex items-center gap-1.5 px-3 py-1.5 glass-input-bar"
             >
+              {/* Text Input */}
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
                   classificationState === "CLASSIFIED"
-                    ? `Ask about patentability (§3(p)), ABS, or licensing for your classified product...`
-                    : classificationState === "COLLECTING_PRODUCT_INFORMATION"
-                    ? "Provide additional formulation or ingredient details..."
-                    : "Describe your product name, ingredients, and formulation method..."
+                    ? "Ask about patentability (§3(p)), ABS, or licensing for your classified product..."
+                    : "Describe your product formulation, herbal ingredients, or IPR query..."
                 }
                 disabled={isSending}
-                className="flex-1 h-11 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 dark:text-white"
+                style={{
+                  color: "var(--text-primary, #152018)",
+                }}
+                className="flex-1 bg-transparent border-0 text-sm placeholder:text-[#8B978F] focus:outline-none focus:ring-0 px-2"
               />
 
-              {/* Voice Speech-to-Text Input Button (Dictation Only) */}
+              {/* Dictation Mic Button */}
               <VoiceInputButton
                 onTranscript={(transcript) => setInput(transcript)}
                 disabled={isSending}
               />
 
-              {/* Hands-Free Voice Conversation Mode Button (STT -> RAG -> TTS) */}
+              {/* Full Hands-Free Voice Mode Button (4 States) */}
               <VoiceConversationButton
                 jurisdiction={active}
                 intent={initialIntent || undefined}
                 disabled={isSending}
               />
 
-              <Button
+              {/* Send Button */}
+              <button
                 type="submit"
                 disabled={!input.trim() || isSending}
-                className="h-11 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm shrink-0"
+                style={{
+                  background: "var(--accent-gradient, linear-gradient(135deg, #10B981, #059669))",
+                  boxShadow: "0 4px 12px rgba(5, 150, 105, 0.4)",
+                }}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100"
+                title="Send query"
               >
-                {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </Button>
+                {isSending ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <Send className="w-3.5 h-3.5 text-white" />
+                )}
+              </button>
             </form>
-          </Card>
-        </section>
-      </div>
 
-      {/* Slide-over Product Formulation History Sidebar */}
-      <ProductHistorySidebar />
+            {/* 4. Disclaimer Footer */}
+            <p
+              className="text-[10px] text-center tracking-tight"
+              style={{ color: "var(--text-muted, #8B978F)" }}
+            >
+              Statutory Notice: IP-SAKTI Sahayak provides verified legal/regulatory information, not legal advice. Official filings require review by a registered patent agent or legal counsel.
+            </p>
+          </div>
+
+          {/* Optional Slide-out Product Classifier Drawer */}
+          {showClassifierDrawer && (
+            <div className="absolute top-14 right-4 bottom-20 w-80 z-30 shadow-2xl rounded-2xl overflow-hidden glass-panel-card border border-emerald-500/20 bg-white/95 animate-in slide-in-from-right-4 duration-200">
+              <div className="p-3 border-b flex items-center justify-between bg-emerald-50/50">
+                <span className="text-xs font-bold text-[#047857] flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Product Diagnostic Panel
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowClassifierDrawer(false)}
+                  className="text-xs text-slate-400 hover:text-slate-700"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-3 h-[calc(100%-48px)] overflow-y-auto">
+                <ProductClassificationPanel
+                  activeClassification={activeClassification}
+                  productContext={productContext}
+                  classificationState={classificationState}
+                  onStartDiagnostic={handleStartDiagnostic}
+                  onResetClassification={handleResetClassification}
+                />
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* Human Facilitator Escalation Modal */}
       <ExpertEscalationModal

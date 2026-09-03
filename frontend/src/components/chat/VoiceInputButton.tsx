@@ -184,26 +184,26 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
     <div className="relative inline-flex items-center">
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         size="icon"
         onClick={toggleListening}
         disabled={disabled}
         title={
           isListening
             ? "Listening... Click to stop recording"
-            : `Voice Input (${selectedLanguage === "auto" ? "Auto / Hindi" : selectedLanguage})`
+            : `Voice Dictation (${selectedLanguage === "auto" ? "Auto / Hindi" : selectedLanguage})`
         }
-        className={`h-11 w-11 rounded-xl transition-all relative ${
+        className={`h-10 w-10 rounded-full transition-all relative ${
           isListening
-            ? "bg-rose-600 hover:bg-rose-700 text-white border-rose-500 shadow-md shadow-rose-600/30 animate-pulse ring-4 ring-rose-500/20"
-            : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30"
+            ? "bg-rose-500 text-white shadow-md shadow-rose-500/30 animate-pulse ring-4 ring-rose-500/20"
+            : "text-[#5C6B62] hover:text-[#047857] hover:bg-emerald-500/10"
         } ${className}`}
       >
         {isListening ? (
           <div className="flex items-center justify-center">
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+            <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
             </span>
             <Mic className="w-4 h-4 text-white animate-bounce" />
           </div>

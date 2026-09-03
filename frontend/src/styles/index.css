@@ -35,6 +35,58 @@
     --ring: 168 80% 23%;
 
     --radius: 0.5rem;
+
+    /* ==========================================================================
+       IP-SAKTI Sahayak Light-Mode Glassmorphism Design Tokens
+       ========================================================================== */
+    /* Accent — emerald green */
+    --accent-500: #10B981;
+    --accent-600: #059669;
+    --accent-700: #047857;
+    --accent-gradient: linear-gradient(135deg, #10B981, #059669);
+
+    /* Backgrounds */
+    --bg-page: #F3F8F5;
+    --bg-blob-1: #D7F5E5;   /* soft blurred backdrop accent, top-left */
+    --bg-blob-2: #DCF0E0;   /* soft blurred backdrop accent, bottom-right */
+
+    /* Glass surfaces */
+    --glass-strong: rgba(255, 255, 255, 0.85);   /* assistant message bubbles */
+    --glass-medium: rgba(255, 255, 255, 0.65);   /* sidebar active item, input bar */
+    --glass-light: rgba(255, 255, 255, 0.50);    /* sidebar inactive items */
+    --glass-border: rgba(255, 255, 255, 0.85);
+
+    /* Text */
+    --text-primary: #152018;
+    --text-secondary: #5C6B62;
+    --text-muted: #8B978F;
+
+    /* Citation/confidence chips */
+    --chip-citation-bg: #ECFDF5;
+    --chip-citation-text: #047857;
+    --chip-confidence-high-bg: #F0FBE9;
+    --chip-confidence-high-text: #3B6D11;
+    --chip-confidence-medium-bg: #FAEEDA;
+    --chip-confidence-medium-text: #854F0B;
+    --chip-confidence-low-bg: #FCEBEB;
+    --chip-confidence-low-text: #791F1F;
+
+    /* Shadows (depth) */
+    --shadow-card: 0 12px 32px rgba(16, 60, 40, 0.10);
+    --shadow-bubble: 0 6px 16px rgba(5, 150, 105, 0.28);
+    --shadow-chip: 0 4px 12px rgba(5, 150, 105, 0.10);
+    --shadow-input: 0 4px 14px rgba(16, 60, 40, 0.06);
+
+    /* Blur amounts */
+    --blur-card: 16px;
+    --blur-panel: 10px;
+    --blur-item: 8px;
+
+    /* Radius */
+    --radius-card: 16px;
+    --radius-bubble-tail: 3px;   /* the "pointer" corner on message bubbles */
+    --radius-bubble: 14px;
+    --radius-pill: 20px;
   }
 
   .dark {
@@ -75,5 +127,110 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ==========================================================================
+   Light-Mode Glassmorphism Utilities & Fallbacks
+   ========================================================================== */
+
+/* Page Background with 2 Soft Radial Blurred Gradient Blobs */
+.glass-page-bg {
+  background:
+    radial-gradient(circle at 15% 15%, var(--bg-blob-1) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, var(--bg-blob-2) 0%, transparent 45%),
+    var(--bg-page);
+}
+
+/* Glass Main Panel */
+.glass-panel-card {
+  background: var(--glass-medium);
+  backdrop-filter: blur(var(--blur-card));
+  -webkit-backdrop-filter: blur(var(--blur-card));
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Glass Input Bar */
+.glass-input-bar {
+  background: var(--glass-medium);
+  backdrop-filter: blur(var(--blur-panel));
+  -webkit-backdrop-filter: blur(var(--blur-panel));
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-input);
+}
+
+/* User Message Bubble */
+.glass-user-bubble {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+  border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble-tail) var(--radius-bubble);
+  box-shadow: var(--shadow-bubble);
+  max-width: 78%;
+}
+
+/* Assistant Message Bubble */
+.glass-assistant-bubble {
+  background: var(--glass-strong);
+  backdrop-filter: blur(var(--blur-panel));
+  -webkit-backdrop-filter: blur(var(--blur-panel));
+  color: var(--text-primary);
+  font-size: 13.5px;
+  line-height: 1.6;
+  border: 0.5px solid var(--glass-border);
+  border-radius: var(--radius-bubble-tail) var(--radius-bubble) var(--radius-bubble) var(--radius-bubble);
+  box-shadow: 0 6px 18px rgba(16, 60, 40, 0.08);
+}
+
+/* Sidebar History Items */
+.glass-history-item-active {
+  background: var(--glass-medium);
+  backdrop-filter: blur(var(--blur-item));
+  -webkit-backdrop-filter: blur(var(--blur-item));
+  color: var(--accent-700);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  box-shadow: var(--shadow-chip);
+  border-radius: 10px;
+}
+
+.glass-history-item-inactive {
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur-item));
+  -webkit-backdrop-filter: blur(var(--blur-item));
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-panel-card,
+  .glass-input-bar,
+  .glass-assistant-bubble,
+  .glass-history-item-active {
+    background-color: rgba(255, 255, 255, 0.96) !important;
+  }
+  .glass-history-item-inactive {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .glass-sidebar-transition,
+  .glass-pulse-ring,
+  .glass-pulse-listening,
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

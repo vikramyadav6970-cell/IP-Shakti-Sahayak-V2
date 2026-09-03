@@ -56,6 +56,7 @@ interface ChatState {
   isHistoryOpen: boolean;
   selectedLanguage: string;
   isVoiceContinuous: boolean;
+  isSidebarCollapsed: boolean;
 
   // Setters
   setActiveConversationId: (id: string | null) => void;
@@ -67,6 +68,7 @@ interface ChatState {
   setSelectedLanguage: (lang: string) => void;
   setIsTranslating: (translating: boolean) => void;
   setIsVoiceContinuous: (continuous: boolean) => void;
+  setIsSidebarCollapsed: (collapsed: boolean) => void;
 
   // Actions
   fetchConversations: () => Promise<void>;
@@ -100,6 +102,7 @@ export const useChatStore = create<ChatState>()(
       isHistoryOpen: false,
       selectedLanguage: getInitialLang(),
       isVoiceContinuous: false,
+      isSidebarCollapsed: false,
 
       setActiveConversationId: (id) => set({ activeConversationId: id }),
       setMessages: (messages) => set({ messages }),
@@ -107,6 +110,7 @@ export const useChatStore = create<ChatState>()(
       setActiveClassification: (activeClassification) => set({ activeClassification }),
       setClassificationState: (classificationState) => set({ classificationState }),
       setIsVoiceContinuous: (isVoiceContinuous) => set({ isVoiceContinuous }),
+      setIsSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }),
       setSelectedLanguage: (selectedLanguage) => {
         if (typeof window !== "undefined") {
           localStorage.setItem("ip_sakti_lang", selectedLanguage);
@@ -441,6 +445,7 @@ export const useChatStore = create<ChatState>()(
         classificationState: state.classificationState,
         selectedLanguage: state.selectedLanguage,
         isVoiceContinuous: state.isVoiceContinuous,
+        isSidebarCollapsed: state.isSidebarCollapsed,
       }),
     }
   )
