@@ -14,8 +14,14 @@ import { useJurisdiction } from "@/store/useJurisdictionStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { JurisdictionCode } from "@/types";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 
-const INTERNATIONAL_COUNTRIES: { code: JurisdictionCode; label: string }[] = [
+interface InternationalCountry {
+  code: JurisdictionCode;
+  label: string;
+}
+
+const INTERNATIONAL_COUNTRIES: InternationalCountry[] = [
   { code: "USA", label: "United States (USPTO / FDA)" },
   { code: "EU", label: "European Union (EPO / EMA)" },
   { code: "UK", label: "United Kingdom (UKIPO / MHRA)" },
@@ -28,11 +34,13 @@ export const Layout: React.FC = () => {
   const { primary, internationalTarget, setPrimary, setInternationalTarget } = useJurisdiction();
   const { user, isAuthenticated, clearAuth } = useAuthStore();
   const location = useLocation();
+  const isChatPage = location.pathname === "/chat";
+  const isLandingPage = location.pathname === "/" || location.pathname === "";
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 selection:bg-emerald-500 selection:text-white">
+    <div className={`min-h-screen flex flex-col bg-slate-50 dark:bg-[#030712] font-sans text-slate-900 dark:text-slate-100 selection:bg-emerald-500 selection:text-white ${isChatPage ? "h-screen overflow-hidden" : ""}`}>
       {/* 1. Global Header & App Navigation */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm">
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#030712]/85 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Logo & Product Name */}
           <Link to="/" className="flex items-center gap-3 group shrink-0">
@@ -52,33 +60,37 @@ export const Layout: React.FC = () => {
 
           {/* Navigation Links — ONLY when logged in */}
           {isAuthenticated ? (
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-2">
               <Link
                 to="/chat"
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`group relative overflow-hidden px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-xs ${
                   location.pathname === "/chat"
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold shadow-xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-500 shadow-emerald-950/30 font-bold"
+                    : "bg-slate-100/90 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-400/50 hover:bg-emerald-50/50 dark:hover:bg-slate-800"
                 }`}
               >
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
-                  Assistant
-                </span>
+                {/* Radial fluid fill on hover */}
+                {location.pathname !== "/chat" && (
+                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full bg-gradient-to-r from-teal-400/20 via-emerald-500/25 to-teal-500/20 group-hover:w-[220px] group-hover:h-[220px] transition-all duration-500 ease-out pointer-events-none" />
+                )}
+                <Sparkles className={`w-3.5 h-3.5 relative z-10 ${location.pathname === "/chat" ? "text-amber-300 animate-pulse" : "text-emerald-600 dark:text-emerald-400 group-hover:rotate-12 transition-transform duration-300"}`} />
+                <span className="relative z-10">AI Assistant</span>
               </Link>
 
               <Link
                 to="/facilitator-desk"
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`group relative overflow-hidden px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-xs ${
                   location.pathname === "/facilitator-desk" || location.pathname === "/my-queries"
-                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-semibold shadow-xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-500 shadow-emerald-950/30 font-bold"
+                    : "bg-slate-100/90 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-400/50 hover:bg-emerald-50/50 dark:hover:bg-slate-800"
                 }`}
               >
-                <span className="flex items-center gap-1.5">
-                  <HelpCircle className="w-4 h-4 text-emerald-600" />
-                  Facilitator Desk
-                </span>
+                {/* Radial fluid fill on hover */}
+                {!(location.pathname === "/facilitator-desk" || location.pathname === "/my-queries") && (
+                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full bg-gradient-to-r from-teal-400/20 via-emerald-500/25 to-teal-500/20 group-hover:w-[240px] group-hover:h-[240px] transition-all duration-500 ease-out pointer-events-none" />
+                )}
+                <HelpCircle className={`w-3.5 h-3.5 relative z-10 ${location.pathname === "/facilitator-desk" || location.pathname === "/my-queries" ? "text-amber-300" : "text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300"}`} />
+                <span className="relative z-10">Facilitator Desk</span>
               </Link>
             </nav>
           ) : (
@@ -175,51 +187,79 @@ export const Layout: React.FC = () => {
                 </Link>
               </div>
             )}
+
+            {/* Theme Toggle (Dark / Bright mode) — on each page except landing page */}
+            {!isLandingPage && <ThemeToggle />}
           </div>
         </div>
       </header>
 
       {/* 2. Main Route Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <main
+        className={`flex-1 w-full mx-auto relative z-10 ${
+          isChatPage
+            ? "h-[calc(100vh-64px)] p-2 sm:p-3 overflow-hidden min-h-0 max-w-[1600px]"
+            : "max-w-7xl p-4 sm:p-6 lg:p-8"
+        }`}
+      >
         <Outlet />
       </main>
 
-      {/* 3. Mandatory Standing Legal Disclaimer (Moved to Bottom) */}
-      <div
-        role="region"
-        aria-label="Standing Legal Disclaimer"
-        className="bg-amber-500/10 border-t border-b border-amber-500/20 text-amber-900 dark:text-amber-200 px-4 py-2.5 text-xs md:text-sm font-medium flex items-center justify-center gap-2 text-center"
-      >
-        <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-        <span>
-          <strong>Statutory Notice:</strong> IP-SAKTI Sahayak provides verified legal/regulatory <strong>information, not legal advice</strong>. Official filings require review by a registered patent agent or legal counsel.
-        </span>
-      </div>
+      {/* 3. Mandatory Standing Legal Disclaimer & Footer (Hidden on Chat to ensure ChatGPT/Gemini single-window fixed layout) */}
+      {!isChatPage && (
+        <>
+          <div
+            role="region"
+            aria-label="Standing Legal Disclaimer"
+            className="relative z-10 bg-amber-950/90 border-t border-b border-amber-500/50 text-white px-4 py-3 text-xs md:text-sm font-medium flex items-center justify-center gap-2 text-center shadow-md backdrop-blur-md"
+            style={{ color: "#ffffff" }}
+          >
+            <ShieldAlert className="w-4 h-4 text-amber-300 shrink-0" />
+            <span className="text-white" style={{ color: "#ffffff" }}>
+              <strong className="text-amber-300 font-bold">Statutory Notice:</strong> IP-SAKTI Sahayak provides verified legal/regulatory <strong className="underline decoration-amber-400">information, not legal advice</strong>. Official filings require review by a registered patent agent or legal counsel.
+            </span>
+          </div>
 
-      {/* 4. Footer */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-emerald-700 text-white flex items-center justify-center font-bold text-xs">
-              IP
+          {/* 4. Static Legal Footer with Direct Links */}
+          <footer className="relative z-10 bg-slate-950 border-t border-slate-800 py-8 text-xs text-white shadow-2xl" style={{ color: "#ffffff" }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-5 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm shadow-md shadow-emerald-900/40 border border-emerald-400/30">
+                  IP
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm tracking-tight" style={{ color: "#ffffff" }}>
+                    IP-SAKTI Sahayak — Ayush IPR & Regulatory Intelligence
+                  </p>
+                  <p className="text-xs text-white font-medium" style={{ color: "#ffffff" }}>
+                    Ministry of Ayush · Government of India
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-white">
+                <span className="text-white flex items-center gap-1.5 font-medium flex-wrap" style={{ color: "#ffffff" }}>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="font-bold text-white" style={{ color: "#ffffff" }}>Primary Gazettes:</span>
+                  <a href="https://wipolex.wipo.int/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors" style={{ color: "#ffffff" }}>WIPO Lex</a>,
+                  <a href="https://ipindia.gov.in/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors" style={{ color: "#ffffff" }}>IP India</a>,
+                  <a href="http://nbaindia.org/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors" style={{ color: "#ffffff" }}>NBA</a>,
+                  <a href="https://www.fssai.gov.in/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors" style={{ color: "#ffffff" }}>FSSAI</a>,
+                  <a href="https://cdsco.gov.in/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-emerald-300 font-semibold underline underline-offset-2 transition-colors" style={{ color: "#ffffff" }}>CDSCO</a>
+                </span>
+                <span className="text-white font-bold hidden sm:inline" style={{ color: "#ffffff" }}>•</span>
+                <Link to="/sources" className="text-white hover:text-emerald-300 transition-colors font-bold underline underline-offset-2" style={{ color: "#ffffff" }}>
+                  Legal Sources
+                </Link>
+                <span className="text-white font-bold hidden sm:inline" style={{ color: "#ffffff" }}>•</span>
+                <Link to="/login" className="text-white hover:text-emerald-300 transition-colors font-bold underline underline-offset-2" style={{ color: "#ffffff" }}>
+                  Portal Access
+                </Link>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-slate-800 dark:text-slate-200">
-                IP-SAKTI Sahayak — Ayush IPR & Regulatory Intelligence
-              </p>
-              <p className="text-[11px] text-slate-400">
-                Ministry of Ayush
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-[11px]">
-            <span className="text-slate-400">Primary Gazettes: WIPO Lex, IP India, NBA, FSSAI, CDSCO</span>
-            <Link to="/login" className="font-semibold text-emerald-700 dark:text-emerald-400 hover:underline">
-              Portal Access
-            </Link>
-          </div>
-        </div>
-      </footer>
+          </footer>
+        </>
+      )}
     </div>
   );
 };

@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Layout } from "@/app/Layout";
 import { LandingPage } from "@/app/LandingPage";
 import { ChatPage } from "@/app/ChatPage";
-import { ABSPage } from "@/app/ABSPage";
 import { FacilitatorQueriesPage } from "@/app/FacilitatorQueriesPage";
 import { LoginPage } from "@/app/LoginPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -49,11 +48,7 @@ export const App: React.FC = () => {
             />
             <Route
               path="abs"
-              element={
-                <ProtectedRoute>
-                  <ABSPage />
-                </ProtectedRoute>
-              }
+              element={<Navigate to="/chat" replace />}
             />
             <Route
               path="facilitator-desk"
@@ -67,9 +62,9 @@ export const App: React.FC = () => {
               path="my-queries"
               element={<Navigate to="/facilitator-desk" replace />}
             />
-            <Route path="login" element={<LoginRoute />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+          <Route path="/login" element={<LoginRoute />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
