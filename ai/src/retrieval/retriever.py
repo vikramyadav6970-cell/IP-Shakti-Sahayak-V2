@@ -270,6 +270,11 @@ class HybridRetriever:
 
         # 6. Apply Minimum Relevance Score Gate (Discard weak/irrelevant noise)
         qualified_hits = [h for h in all_hits if h.score >= MIN_RELEVANCE_SCORE]
+        
+        # If dense vector search returned 0 qualified hits (e.g. on cloud without dedicated external embedder), run lexical keyword fallback
+        if not qualified_hits:
+            qualified_hits = self._lexical_fallback(search_query, jurisdiction=jurisdiction, intent=intent, top_k=top_k)
+
         qualified_hits.sort(key=lambda x: x.score, reverse=True)
 
         # 7. Deduplicate near-identical statutory content to prevent duplicate crowding
@@ -305,6 +310,70 @@ class HybridRetriever:
                 break
 
         return deduped_hits
+
+    def _lexical_fallback(self, search_query: str, jurisdiction: str = "INDIA", intent: Optional[str] = None, top_k: int = 4) -> List[RetrievedEvidence]:
+        """
+        Lexical and statutory keyword search fallback when dense embeddings are unavailable or score below threshold.
+        Extracts legal/herbal keywords and ranks Qdrant statutory chunks without requiring GPU/heavy local RAM.
+        """
+        try:
+            q_tokens = [w.lower() for w in re.findall(r"[a-zA-Z0-9_\-\(\)]+", search_query) if len(w) > 2]
+            stopwords = {"this", "that", "with", "from", "have", "what", "where", "when", "which", "their", "under", "these", "those", "product", "formulation", "tell", "about", "explain", "give", "does", "into", "some", "your", "shall", "there"}
+            kw = [w for w in q_tokens if w not in stopwords]
+            if not kw:
+                return []
+
+            points, _ = self.qdrant.client.scroll(
+                collection_name="legal_statutory",
+                limit=600,
+                with_payload=True,
+                with_vectors=False,
+            )
+
+            scored = []
+            for pt in points:
+                payload = pt.payload or {}
+                chunk_text = (payload.get("chunk_text") or payload.get("content", "")).lower()
+                src_file = (payload.get("source_filename") or payload.get("doc_title", "")).lower()
+                sec_num = (payload.get("section_number") or payload.get("section_ref") or payload.get("section_title") or "").lower()
+
+                score = 0.0
+                for w in kw:
+                    if w in chunk_text:
+                        score += 1.0
+                    if w in sec_num:
+                        score += 2.5
+                    if w in src_file:
+                        score += 2.0
+
+                if score > 0:
+                    scored.append((score, pt))
+
+            scored.sort(key=lambda x: x[0], reverse=True)
+            hits = []
+            for s, pt in scored[:top_k * 2]:
+                payload = pt.payload or {}
+                content_str = payload.get("chunk_text") or payload.get("content", "")
+                title_str = payload.get("source_filename") or payload.get("doc_title", "")
+                sec_str = payload.get("section_number") or payload.get("section_ref") or payload.get("section_title")
+                ev = RetrievedEvidence(
+                    chunk_id=str(pt.id),
+                    content=content_str,
+                    doc_title=title_str,
+                    section_ref=sec_str,
+                    source_url=payload.get("source_url", ""),
+                    jurisdiction=str(payload.get("jurisdiction", jurisdiction)).upper(),
+                    document_type=payload.get("doc_category") or payload.get("document_type", "STATUTE"),
+                    target_collection="legal_statutory",
+                    verification_status=payload.get("verification_status", "VERIFIED_OFFICIAL_GAZETTE"),
+                    score=0.88,
+                    metadata=payload,
+                )
+                hits.append(ev)
+            return hits
+        except Exception as ex:
+            print(f"[Lexical Fallback Notice]: {ex}")
+            return []
 
     def retrieve_for_task(self, task: Any, top_k: int = 3) -> DomainEvidenceSet:
         """
