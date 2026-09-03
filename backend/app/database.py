@@ -22,11 +22,14 @@ engine_kwargs = {
     "future": True,
 }
 
+import uuid
+
 if db_url.startswith("postgresql"):
     is_cloud_db = any(k in db_url.lower() for k in ["supabase", "neon", "aws", "pooler", "render", "cockroach"])
     connect_args = {
         "statement_cache_size": 0,
         "prepared_statement_cache_size": 0,
+        "prepared_statement_name_func": lambda: f"__asyncpg_stmt_{uuid.uuid4().hex}__",
         "timeout": 60,  # 60s handshake timeout to support cloud database cold-starts
         "server_settings": {
             "tcp_keepalives_idle": "60",
