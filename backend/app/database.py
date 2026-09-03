@@ -21,21 +21,24 @@ engine_kwargs = {
 }
 
 if db_url.startswith("postgresql"):
+    is_cloud_db = any(k in db_url.lower() for k in ["supabase", "neon", "aws", "pooler", "render", "cockroach"])
     connect_args = {
         "statement_cache_size": 0,
         "prepared_statement_cache_size": 0,
-        "timeout": 60,
-        "command_timeout": 60,
+        "timeout": 60,  # 60s handshake timeout to support cloud database cold-starts
         "server_settings": {
             "tcp_keepalives_idle": "60",
             "tcp_keepalives_interval": "10",
             "tcp_keepalives_count": "5",
         },
     }
+    if is_cloud_db and "sslmode" not in db_url and "ssl=" not in db_url:
+        connect_args["ssl"] = "require"
+
     engine_kwargs.update({
-        "pool_size": 5,
-        "max_overflow": 10,
-        "pool_recycle": 300,
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_recycle": 180,
         "pool_timeout": 60,
         "pool_pre_ping": True,
         "connect_args": connect_args,

@@ -84,25 +84,35 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
   const audioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const silenceTimerRef = useRef<any>(null);
   const hasSpokenRef = useRef<boolean>(false);
+  const silenceStartTimestampRef = useRef<number | null>(null);
+  const recordingStartTimestampRef = useRef<number>(0);
   const animationFrameRef = useRef<number | null>(null);
 
   // Audio Playback ref (for barge-in interruption)
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Constants for Speech and Silence Thresholds (RMS Volume Scale)
+  const SPEECH_RMS_THRESHOLD = 0.018; // Detects natural speech above ambient room floor
+  const SILENCE_RMS_THRESHOLD = 0.012; // Level below which audio is counted as silence
+  const SILENCE_DURATION_MS = 1800; // Auto-stop after 1.8s of sustained silence after speaking
+  const MAX_RECORDING_DURATION_MS = 30000; // 30s safety timeout
 
   // Clean up streams & audio on unmount
   useEffect(() => {
     return () => {
       stopMediaStream();
       stopPlayback();
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
   }, []);
 
   const stopMediaStream = useCallback(() => {
     isRecordingRef.current = false;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
     if (processorRef.current) {
       processorRef.current.disconnect();
       processorRef.current = null;
@@ -130,9 +140,9 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
     if (!isRecordingRef.current) return;
     isRecordingRef.current = false;
 
-    if (silenceTimerRef.current) {
-      clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
     const chunks = [...pcmChunksRef.current];
@@ -160,47 +170,67 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
     await handleProcessVoice(wavBlob);
   }, []);
 
-  // Silence Detection Loop using Web Audio Analyser
+  const stopRecordingAndProcessRef = useRef(stopRecordingAndProcess);
+  useEffect(() => {
+    stopRecordingAndProcessRef.current = stopRecordingAndProcess;
+  }, [stopRecordingAndProcess]);
+
+  // Silence Detection Loop using Real-Time Time-Domain RMS Energy
   const monitorAudioVolume = useCallback(() => {
     if (!analyserRef.current || !isRecordingRef.current) return;
 
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    analyserRef.current.getByteFrequencyData(dataArray);
+    const bufferLength = analyserRef.current.fftSize;
+    const timeData = new Float32Array(bufferLength);
+    analyserRef.current.getFloatTimeDomainData(timeData);
 
-    // Compute average energy
-    let sum = 0;
+    // Calculate root-mean-square (RMS) volume from waveform
+    let sumSquares = 0;
     for (let i = 0; i < bufferLength; i++) {
-      sum += dataArray[i];
+      sumSquares += timeData[i] * timeData[i];
     }
-    const average = sum / bufferLength;
+    const rms = Math.sqrt(sumSquares / bufferLength);
+    const now = performance.now();
 
-    // Speech threshold
-    if (average > 12) {
+    // 1. Detect if speech has occurred
+    if (rms >= SPEECH_RMS_THRESHOLD) {
       hasSpokenRef.current = true;
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-        silenceTimerRef.current = null;
-      }
+      silenceStartTimestampRef.current = null; // Reset silence counter while speaking
     } else if (hasSpokenRef.current) {
-      // User started speaking and is now silent: start 1.8s auto-stop countdown
-      if (!silenceTimerRef.current) {
-        silenceTimerRef.current = setTimeout(() => {
-          stopRecordingAndProcess();
-        }, 1800);
+      // 2. User spoke and is now quiet: track silence accumulation
+      if (rms <= SILENCE_RMS_THRESHOLD) {
+        if (!silenceStartTimestampRef.current) {
+          silenceStartTimestampRef.current = now;
+        } else if (now - silenceStartTimestampRef.current >= SILENCE_DURATION_MS) {
+          // 1.8s silence reached -> auto-stop recording & send query
+          stopRecordingAndProcessRef.current();
+          return;
+        }
+      } else {
+        // Marginal noise level: only reset if noise is close to speech volume
+        if (rms > (SPEECH_RMS_THRESHOLD + SILENCE_RMS_THRESHOLD) / 2) {
+          silenceStartTimestampRef.current = null;
+        }
       }
+    }
+
+    // Safety timeout: auto-stop after 30s max
+    if (now - recordingStartTimestampRef.current > MAX_RECORDING_DURATION_MS) {
+      stopRecordingAndProcessRef.current();
+      return;
     }
 
     if (isRecordingRef.current) {
       animationFrameRef.current = requestAnimationFrame(monitorAudioVolume);
     }
-  }, [stopRecordingAndProcess]);
+  }, []);
 
   // Start Recording
   const startRecording = async () => {
     setErrorMessage(null);
     stopPlayback();
     hasSpokenRef.current = false;
+    silenceStartTimestampRef.current = null;
+    recordingStartTimestampRef.current = performance.now();
     pcmChunksRef.current = [];
 
     try {
@@ -210,6 +240,7 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
           sampleRate: 16000,
           echoCancellation: true,
           noiseSuppression: true,
+          autoGainControl: true,
         },
       });
       streamRef.current = stream;
@@ -220,7 +251,7 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
 
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 512;
       source.connect(analyser);
       analyserRef.current = analyser;
 
@@ -240,7 +271,7 @@ export const VoiceConversationButton: React.FC<VoiceConversationButtonProps> = (
 
       setVoiceState("listening");
 
-      // Start volume monitor loop
+      // Start continuous volume monitor loop
       animationFrameRef.current = requestAnimationFrame(monitorAudioVolume);
     } catch (err: any) {
       console.error("Microphone access error:", err);

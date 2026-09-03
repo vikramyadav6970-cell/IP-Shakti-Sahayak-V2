@@ -20,6 +20,7 @@ load_dotenv(root_dir / "backend" / ".env")
 load_dotenv(root_dir / "ai" / ".env")
 
 from src.classification.jurisdiction_classifier import JurisdictionClassifier
+from src.classification.intent_classifier import IntentClassifier
 from src.confidence.confidence_scorer import ConfidenceScorer
 from src.orchestration.decomposer import QueryDecomposer, AgentTask
 from src.prompts.templates import (
@@ -306,8 +307,77 @@ def test_multi_domain_confidence_scoring():
     assert assessment.domain_confidence["patent_agent"]["score"] > 0.60
     assert assessment.domain_confidence["biodiversity_agent"]["score"] <= 0.45
     assert assessment.domain_confidence["biodiversity_agent"]["label"] == "LOW"
-    # Overall score must reflect the weakest domain
     assert assessment.overall_composite_score <= 0.45
     assert assessment.overall_confidence_label == "LOW"
     assert assessment.requires_human_review is True
+
+
+# ==============================================================================
+# 5. OUT-OF-DOMAIN GUARDRAIL LEAK & BORDERLINE NON-OVER-REFUSAL REGRESSION
+# ==============================================================================
+
+@pytest.mark.parametrize(
+    "off_topic_query,forbidden_keywords",
+    [
+        ("what is a mobile", ["cellular", "handheld device", "touchscreen", "portable telephone", "telecommunication"]),
+        ("how to repair a car engine", ["internal combustion", "piston", "spark plug", "transmission"]),
+        ("who is the president of france", ["macron", "elysee", "french republic", "head of state"]),
+        ("write python code for binary search", ["def binary_search", "mid = ", "left <= right"]),
+    ],
+)
+def test_out_of_domain_guardrail_zero_leakage(off_topic_query, forbidden_keywords):
+    """
+    ISSUE 1 REGRESSION TEST:
+    Verifies that off-topic queries are detected at Layer 1 structural guardrail,
+    decomposed as OUT_OF_SCOPE, and contain zero substantive/factual definitions of the off-topic subject.
+    """
+    is_in_domain, conf, reason = IntentClassifier.is_in_domain(off_topic_query)
+    assert not is_in_domain, f"Query '{off_topic_query}' was incorrectly classified as in-domain (reason: {reason})"
+    assert conf == 0.0
+
+    tasks = QueryDecomposer.decompose(off_topic_query)
+    assert len(tasks) == 1
+    assert tasks[0].intent == "OUT_OF_SCOPE"
+    assert tasks[0].agent_scope == "out_of_scope_agent"
+
+    # Verify fixed templated refusal response
+    refusal = (
+        "I'm scoped specifically to Intellectual Property and regulatory guidance for Ayurvedic "
+        "and traditional medicine products — patents, trademarks, ABS compliance, formulation "
+        "classification, and related topics under Ministry of Ayush frameworks. That question is "
+        "outside what I can help with here. If you have an Ayurvedic or herbal product you'd like "
+        "guidance on, describe it and I can help classify it and walk through the applicable IP/regulatory considerations."
+    )
+    assert "scoped specifically to Intellectual Property" in refusal
+    for kw in forbidden_keywords:
+        assert kw.lower() not in refusal.lower(), f"Leaked forbidden substantive content '{kw}' in out-of-scope response!"
+
+
+@pytest.mark.parametrize(
+    "borderline_query,expected_min_intent",
+    [
+        ("tell me about Ashwagandha", "FORMULATION"),
+        ("what is turmeric used for", "FORMULATION"),
+        ("can I patent my herbal mixture", "PATENT"),
+        ("what is NBA approval for herbs", "ABS"),
+        ("licensing requirements for herbal tea", "FORMULATION"),
+        ("is Triphala considered classical medicine", "FORMULATION"),
+        ("exporting neem extract to Europe", "EXPORT"),
+    ],
+)
+def test_in_domain_borderline_not_over_refused(borderline_query, expected_min_intent):
+    """
+    ISSUE 1 REGRESSION TEST:
+    Confirms genuinely in-domain but borderline queries are NOT accidentally caught by
+    the stricter floor threshold, preventing over-refusal of legitimate Ayush/IP questions.
+    """
+    is_in_domain, conf, reason = IntentClassifier.is_in_domain(borderline_query)
+    assert is_in_domain, f"Borderline in-domain query '{borderline_query}' was falsely rejected as out-of-domain"
+    assert conf > 0.0
+
+    tasks = QueryDecomposer.decompose(borderline_query)
+    assert len(tasks) >= 1
+    assert all(t.intent != "OUT_OF_SCOPE" for t in tasks), f"Task for '{borderline_query}' was incorrectly set to OUT_OF_SCOPE"
+    assert all(t.agent_scope != "out_of_scope_agent" for t in tasks)
+
 

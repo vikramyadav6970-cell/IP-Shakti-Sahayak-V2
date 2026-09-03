@@ -42,27 +42,24 @@ async def lifespan(app: FastAPI):
         from app.database import engine
         from app.models.base import Base
 
-        async with engine.begin() as conn:
+        async with engine.connect() as conn:
             try:
                 await conn.run_sync(Base.metadata.create_all)
+                await conn.commit()
             except Exception as dbe:
+                await conn.rollback()
                 print(f"[Lifespan Schema Init Notice]: {dbe}")
 
-            # Safe column additions for PostgreSQL / SQLite
-            try:
-                await conn.execute(
-                    text("ALTER TABLE conversations ADD COLUMN IF NOT EXISTS product_context_json JSONB;")
-                )
-            except Exception:
-                pass
-            try:
-                await conn.execute(
-                    text(
-                        "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS classification_state VARCHAR(50) DEFAULT 'COLLECTING_PRODUCT_INFORMATION';"
-                    )
-                )
-            except Exception:
-                pass
+            # Safe column additions for PostgreSQL / SQLite with independent transactions
+            for stmt in [
+                "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS product_context_json JSONB;",
+                "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS classification_state VARCHAR(50) DEFAULT 'COLLECTING_PRODUCT_INFORMATION';",
+            ]:
+                try:
+                    await conn.execute(text(stmt))
+                    await conn.commit()
+                except Exception:
+                    await conn.rollback()
         # Check Embedding Provider Configuration
         embedding_prov = (os.environ.get("EMBEDDING_PROVIDER") or "bge-m3").lower()
         if embedding_prov in ["mock", "test"] and settings.ENVIRONMENT != "test":

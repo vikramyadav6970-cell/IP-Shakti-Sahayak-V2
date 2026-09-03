@@ -22,14 +22,15 @@ INTENT_TO_AGENT_SCOPE: Dict[str, str] = {
     "EXPORT": "international_agent",
     "CASE_LAW": "patent_agent",
     "RESEARCH": "patent_agent",
+    "OUT_OF_SCOPE": "out_of_scope_agent",
 }
 
 
 @dataclass
 class AgentTask:
     """Domain-specific sub-task dispatched to a specialized legal/regulatory retrieval agent."""
-    agent_scope: str        # e.g. "patent_agent", "biodiversity_agent"
-    intent: str             # e.g. "PATENT", "ABS"
+    agent_scope: str        # e.g. "patent_agent", "biodiversity_agent", "out_of_scope_agent"
+    intent: str             # e.g. "PATENT", "ABS", "OUT_OF_SCOPE"
     sub_question: str       # Domain-specific slice or full inquiry
     jurisdiction: str       # "INDIA" | "INTERNATIONAL"
     confidence: float       # Intent match confidence (0.0 to 1.0)
@@ -51,10 +52,10 @@ class QueryDecomposer:
         """
         # 1. Multi-intent classification check
         scored_intents: List[Tuple[str, float]] = IntentClassifier.classify_multi(query)
-        qualifying = [(intent, score) for intent, score in scored_intents if score >= confidence_threshold]
+        qualifying = [(intent, score) for intent, score in scored_intents if score >= confidence_threshold and intent != "OUT_OF_SCOPE"]
 
         # If user explicitly pinned an intent AND query does not contain multiple qualifying intents, respect it
-        if explicit_intent and len(qualifying) <= 1:
+        if explicit_intent and explicit_intent != "OUT_OF_SCOPE" and len(qualifying) <= 1:
             scope = INTENT_TO_AGENT_SCOPE.get(explicit_intent, "patent_agent")
             return [
                 AgentTask(
@@ -66,17 +67,29 @@ class QueryDecomposer:
                 )
             ]
 
-        # If no patterns matched, fallback to explicit or primary default
+        # If no qualifying in-domain patterns matched
         if not qualifying:
-            primary_intent = explicit_intent or IntentClassifier.classify(query)
-            scope = INTENT_TO_AGENT_SCOPE.get(primary_intent, "patent_agent")
+            in_domain, conf, _ = IntentClassifier.is_in_domain(query)
+            if in_domain:
+                primary_intent = explicit_intent or "FORMULATION"
+                scope = INTENT_TO_AGENT_SCOPE.get(primary_intent, "formulation_agent")
+                return [
+                    AgentTask(
+                        agent_scope=scope,
+                        intent=primary_intent,
+                        sub_question=query,
+                        jurisdiction=jurisdiction,
+                        confidence=conf or 0.5,
+                    )
+                ]
+
             return [
                 AgentTask(
-                    agent_scope=scope,
-                    intent=primary_intent,
+                    agent_scope="out_of_scope_agent",
+                    intent="OUT_OF_SCOPE",
                     sub_question=query,
                     jurisdiction=jurisdiction,
-                    confidence=1.0,
+                    confidence=0.0,
                 )
             ]
 

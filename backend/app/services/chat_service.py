@@ -244,6 +244,62 @@ class ChatService:
             jurisdiction=req.jurisdiction,
             explicit_intent=explicit_intent,
         )
+
+        # Layer 1 Structural Hard Guardrail: Detect out-of-domain queries before open LLM generation
+        if len(agent_tasks) == 1 and agent_tasks[0].intent == "OUT_OF_SCOPE":
+            if is_new_conv:
+                await self.chat_repo.create_conversation(conversation)
+
+            user_msg = Message(
+                conversation_id=conversation.id,
+                role="user",
+                content=req.question,
+                jurisdiction=req.jurisdiction,
+            )
+            await self.chat_repo.add_message(user_msg)
+
+            refusal_text = (
+                "I'm scoped specifically to Intellectual Property and regulatory guidance for Ayurvedic and "
+                "traditional medicine products — patents, trademarks, ABS compliance, formulation classification, "
+                "and related topics under Ministry of Ayush frameworks. That question is outside what I can help "
+                "with here. If you have an Ayurvedic or herbal product you'd like guidance on, describe it and I "
+                "can help classify it and walk through the applicable IP/regulatory considerations."
+            )
+
+            if is_indic_query:
+                trans_refusal, trans_ok, _ = await translation_service.safe_translate_from_english(
+                    refusal_text, detected_language
+                )
+                if trans_ok and trans_refusal:
+                    refusal_text = trans_refusal
+
+            bot_msg = Message(
+                conversation_id=conversation.id,
+                role="assistant",
+                content=refusal_text,
+                jurisdiction=req.jurisdiction,
+                confidence_score=0.95,
+                confidence_label="HIGH",
+                requires_human_review=False,
+            )
+            bot_msg = await self.chat_repo.add_message(bot_msg)
+            await self.session.commit()
+
+            return ChatResponse(
+                conversation_id=conversation.id,
+                message_id=bot_msg.id,
+                content=bot_msg.content,
+                jurisdiction=req.jurisdiction,
+                confidence_score=0.95,
+                confidence_label="HIGH",
+                requires_human_review=False,
+                citations=[],
+                out_of_scope_detected=True,
+                detected_language=detected_language,
+                original_language="en-IN" if is_indic_query else detected_language,
+                is_translated=is_translated,
+            )
+
         is_multi_agent = len(agent_tasks) > 1
         t_context_ms = (time.perf_counter() - t_context_start) * 1000
 
@@ -456,7 +512,7 @@ class ChatService:
                 reason_match = re.search(r"(?:\*\*Reason:\*\*|Reason:)\s*(.+?)(?:\n\n|\Z)", answer_text, re.DOTALL | re.IGNORECASE)
                 reason_text = reason_match.group(1).strip() if reason_match else cat_info["short_desc"]
 
-                base_dict = product_context_data.to_dict() if product_context_data else prev_context_data
+                base_dict = (product_context_data.model_dump() if product_context_data else prev_context_data) or {}
                 product_context_data = ProductContextData(
                     product_name=base_dict.get("product_name") or "Ayurvedic Product",
                     description=base_dict.get("description") or req.question[:120],

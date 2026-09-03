@@ -35,10 +35,10 @@ class QdrantManager:
         self.api_key = api_key or os.getenv("QDRANT_API_KEY")
 
         if in_memory or (not self.url and not self.api_key):
-            self.client = QdrantClient(":memory:")
+            self.client = QdrantClient(":memory:", check_compatibility=False)
             self.is_cloud = False
         else:
-            self.client = QdrantClient(url=self.url, api_key=self.api_key, timeout=8.0)
+            self.client = QdrantClient(url=self.url, api_key=self.api_key, timeout=8.0, check_compatibility=False)
             self.is_cloud = True
 
         self._available_collections: Optional[set[str]] = None

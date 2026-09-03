@@ -108,8 +108,8 @@ class VoiceService:
         self,
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
-        stt_timeout: float = 15.0,
-        tts_timeout: float = 20.0,
+        stt_timeout: float = 20.0,
+        tts_timeout: float = 35.0,
         max_retries: int = 1,
     ):
         self.api_key = api_key or settings.SARVAM_API_KEY
@@ -117,6 +117,25 @@ class VoiceService:
         self.stt_timeout = stt_timeout
         self.tts_timeout = tts_timeout
         self.max_retries = max_retries
+
+    @staticmethod
+    def _extract_spoken_summary(text: str, max_chars: int = 350) -> str:
+        """
+        Extracts a natural, complete spoken advisory summary without cutting off mid-sentence.
+        Full regulatory citations and text remain visible in the UI chat interface.
+        """
+        if len(text) <= max_chars:
+            return text
+
+        truncated = text[:max_chars]
+        last_punct = max(truncated.rfind(". "), truncated.rfind("? "), truncated.rfind("! "), truncated.rfind("। "))
+        if last_punct > 100:
+            return truncated[:last_punct + 1].strip()
+
+        last_space = truncated.rfind(" ")
+        if last_space > 100:
+            return truncated[:last_space].strip() + "."
+        return truncated.strip() + "."
 
     async def transcribe_audio(
         self,
@@ -214,11 +233,10 @@ class VoiceService:
         if not clean_text:
             return None
 
-        # Truncate for TTS input if text exceeds comfortable audio buffer (max ~500 chars for crisp voice response)
-        # Note: Full advisory details and markdown formatting remain fully intact in the visual chat UI
-        tts_input_text = clean_text
-        if len(tts_input_text) > 500:
-            tts_input_text = tts_input_text[:497] + "..."
+        # Extract natural, complete spoken advisory summary (optimal ~250-350 chars for clean 2-4s audio response)
+        tts_input_text = self._extract_spoken_summary(clean_text, max_chars=350)
+        if not tts_input_text:
+            return None
 
         # Resolve speaker
         lang = target_language_code if target_language_code in DEFAULT_TTS_SPEAKERS else "en-IN"
