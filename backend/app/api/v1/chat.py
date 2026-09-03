@@ -153,7 +153,7 @@ async def voice_chat(
     summary="List past consultation sessions for current user",
 )
 async def list_conversations(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Returns past chat sessions."""
@@ -169,7 +169,7 @@ async def list_conversations(
 )
 async def get_conversation(
     conversation_id: uuid.UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Returns conversation transcript and citations."""
@@ -184,7 +184,7 @@ async def get_conversation(
 )
 async def delete_conversation(
     conversation_id: uuid.UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     service = ChatService(db)
@@ -201,9 +201,9 @@ async def delete_conversation(
 async def submit_feedback(
     message_id: uuid.UUID,
     req: FeedbackCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_optional_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Saves rating (1-5) and user comments on assistant answer."""
+    """Saves user rating and comments on AI responses for continuous improvement."""
     service = ChatService(db)
-    return await service.add_message_feedback(current_user, message_id, req)
+    return await service.record_feedback(current_user, message_id, req)
