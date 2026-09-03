@@ -10,6 +10,8 @@ python-multipart==0.0.20
 # Configuration & Validation
 pydantic==2.10.6
 pydantic-settings==2.7.1
+pydantic[email]>=2.10.0
+email-validator>=2.0.0
 python-dotenv==1.0.1
 
 # Database & ORM (PostgreSQL + Asyncpg + Alembic)
