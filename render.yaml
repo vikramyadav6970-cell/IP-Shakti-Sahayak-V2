@@ -1,0 +1,54 @@
+services:
+  # ----------------------------------------------------------------------------
+  # 1. FastAPI Backend & AI Multi-Agent RAG Web Service
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: ip-sakti-backend
+    env: docker
+    plan: standard # Minimum 2GB RAM recommended for BAAI/bge-m3 dense model & PyTorch
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeploy: true
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: PORT
+        value: "8000"
+      - key: EMBEDDING_PROVIDER
+        value: bge-m3
+      - key: DATABASE_URL
+        sync: false # Set in Render Dashboard (e.g. postgresql+asyncpg://...)
+      - key: QDRANT_URL
+        sync: false # Set in Render Dashboard
+      - key: QDRANT_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: GEMINI_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: SARVAM_API_KEY
+        sync: false # Set in Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "https://ip-sakti-frontend.onrender.com,http://localhost:5173"
+
+  # ----------------------------------------------------------------------------
+  # 2. React Vite Frontend Static Site
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: ip-sakti-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: ip-sakti-backend
+          property: host

@@ -1,20 +1,48 @@
+# ==============================================================================
+# IP-SAKTI Sahayak — Unified Backend & AI Production Dependencies
+# ==============================================================================
+
+# Web Framework & ASGI Server
 fastapi==0.115.8
 uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+
+# Configuration & Validation
 pydantic==2.10.6
 pydantic-settings==2.7.1
+python-dotenv==1.0.1
+
+# Database & ORM (PostgreSQL + Asyncpg + Alembic)
 sqlalchemy[asyncio]==2.0.38
 asyncpg==0.30.0
 psycopg2-binary==2.9.10
 alembic==1.14.1
+
+# Caching, Task Queue & Cloud Storage
 redis==5.2.1
 celery==5.4.0
+boto3==1.36.21
+httpx==0.28.1
+
+# Security & Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
-boto3==1.36.21
-httpx==0.28.1
-python-dotenv==1.0.1
-pytest==8.3.4
-pytest-asyncio==0.25.3
+
+# LLM Providers (Google Gemini)
 google-genai==0.3.0
 google-generativeai==0.8.4
+
+# Vector Database & Neural Embeddings
+qdrant-client==1.13.2
+sentence-transformers>=3.4.0
+
+# Document & PDF Parsing
+pymupdf>=1.25.0
+beautifulsoup4>=4.12.0
+
+# Monitoring & Testing
+sentry-sdk[fastapi]>=2.0.0
+pytest==8.3.4
+pytest-asyncio==0.25.3
+pytest-mock>=3.14.0

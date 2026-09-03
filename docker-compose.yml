@@ -1,0 +1,74 @@
+version: "3.8"
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: ip_sakti_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ip_sakti_user
+      POSTGRES_PASSWORD: ip_sakti_password
+      POSTGRES_DB: ip_sakti_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ip_sakti_user -d ip_sakti_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # 2. Redis Cache & Queue
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: ip_sakti_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # 3. Backend & AI Service
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ip_sakti_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      PORT: "8000"
+      DATABASE_URL: postgresql+asyncpg://ip_sakti_user:ip_sakti_password@postgres:5432/ip_sakti_db
+      REDIS_URL: redis://redis:6379/0
+      EMBEDDING_PROVIDER: bge-m3
+      QDRANT_URL: ${QDRANT_URL}
+      QDRANT_API_KEY: ${QDRANT_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      SARVAM_API_KEY: ${SARVAM_API_KEY}
+      JWT_SECRET: ${JWT_SECRET:-production-super-secret-jwt-key-min-32-chars}
+      CORS_ORIGINS: "http://localhost:5173,http://localhost:80,http://localhost:3000"
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
+  redisdata:

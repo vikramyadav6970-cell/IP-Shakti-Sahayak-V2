@@ -1,0 +1,46 @@
+# Git and IDE
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+*.swp
+*.swo
+
+# Node & Frontend Build Artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+admin/node_modules/
+ip-facilitator/node_modules/
+
+# Python Virtual Environments & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+!.env.example
+venv/
+.venv/
+env/
+ENV/
+
+# Large Datasets & Raw PDF Corpus (Already Ingested to Qdrant)
+ai/NewDataSet/
+ai/NewDataSet/**
+ai/data/
+ai/data/**
+*.pdf
+*.PDF
+
+# Local databases and logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+scratch/
