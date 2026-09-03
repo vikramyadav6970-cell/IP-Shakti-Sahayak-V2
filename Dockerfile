@@ -55,16 +55,17 @@ COPY ai /app/ai
 # Copy Backend FastAPI application, models, services, and repositories
 COPY backend /app/backend
 
-# Create non-root user for security best practices
-RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
-USER appuser
+# Create non-root user for security best practices (UID 1000 compatible with HF Spaces)
+RUN useradd -m -u 1000 user && chown -R user:user /app
+USER user
 
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
+
+EXPOSE 7860
 EXPOSE 8000
 
-# Health check probe against the FastAPI ready endpoint
-HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
-    CMD curl -f http://localhost:8000/health/ready || exit 1
-
-# Start Uvicorn production server
 WORKDIR /app/backend
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+
+# Start Uvicorn production server with dynamic port resolution
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}"]

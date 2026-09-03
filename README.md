@@ -1,3 +1,13 @@
+---
+title: IP SAKTI Sahayak Backend
+emoji: 🌿
+colorFrom: green
+colorTo: emerald
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # IP-SAKTI Sahayak: AI-Powered Intellectual Property & Regulatory Intelligence for Ayush
 
 **Smart India Hackathon (SIH) — Problem Statement 26045 (Ministry of Ayush / All India Institute of Ayurveda)**

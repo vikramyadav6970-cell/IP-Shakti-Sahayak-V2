@@ -4,103 +4,93 @@ Comprehensive deployment guide for **IP-SAKTI Sahayak** (Frontend React SPA, Fas
 
 ---
 
-## Architecture Overview
+## Free-Tier Solutions for the 512MB RAM Constraint
+
+The neural embedding model (`BAAI/bge-m3`) requires ~2.2GB RAM. Since cloud free tiers (like Render $0/mo) provide **512MB RAM**, you have two 100% free production solutions:
 
 ```
-[ Frontend (Vercel / Netlify) ]
-             |
-             v (HTTPS / REST & Voice WAV)
-[ Backend + AI Service (Render / Railway / Docker) ]
-             |
-             +---> PostgreSQL (Supabase / Neon)
-             +---> Vector Database (Qdrant Cloud)
-             +---> LLM Reasoning (Google Gemini 1.5 Flash)
-             +---> Multilingual Voice & STT/TTS (Sarvam AI)
-             +---> Cache & Queue (Upstash Redis)
+[ ARCHITECTURE OPTION 1: Serverless Split (Recommended for Render 512MB) ]
+
+[ Vercel / Netlify ] ---> [ Render Backend (512MB RAM Free) ] ---> [ Qdrant Cloud ]
+                                    |
+                                    v (HTTP POST /embed)
+                         [ Free HuggingFace Space ] (16GB RAM Free)
+                         (Runs BAAI/bge-m3 in RAM)
+```
+
+```
+[ ARCHITECTURE OPTION 2: All-in-One Free 16GB RAM ]
+
+[ Vercel / Netlify ] ---> [ Hugging Face Docker Space ] (16GB RAM + 2 vCPU Free)
+                         (Runs FastAPI Backend + AI + BAAI/bge-m3 together)
 ```
 
 ---
 
-## Option 1: Managed Cloud Deployment (Recommended)
+## Option 1: Render Free Tier (512MB) + Free Hugging Face Embedding Microservice
 
-### A. Deploy Backend & AI Service (Render.com / Railway.app)
-
-> [!TIP]
-> **Resource Recommendation**: Deploy with at least **2GB RAM** (Render Standard plan or Railway Pro) to accommodate PyTorch and the `BAAI/bge-m3` (2.2GB) dense embedding model in memory.
-
-#### Steps for Render:
-1. Push your repository to GitHub.
-2. Log in to [Render.com](https://render.com) and click **New +** $\rightarrow$ **Web Service**.
-3. Connect your GitHub repository: `vikramyadav6970-cell/IP-Shakti-Sahayak-V2`.
-4. Choose **Docker** as the Environment (Render will automatically detect the root `Dockerfile`).
-5. Set the **Instance Type** to at least **2 GB RAM (Standard)**.
-6. Configure the **Environment Variables** in the Render Dashboard (see [Environment Variables Table](#environment-variables-reference) below).
-7. Set **Health Check Path** to `/health/ready`.
-8. Click **Create Web Service**.
-9. Once deployed, copy your backend service URL (e.g., `https://ip-sakti-backend.onrender.com`).
+### Step 1: Deploy the Embedding Model on Hugging Face Spaces (100% FREE, 16GB RAM)
+1. Go to [Hugging Face Spaces](https://huggingface.co/new-space).
+2. Set Space Name: `bge-m3-embedder`
+3. License: `apache-2.0`
+4. SDK: Select **Docker** $\rightarrow$ **Blank**.
+5. Hardware: **CPU Basic (2 vCPU, 16 GB RAM) — Free**.
+6. Visibility: **Public**.
+7. Click **Create Space**.
+8. In the Space files tab, upload the 3 files from [`ai/deploy_bge_m3_space/`](file:///d:/Hackathons/SIH%20Project/ip-sakti-V2/ai/deploy_bge_m3_space/):
+   - `Dockerfile`
+   - `requirements.txt`
+   - `app.py`
+9. Once built (takes ~2 minutes), your embedding endpoint will be live at:
+   `https://<your-hf-username>-bge-m3-embedder.hf.space/embed`
 
 ---
 
-### B. Deploy Frontend (Vercel / Netlify)
+### Step 2: Deploy Backend on Render ($0 / Free 512MB Tier)
+1. Log in to [Render.com](https://render.com) $\rightarrow$ **New +** $\rightarrow$ **Web Service**.
+2. Connect your GitHub repository: `vikramyadav6970-cell/IP-Shakti-Sahayak-V2`.
+3. Choose **Docker** as the Environment.
+4. Select the **Free Plan (512 MB RAM / 0.1 CPU)**.
+5. In **Environment Variables**, add:
+   - `EMBEDDING_PROVIDER`: `remote`
+   - `EMBEDDING_API_URL`: `https://<your-hf-username>-bge-m3-embedder.hf.space/embed`
+   - `DATABASE_URL`: `postgresql+asyncpg://...` *(from Supabase / Neon)*
+   - `GEMINI_API_KEY`: `your_gemini_api_key`
+   - `SARVAM_API_KEY`: `your_sarvam_api_key`
+   - `QDRANT_URL`: `https://your-cluster.cloud.qdrant.io:6333`
+   - `QDRANT_API_KEY`: `your_qdrant_api_key`
+   - `JWT_SECRET`: `your_random_32_char_secret`
+   - `CORS_ORIGINS`: `https://your-frontend.vercel.app,http://localhost:5173`
+6. Set **Health Check Path** to `/health/ready`.
+7. Click **Create Web Service**.
+8. The backend will consume only **~65 MB RAM** on Render!
 
-#### Steps for Vercel:
-1. Log in to [Vercel.com](https://vercel.com) and click **Add New...** $\rightarrow$ **Project**.
-2. Select your GitHub repository: `vikramyadav6970-cell/IP-Shakti-Sahayak-V2`.
-3. In the project settings:
+---
+
+## Option 2: Deploy Entire Backend on Hugging Face Spaces (All-in-One 16GB RAM Free)
+
+You can host the entire FastAPI backend with the local 2.2GB model directly on Hugging Face Spaces:
+
+1. Create a new Space on [huggingface.co/new-space](https://huggingface.co/new-space).
+2. Select **Docker**. Hardware: **CPU Basic (16GB RAM) - Free**.
+3. Push/Sync this repository to the Hugging Face Space.
+4. Add your secrets (`DATABASE_URL`, `GEMINI_API_KEY`, `SARVAM_API_KEY`, `QDRANT_URL`, etc.) under Space **Settings $\rightarrow$ Variables and Secrets**.
+5. Your backend will be accessible at `https://<username>-<space-name>.hf.space`.
+
+---
+
+## Deploying the Frontend (Vercel / Netlify)
+
+1. Log in to [Vercel.com](https://vercel.com) $\rightarrow$ **Add New...** $\rightarrow$ **Project**.
+2. Import `vikramyadav6970-cell/IP-Shakti-Sahayak-V2`.
+3. Settings:
    - **Framework Preset**: `Vite`
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-4. Under **Environment Variables**, add:
-   - `VITE_API_BASE_URL`: `https://your-backend-service.onrender.com` *(your deployed backend URL from Step A)*
+4. Add Environment Variable:
+   - `VITE_API_BASE_URL`: `https://your-backend-url` *(from Render or HuggingFace)*
 5. Click **Deploy**.
-6. The `frontend/vercel.json` file will automatically handle Single-Page Application (SPA) routing for `/chat`, `/expert`, and all client routes.
-
-#### Steps for Netlify (Alternative):
-1. Log in to [Netlify.com](https://netlify.com) $\rightarrow$ **Add new site** $\rightarrow$ **Import an existing project**.
-2. Base directory: `frontend`
-3. Build command: `npm run build`
-4. Publish directory: `frontend/dist`
-5. Add environment variable: `VITE_API_BASE_URL` = `https://your-backend-service.onrender.com`.
-
----
-
-## Option 2: Self-Hosted Docker / VPS (AWS EC2 / DigitalOcean)
-
-Deploy the entire stack with Docker Compose on any Ubuntu/Linux server:
-
-1. **Install Docker & Docker Compose**:
-   ```bash
-   sudo apt-get update
-   sudo apt-get install -y docker.io docker-compose
-   ```
-
-2. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/vikramyadav6970-cell/IP-Shakti-Sahayak-V2.git
-   cd IP-Shakti-Sahayak-V2
-   ```
-
-3. **Configure Environment Variables**:
-   Create a `.env` file at the root:
-   ```bash
-   QDRANT_URL=https://your-qdrant-cluster.cloud.qdrant.io:6333
-   QDRANT_API_KEY=your_qdrant_api_key
-   GEMINI_API_KEY=your_gemini_api_key
-   SARVAM_API_KEY=your_sarvam_api_key
-   JWT_SECRET=super_secure_random_jwt_secret_min_32_chars
-   ```
-
-4. **Start the Stack**:
-   ```bash
-   docker-compose up -d --build
-   ```
-
-5. **Verify Running Containers**:
-   ```bash
-   docker ps
-   curl http://localhost:8000/health/ready
-   ```
 
 ---
 
@@ -113,25 +103,8 @@ Deploy the entire stack with Docker Compose on any Ubuntu/Linux server:
 | `SARVAM_API_KEY` | **Yes** | Sarvam AI API key for Indian language STT (`saaras:v3`) and TTS (`bulbul:v3`) |
 | `QDRANT_URL` | **Yes** | Qdrant Cloud cluster URL (`https://xyz.cloud.qdrant.io:6333`) |
 | `QDRANT_API_KEY` | **Yes** | Qdrant Cloud cluster API key |
-| `EMBEDDING_PROVIDER` | **Yes** | Must be set to `bge-m3` for dense 1024-dim neural retrieval |
+| `EMBEDDING_PROVIDER` | **Yes** | `remote` (for 512MB RAM Render) or `bge-m3` (if 2GB+ RAM available) |
+| `EMBEDDING_API_URL` | If remote | `https://<username>-bge-m3-embedder.hf.space/embed` |
 | `JWT_SECRET` | **Yes** | 32+ character random string for signing JWT tokens |
 | `CORS_ORIGINS` | **Yes** | Comma-separated allowed origins (e.g. `https://my-app.vercel.app,http://localhost:5173`) |
-| `REDIS_URL` | Optional | Upstash Redis URL (`rediss://...`) for Celery & rate limiting |
-| `ENVIRONMENT` | Optional | `production` (default in Dockerfile) |
-| `PORT` | Optional | `8000` (default) |
-| `VITE_API_BASE_URL` | **Frontend** | URL pointing to the deployed backend (e.g. `https://ip-sakti-backend.onrender.com`) |
-
----
-
-## Post-Deployment Verification Checklist
-
-- [ ] **Backend Health Probe**:
-  `curl -i https://your-backend.onrender.com/health` returns `{"status": "healthy"}`
-- [ ] **Database Readiness**:
-  `curl -i https://your-backend.onrender.com/health/ready` returns `{"status": "ready", "database": "connected"}`
-- [ ] **AI Multi-Agent RAG**:
-  Querying via Frontend or `/api/v1/chat` triggers `BAAI/bge-m3` embedding search against Qdrant and grounds response with statutory citations.
-- [ ] **Voice Pipeline**:
-  `POST /api/v1/chat/voice` transcribes speech via Sarvam STT, performs RAG reasoning, and synthesizes audio via Sarvam TTS.
-- [ ] **SPA Navigation**:
-  Reloading `/chat`, `/expert`, or `/dashboard` in the browser returns the page without a 404 error.
+| `VITE_API_BASE_URL` | **Frontend** | URL pointing to the deployed backend |

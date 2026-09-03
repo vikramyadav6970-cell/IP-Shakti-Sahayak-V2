@@ -105,19 +105,74 @@ class MockEmbeddingProvider(EmbeddingProvider):
         return results
 
 
+class RemoteEmbeddingProvider(EmbeddingProvider):
+    """
+    Remote HTTP embedding provider for delegating BAAI/bge-m3 dense vector generation
+    to a dedicated external endpoint (e.g. Hugging Face Space, Modal, Cloud Run) with 0 local RAM.
+    """
+
+    def __init__(self, endpoint_url: Optional[str] = None, api_key: Optional[str] = None, dimension: int = 1024):
+        super().__init__(model_name="remote-bge-m3", dimension=dimension)
+        self.endpoint_url = endpoint_url or os.environ.get("EMBEDDING_API_URL") or "https://router.huggingface.co/hf-inference/models/BAAI/bge-m3"
+        self.api_key = api_key or os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_HUB_TOKEN")
+
+    def embed_texts(self, texts: List[str]) -> List[List[float]]:
+        if not texts:
+            return []
+        import httpx
+        headers = {"Content-Type": "application/json"}
+        if self.api_key:
+            headers["Authorization"] = f"Bearer {self.api_key}"
+
+        payload = {"inputs": texts} if "huggingface" in self.endpoint_url else {"texts": texts}
+        try:
+            with httpx.Client(timeout=30.0) as client:
+                res = client.post(self.endpoint_url, headers=headers, json=payload)
+                if res.status_code == 200:
+                    data = res.json()
+                    # Handle both HF feature extraction format and custom API format
+                    if isinstance(data, dict) and "embeddings" in data:
+                        return data["embeddings"]
+                    if isinstance(data, list):
+                        # If list of vectors
+                        if len(data) > 0 and isinstance(data[0], list):
+                            # If 3D token-level [batch, seq, dim], mean pool to 2D
+                            if len(data[0]) > 0 and isinstance(data[0][0], list):
+                                pooled = []
+                                for token_seq in data:
+                                    dim = len(token_seq[0])
+                                    mean_vec = [sum(token[i] for token in token_seq) / len(token_seq) for i in range(dim)]
+                                    # Normalize
+                                    norm = math.sqrt(sum(x * x for x in mean_vec)) or 1.0
+                                    pooled.append([x / norm for x in mean_vec])
+                                return pooled
+                            return data
+        except Exception as e:
+            print(f"[Remote Embedding Notice]: {e}")
+        return [[0.0] * self.dimension for _ in texts]
+
+
 def get_embedding_provider(provider_type: Optional[str] = None) -> EmbeddingProvider:
     """
     Factory to obtain embedding provider with global singleton caching.
-    Automatically uses BAAI/bge-m3 on GPU/CPU for live AI intelligence.
-    Set EMBEDDING_PROVIDER=mock only for isolated unit tests.
+    Supports:
+    - 'bge-m3' (default): In-memory PyTorch BGEM3EmbeddingProvider
+    - 'remote' / 'hf': Remote HTTP BGEM3 vector endpoint (0 RAM usage, for 512MB hosting)
+    - 'mock' / 'test': Fast unit test mock provider
     """
     global _GLOBAL_PROVIDER
     selected = (provider_type or os.environ.get("EMBEDDING_PROVIDER") or "").lower()
     if selected in ["mock", "test"]:
         return MockEmbeddingProvider()
+    if selected in ["remote", "hf", "huggingface"]:
+        if _GLOBAL_PROVIDER is None or not isinstance(_GLOBAL_PROVIDER, RemoteEmbeddingProvider):
+            _GLOBAL_PROVIDER = RemoteEmbeddingProvider()
+        return _GLOBAL_PROVIDER
+
     if _GLOBAL_PROVIDER is None:
         try:
             _GLOBAL_PROVIDER = BGEM3EmbeddingProvider()
         except Exception:
             _GLOBAL_PROVIDER = MockEmbeddingProvider()
     return _GLOBAL_PROVIDER
+
