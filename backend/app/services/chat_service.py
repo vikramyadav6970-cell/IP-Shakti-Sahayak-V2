@@ -22,10 +22,15 @@ from src.classification.product_classifier import CATEGORIES_REGISTRY, normalize
 from src.confidence.confidence_scorer import ConfidenceScorer
 from src.embeddings.embedding_provider import get_embedding_provider
 from src.embeddings.sparse_provider import BM25SparseProvider
-from src.prompts.templates import CONSULTATION_SYSTEM_PROMPT, build_user_prompt
+from src.orchestration.decomposer import QueryDecomposer, AgentTask
+from src.prompts.templates import (
+    CONSULTATION_SYSTEM_PROMPT,
+    build_user_prompt,
+    build_multi_domain_user_prompt,
+)
 from src.reasoning.llm_provider import get_llm_provider
 from src.retrieval.qdrant_manager import QdrantManager
-from src.retrieval.retriever import HybridRetriever
+from src.retrieval.retriever import HybridRetriever, DomainEvidenceSet
 
 from app.config import settings
 from app.models.entities import AuditLog, Citation, Conversation, Feedback, Message, User
@@ -222,6 +227,7 @@ class ChatService:
         t_trans_guard_ms = (time.perf_counter() - t_trans_guard_start) * 1000
 
         # 3. Parse existing prior product context
+        # 3. Resolve Intent & Multi-Agent Decomposition
         t_context_start = time.perf_counter()
         prev_context_data: Dict[str, Any] = {}
         if req.active_product_context:
@@ -232,48 +238,116 @@ class ChatService:
         elif conversation.product_context_json:
             prev_context_data = conversation.product_context_json
 
-        intent = req.active_intent.value if req.active_intent else IntentClassifier.classify(core_question)
-        t_context_ms = (time.perf_counter() - t_context_start) * 1000
-
-        # 4. Parallel Hybrid Retrieval across Qdrant Collections
-        t_retrieval_start = time.perf_counter()
-        evidence_hits = await asyncio.to_thread(
-            self.retriever.retrieve,
+        explicit_intent = req.active_intent.value if req.active_intent else None
+        agent_tasks: List[AgentTask] = QueryDecomposer.decompose(
             query=core_question,
             jurisdiction=req.jurisdiction,
-            intent=intent,
-            top_k=4,
+            explicit_intent=explicit_intent,
         )
-        t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
+        is_multi_agent = len(agent_tasks) > 1
+        t_context_ms = (time.perf_counter() - t_context_start) * 1000
 
-        # Terminal Logging: Vector DB retrieval results (with ASCII-safe snippet printing)
-        print("\n" + "=" * 75)
-        print(" [VECTOR DB RETRIEVAL - QDRANT CLOUD]")
-        print(f" Query: '{core_question}'")
-        print(f" Jurisdiction: {req.jurisdiction} | Intent: {intent} | Hits Retrieved: {len(evidence_hits)} (in {t_retrieval_ms:.1f}ms)")
-        print("-" * 75)
-        if evidence_hits:
-            for idx, ev in enumerate(evidence_hits, 1):
-                print(f" [Hit #{idx}] Score: {ev.score:.4f} | Collection: {ev.target_collection}")
-                print(f"   * Document: {ev.doc_title}")
-                print(f"   * Section/Ref: {ev.section_ref or 'N/A'}")
-                print(f"   * Scope: {ev.document_type} ({ev.jurisdiction})")
-                clean_snippet = ev.content.replace('\n', ' ')[:220].encode('ascii', errors='replace').decode('ascii')
-                print(f"   * Snippet: {clean_snippet}...")
+        # 4. Scoped Hybrid Retrieval (Parallel multi-domain or single-pass fast path)
+        t_retrieval_start = time.perf_counter()
+        evidence_hits: List[RetrievedEvidence] = []
+        domain_evidence_map: Dict[str, Any] = {}
+
+        if not is_multi_agent:
+            single_task = agent_tasks[0]
+            intent = single_task.intent
+            t_single_start = time.perf_counter()
+            evidence_hits = await asyncio.to_thread(
+                self.retriever.retrieve,
+                query=single_task.sub_question,
+                jurisdiction=single_task.jurisdiction,
+                intent=single_task.intent,
+                top_k=4,
+            )
+            t_single_ms = (time.perf_counter() - t_single_start) * 1000
+            evidence_dicts = [e.to_dict() for e in evidence_hits]
+            system_prompt = CONSULTATION_SYSTEM_PROMPT
+            user_prompt = build_user_prompt(
+                question=core_question,
+                jurisdiction=req.jurisdiction,
+                intent=intent,
+                evidence_items=evidence_dicts,
+                classification_category=prev_context_data.get("category"),
+                product_context=req.active_product_context,
+            )
+
+            t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
+
+            # Terminal Logging: Single-Agent retrieval results
+            print("\n" + "=" * 80)
+            print(" [VECTOR RETRIEVAL - SINGLE-AGENT]")
+            print(f" Query: '{core_question}'")
+            print(f" Jurisdiction: {req.jurisdiction} | Overall Retrieval Time: {t_retrieval_ms:.1f}ms | Total Chunks: {len(evidence_hits)}")
+            print("-" * 80)
+            print(f" [Agent: {single_task.agent_scope}] (Intent: {single_task.intent}) -> Retrieved {len(evidence_hits)} chunks in {t_single_ms:.1f}ms:")
+            if evidence_hits:
+                for idx, ev in enumerate(evidence_hits, 1):
+                    clean_title = ev.doc_title or "Unknown Document"
+                    clean_sec = ev.section_ref or "General Provision"
+                    clean_snippet = ev.content.replace('\n', ' ')[:180].encode('ascii', errors='replace').decode('ascii')
+                    print(f"   [{idx}] Score: {ev.score:.4f} | Doc: {clean_title} | Sec: {clean_sec} | Type: {ev.document_type}")
+                    print(f"       Snippet: {clean_snippet}...")
+            else:
+                print("   (No matching statutory chunks retrieved for this filter)")
+            print("=" * 80 + "\n")
         else:
-            print("   (No matching vector points retrieved for this query filter)")
-        print("=" * 75 + "\n")
+            # Multi-Agent Orchestration: parallel domain-scoped retrieval with individual timers
+            async def _retrieve_scoped(task: AgentTask):
+                t_sub_start = time.perf_counter()
+                d_set = await asyncio.to_thread(self.retriever.retrieve_for_task, task, 3)
+                t_sub_ms = (time.perf_counter() - t_sub_start) * 1000
+                return d_set, t_sub_ms
 
-        evidence_dicts = [e.to_dict() for e in evidence_hits]
-        system_prompt = CONSULTATION_SYSTEM_PROMPT
-        user_prompt = build_user_prompt(
-            question=core_question,
-            jurisdiction=req.jurisdiction,
-            intent=intent,
-            evidence_items=evidence_dicts,
-            classification_category=prev_context_data.get("category"),
-            product_context=req.active_product_context,
-        )
+            scoped_results = await asyncio.gather(*[_retrieve_scoped(task) for task in agent_tasks])
+
+            for d_set, sub_ms in scoped_results:
+                domain_evidence_map[d_set.agent_scope] = {
+                    "agent_scope": d_set.agent_scope,
+                    "intent": d_set.intent,
+                    "sub_question": d_set.sub_question,
+                    "evidence": [e.to_dict() for e in d_set.evidence],
+                    "hits_found": d_set.hits_found,
+                    "duration_ms": sub_ms,
+                }
+                evidence_hits.extend(d_set.evidence)
+
+            intent = "+".join([t.intent for t in agent_tasks])
+            system_prompt = CONSULTATION_SYSTEM_PROMPT
+            user_prompt = build_multi_domain_user_prompt(
+                question=core_question,
+                jurisdiction=req.jurisdiction,
+                domain_evidence_map=domain_evidence_map,
+                classification_category=prev_context_data.get("category"),
+                product_context=req.active_product_context,
+            )
+
+            t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
+
+            # Terminal Logging: Multi-Agent domain-scoped retrieval breakdown
+            print("\n" + "=" * 80)
+            print(f" [VECTOR RETRIEVAL ORCHESTRATION] (MULTI-AGENT: {len(agent_tasks)} AGENTS)")
+            print(f" Query: '{core_question}'")
+            print(f" Jurisdiction: {req.jurisdiction} | Overall Retrieval Time: {t_retrieval_ms:.1f}ms | Total Chunks: {len(evidence_hits)}")
+            print("-" * 80)
+
+            for d_set, sub_ms in scoped_results:
+                print(f" [Agent: {d_set.agent_scope}] (Intent: {d_set.intent}) -> Retrieved {len(d_set.evidence)} chunks in {sub_ms:.1f}ms:")
+                print(f"   Sub-Query: '{d_set.sub_question}'")
+                if d_set.evidence:
+                    for idx, ev in enumerate(d_set.evidence, 1):
+                        clean_title = ev.doc_title or "Unknown Document"
+                        clean_sec = ev.section_ref or "General Provision"
+                        clean_snippet = ev.content.replace('\n', ' ')[:180].encode('ascii', errors='replace').decode('ascii')
+                        print(f"   [{idx}] Score: {ev.score:.4f} | Doc: {clean_title} | Sec: {clean_sec} | Type: {ev.document_type}")
+                        print(f"       Snippet: {clean_snippet}...")
+                else:
+                    print("   (No matching domain chunks retrieved)")
+                print()
+            print("=" * 80 + "\n")
 
         if is_indic_query:
             user_prompt += (
@@ -429,18 +503,34 @@ class ChatService:
         await self.chat_repo.add_message(user_msg)
 
         # 7. Validate Citations and Compute Dynamic Multi-Factor Confidence Score
+        # 7. Validate Citations and Compute Dynamic Multi-Factor Confidence Score
         validated_citations, citation_ratio = CitationValidator.validate_citations(
             response_text=answer_text,
             retrieved_evidence=evidence_hits,
             jurisdiction=req.jurisdiction,
         )
 
-        confidence_assessment = ConfidenceScorer.calculate_confidence(
-            response_text=answer_text,
-            evidence_hits=evidence_hits,
-            validated_citations=validated_citations,
-            citation_ratio=citation_ratio,
-        )
+        domain_confidence_dict: Optional[Dict[str, Any]] = None
+        if is_multi_agent:
+            multi_assessment = ConfidenceScorer.calculate_multi_domain_confidence(
+                response_text=answer_text,
+                domain_evidence_map=domain_evidence_map,
+                validated_citations=validated_citations,
+            )
+            confidence_score = multi_assessment.overall_composite_score
+            confidence_label = multi_assessment.overall_confidence_label
+            requires_human_review = multi_assessment.requires_human_review
+            domain_confidence_dict = multi_assessment.domain_confidence
+        else:
+            confidence_assessment = ConfidenceScorer.calculate_confidence(
+                response_text=answer_text,
+                evidence_hits=evidence_hits,
+                validated_citations=validated_citations,
+                citation_ratio=citation_ratio,
+            )
+            confidence_score = confidence_assessment.composite_score
+            confidence_label = confidence_assessment.confidence_label
+            requires_human_review = confidence_assessment.requires_human_review
 
         # 8. Persist Citations ONLY if actual evidence was retrieved from RAG
         persisted_citations: List[CitationRead] = []
@@ -557,7 +647,9 @@ class ChatService:
             metadata_json={
                 "jurisdiction": req.jurisdiction,
                 "intent": intent,
+                "multi_agent": is_multi_agent,
                 "confidence": confidence_score,
+                "domain_confidence": domain_confidence_dict,
                 "citations_count": len(persisted_citations),
                 "classification_state": product_context_data.state if product_context_data else "PENDING",
                 "classified_category": product_classification_meta.category if product_classification_meta else None,
@@ -600,6 +692,7 @@ class ChatService:
             is_translated=is_translated,
             product_classification=product_classification_meta,
             product_context=product_context_data,
+            domain_confidence=domain_confidence_dict,
         )
 
     async def list_user_conversations(self, user: User) -> List[ConversationSummaryRead]:

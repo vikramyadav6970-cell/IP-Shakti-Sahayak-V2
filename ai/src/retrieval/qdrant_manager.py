@@ -38,33 +38,49 @@ class QdrantManager:
             self.client = QdrantClient(":memory:")
             self.is_cloud = False
         else:
-            self.client = QdrantClient(url=self.url, api_key=self.api_key, timeout=30.0)
+            self.client = QdrantClient(url=self.url, api_key=self.api_key, timeout=8.0)
             self.is_cloud = True
+
+        self._available_collections: Optional[set[str]] = None
+
+    def get_available_collections(self) -> set[str]:
+        """Returns the set of existing collections currently in the active Qdrant cluster."""
+        if self._available_collections is None:
+            try:
+                self._available_collections = {c.name for c in self.client.get_collections().collections}
+            except Exception:
+                self._available_collections = {"legal_statutory"}
+        return self._available_collections
 
     def init_collections(self) -> None:
         """Create the 5 canonical collections if they don't already exist."""
-        existing = {c.name for c in self.client.get_collections().collections}
+        existing = self.get_available_collections()
 
         for col in CANONICAL_COLLECTIONS:
             if col not in existing:
-                self.client.create_collection(
-                    collection_name=col,
-                    vectors_config={
-                        "dense": rest.VectorParams(
-                            size=DENSE_VECTOR_DIM,
-                            distance=rest.Distance.COSINE,
-                        )
-                    },
-                    sparse_vectors_config={
-                        "sparse": rest.SparseVectorParams(
-                            index=rest.SparseIndexParams(
-                                on_disk=False,
+                try:
+                    self.client.create_collection(
+                        collection_name=col,
+                        vectors_config={
+                            "dense": rest.VectorParams(
+                                size=DENSE_VECTOR_DIM,
+                                distance=rest.Distance.COSINE,
                             )
-                        )
-                    },
-                )
-                # Create payload indexes for fast filtering
-                self._create_payload_indexes(col)
+                        },
+                        sparse_vectors_config={
+                            "sparse": rest.SparseVectorParams(
+                                index=rest.SparseIndexParams(
+                                    on_disk=False,
+                                )
+                            )
+                        },
+                    )
+                    # Create payload indexes for fast filtering
+                    self._create_payload_indexes(col)
+                    if self._available_collections is not None:
+                        self._available_collections.add(col)
+                except Exception:
+                    pass
 
     def _create_payload_indexes(self, collection_name: str) -> None:
         """Create indexes on frequently filtered fields."""
@@ -76,6 +92,8 @@ class QdrantManager:
             ("section_ref", rest.PayloadSchemaType.KEYWORD),
             ("section_number", rest.PayloadSchemaType.KEYWORD),
             ("doc_category", rest.PayloadSchemaType.KEYWORD),
+            ("ip_domain", rest.PayloadSchemaType.KEYWORD),
+            ("agent_scope", rest.PayloadSchemaType.KEYWORD),
         ]
         for field_name, field_type in fields_to_index:
             try:
@@ -108,23 +126,23 @@ class QdrantManager:
         limit: int = 5,
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[rest.ScoredPoint]:
-        """Execute dense vector similarity query with retries."""
+        """Execute dense vector similarity query."""
+        avail = self.get_available_collections()
+        target_col = collection_name if collection_name in avail else "legal_statutory"
+        if target_col not in avail:
+            return []
+
         q_filter = self._build_filter(filters)
-        for attempt in range(3):
-            try:
-                return self.client.query_points(
-                    collection_name=collection_name,
-                    query=vector,
-                    limit=limit,
-                    query_filter=q_filter,
-                    with_payload=True,
-                ).points
-            except Exception:
-                if attempt == 2:
-                    return []
-                import time
-                time.sleep(1)
-        return []
+        try:
+            return self.client.query_points(
+                collection_name=target_col,
+                query=vector,
+                limit=limit,
+                query_filter=q_filter,
+                with_payload=True,
+            ).points
+        except Exception:
+            return []
 
     def search_hybrid(
         self,

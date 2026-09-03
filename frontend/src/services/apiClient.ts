@@ -40,9 +40,10 @@ export async function apiClient<T>(
   }
 
   const token = useAuthStore.getState().token || localStorage.getItem("ip_sakti_token");
+  const isFormData = customConfig.body instanceof FormData;
 
   const requestHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(headers as Record<string, string>),
   };
@@ -96,6 +97,8 @@ export const api = {
     apiClient<T>(endpoint, { method: "GET", params }),
   post: <T>(endpoint: string, body?: any) =>
     apiClient<T>(endpoint, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
+  postForm: <T>(endpoint: string, formData: FormData) =>
+    apiClient<T>(endpoint, { method: "POST", body: formData }),
   put: <T>(endpoint: string, body?: any) =>
     apiClient<T>(endpoint, { method: "PUT", body: body ? JSON.stringify(body) : undefined }),
   patch: <T>(endpoint: string, body?: any) =>

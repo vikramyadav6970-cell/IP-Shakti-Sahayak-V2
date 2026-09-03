@@ -112,6 +112,14 @@ class ChatResponse(BaseModel):
     is_translated: bool = False
     product_classification: Optional[ProductClassificationMeta] = None
     product_context: Optional[ProductContextData] = None
+    domain_confidence: Optional[Dict[str, Any]] = None
+
+
+class VoiceChatResponse(ChatResponse):
+    """Extends standard chat advisory with speech transcription and synthesized voice audio."""
+    transcribed_text: str
+    audio_base64: Optional[str] = None
+    audio_format: Optional[str] = "audio/wav"
 
 
 class ConversationRead(BaseModel):

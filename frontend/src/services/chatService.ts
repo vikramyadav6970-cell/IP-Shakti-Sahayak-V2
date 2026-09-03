@@ -33,6 +33,13 @@ export interface ChatResponse {
   is_translated?: boolean;
   product_classification?: ProductClassificationMeta;
   product_context?: ProductContextData;
+  domain_confidence?: Record<string, any>;
+}
+
+export interface VoiceChatResponse extends ChatResponse {
+  transcribed_text: string;
+  audio_base64?: string | null;
+  audio_format?: string;
 }
 
 export const chatService = {
@@ -162,6 +169,10 @@ export const chatService = {
         product_context,
       };
     }
+  },
+
+  sendVoiceMessage: async (formData: FormData): Promise<VoiceChatResponse> => {
+    return await api.postForm<VoiceChatResponse>("/api/v1/chat/voice", formData);
   },
 
   getConversations: async (): Promise<ConversationSummary[]> => {

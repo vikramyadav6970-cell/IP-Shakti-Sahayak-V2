@@ -29,6 +29,7 @@ import { ProductClassificationPanel } from "@/components/chat/ProductClassificat
 import { ProductHistorySidebar } from "@/components/chat/ProductHistorySidebar";
 import { LanguageSelector } from "@/components/chat/LanguageSelector";
 import { VoiceInputButton } from "@/components/chat/VoiceInputButton";
+import { VoiceConversationButton } from "@/components/chat/VoiceConversationButton";
 import {
   getSampleQueries,
   getSampleQueriesHeading,
@@ -417,9 +418,16 @@ export const ChatPage: React.FC = () => {
                 className="flex-1 h-11 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 dark:text-white"
               />
 
-              {/* Voice Speech-to-Text Input Button */}
+              {/* Voice Speech-to-Text Input Button (Dictation Only) */}
               <VoiceInputButton
                 onTranscript={(transcript) => setInput(transcript)}
+                disabled={isSending}
+              />
+
+              {/* Hands-Free Voice Conversation Mode Button (STT -> RAG -> TTS) */}
+              <VoiceConversationButton
+                jurisdiction={active}
+                intent={initialIntent || undefined}
                 disabled={isSending}
               />
 

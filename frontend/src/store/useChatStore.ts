@@ -9,7 +9,7 @@ import {
   ConversationDetail,
   Citation,
 } from "@/types";
-import { chatService, SendMessagePayload } from "@/services/chatService";
+import { chatService, SendMessagePayload, VoiceChatResponse } from "@/services/chatService";
 import { getWelcomeMessage, isWelcomeMessage } from "@/lib/welcomeLocalization";
 
 export interface ChatMessage extends Message {
@@ -55,6 +55,7 @@ interface ChatState {
   isTranslating: boolean;
   isHistoryOpen: boolean;
   selectedLanguage: string;
+  isVoiceContinuous: boolean;
 
   // Setters
   setActiveConversationId: (id: string | null) => void;
@@ -65,6 +66,7 @@ interface ChatState {
   toggleHistory: (open?: boolean) => void;
   setSelectedLanguage: (lang: string) => void;
   setIsTranslating: (translating: boolean) => void;
+  setIsVoiceContinuous: (continuous: boolean) => void;
 
   // Actions
   fetchConversations: () => Promise<void>;
@@ -76,6 +78,11 @@ interface ChatState {
     jurisdiction: string;
     intent?: string;
   }) => Promise<void>;
+  sendVoiceMessage: (
+    audioBlob: Blob,
+    jurisdiction: string,
+    intent?: string
+  ) => Promise<VoiceChatResponse>;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -92,12 +99,14 @@ export const useChatStore = create<ChatState>()(
       isTranslating: false,
       isHistoryOpen: false,
       selectedLanguage: getInitialLang(),
+      isVoiceContinuous: false,
 
       setActiveConversationId: (id) => set({ activeConversationId: id }),
       setMessages: (messages) => set({ messages }),
       setProductContext: (productContext) => set({ productContext }),
       setActiveClassification: (activeClassification) => set({ activeClassification }),
       setClassificationState: (classificationState) => set({ classificationState }),
+      setIsVoiceContinuous: (isVoiceContinuous) => set({ isVoiceContinuous }),
       setSelectedLanguage: (selectedLanguage) => {
         if (typeof window !== "undefined") {
           localStorage.setItem("ip_sakti_lang", selectedLanguage);
@@ -327,6 +336,100 @@ export const useChatStore = create<ChatState>()(
           set({ isSending: false });
         }
       },
+
+      sendVoiceMessage: async (
+        audioBlob: Blob,
+        jurisdiction: string,
+        intent?: string
+      ): Promise<VoiceChatResponse> => {
+        const state = get();
+        const activeConvId = state.activeConversationId;
+        const productContext = state.productContext;
+
+        set({ isSending: true });
+
+        try {
+          const formData = new FormData();
+          formData.append("file", audioBlob, "speech_query.wav");
+          if (activeConvId) formData.append("conversation_id", activeConvId);
+          formData.append("jurisdiction", jurisdiction || "INDIA");
+          formData.append("language", state.selectedLanguage || "auto");
+          if (intent) formData.append("active_intent", intent);
+          if (productContext) formData.append("active_product_context", JSON.stringify(productContext));
+
+          const res = await chatService.sendVoiceMessage(formData);
+
+          // Append recognized user speech turn and assistant response turn
+          const userMsg: ChatMessage = {
+            id: `usr-${Date.now()}`,
+            conversation_id: res.conversation_id,
+            role: "user",
+            content: res.transcribed_text,
+            jurisdiction: jurisdiction,
+            created_at: new Date().toISOString(),
+          };
+
+          const botMsg: ChatMessage = {
+            id: res.message_id || `bot-${Date.now()}`,
+            conversation_id: res.conversation_id,
+            role: "assistant",
+            content: res.content,
+            jurisdiction: res.jurisdiction,
+            confidence_score: res.confidence_score,
+            confidence_label: res.confidence_label,
+            requires_human_review: res.requires_human_review,
+            citations: res.citations || [],
+            out_of_scope_detected: res.out_of_scope_detected,
+            detected_language: res.detected_language,
+            is_translated: res.is_translated,
+            created_at: new Date().toISOString(),
+          };
+
+          let newProductContext = state.productContext;
+          let newClassification = state.activeClassification;
+          let newClassificationState = state.classificationState;
+
+          if (res.product_context) {
+            newProductContext = res.product_context;
+            if (res.product_context.state) {
+              newClassificationState = res.product_context.state as ClassificationState;
+            }
+          }
+
+          if (res.product_classification) {
+            newClassification = res.product_classification;
+          }
+
+          set((s) => ({
+            activeConversationId: res.conversation_id,
+            messages: [...s.messages, userMsg, botMsg],
+            productContext: newProductContext,
+            activeClassification: newClassification,
+            classificationState: newClassificationState,
+          }));
+
+          get().fetchConversations();
+          return res;
+        } catch (err: any) {
+          console.error("Voice chat turn error:", err);
+          const errorMsg: ChatMessage = {
+            id: `err-${Date.now()}`,
+            conversation_id: activeConvId || "error",
+            role: "assistant",
+            content:
+              "Unable to process voice message at this moment. Please try again or type your question in the text box.",
+            jurisdiction: jurisdiction,
+            requires_human_review: true,
+            created_at: new Date().toISOString(),
+          };
+          set((s) => ({
+            messages: [...s.messages, errorMsg],
+          }));
+          throw err;
+        } finally {
+          set({ isSending: false });
+        }
+      },
     }),
     {
       name: "ip-sakti-chat-session",
@@ -337,6 +440,7 @@ export const useChatStore = create<ChatState>()(
         activeClassification: state.activeClassification,
         classificationState: state.classificationState,
         selectedLanguage: state.selectedLanguage,
+        isVoiceContinuous: state.isVoiceContinuous,
       }),
     }
   )

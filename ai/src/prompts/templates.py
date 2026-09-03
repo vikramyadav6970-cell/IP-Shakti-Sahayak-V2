@@ -5,6 +5,8 @@ System and user prompt templates enforcing strict evidence grounding,
 statutory citations, regulatory clarity, and conversational product classification.
 """
 
+from typing import Any, Dict, List, Optional
+
 CONSULTATION_SYSTEM_PROMPT = """You are IP-SAKTI Sahayak, an authoritative AI legal and regulatory decision support assistant for Ayurvedic, herbal, and traditional innovations developed under Ministry of Ayush guidelines.
 
 CONVERSATIONAL PRODUCT CLASSIFICATION WORKFLOW (MANDATORY):
@@ -124,3 +126,90 @@ def build_user_prompt(
         evidence_block=evidence_block,
         question=question,
     )
+
+
+MULTI_DOMAIN_SYNTHESIS_DIRECTIVE = """
+MULTI-DOMAIN SYNTHESIS DIRECTIVE:
+You have been provided with labeled evidence from multiple domain-specific retrieval agents. Each domain's evidence is labeled and isolated. For your response:
+
+1. DOMAIN-ISOLATED GROUNDING:
+   - Address each domain's sub-question using ONLY that domain's labeled evidence.
+   - Do NOT cross-pollinate: never use patent_agent evidence to answer biodiversity_agent questions, or vice versa.
+
+2. SELECTIVE / PARTIAL GROUNDING & ABSENCE RULE:
+   - If a domain's evidence set has hits_found: False, apply the ABSENCE OF RETRIEVED STATUTES RULE for that domain specifically (disclaim, state general principles only, never invent citations) while still answering other domain(s) with full statutory citations if they have strong evidence.
+
+3. STRUCTURED PER-DOMAIN HEADINGS:
+   - Structure your response with a clear markdown heading for each domain (e.g., "### 1. Patentability Assessment (§3(p) / §3(e))" and "### 2. Biological Resources & NBA ABS Compliance").
+
+4. CONTEXT TAG:
+   - Output the single-line [[PRODUCT_CONTEXT:...]] tag at the very end of your response.
+"""
+
+MULTI_DOMAIN_USER_PROMPT_TEMPLATE = """Active Jurisdiction: {jurisdiction}
+Mode: MULTI-AGENT ORCHESTRATION (Domains Dispatched: {domains_list})
+{product_context_block}
+
+MULTI-DOMAIN LABELED STATUTORY EVIDENCE:
+{domain_evidence_blocks}
+
+USER COMPOUND QUERY:
+{question}
+
+{multi_domain_directive}
+
+Provide an authoritative, well-structured multi-domain response adhering strictly to the Multi-Domain Synthesis Directive and Evidence-Grounding boundaries. Output the [[PRODUCT_CONTEXT:...]] tag at the very end:"""
+
+
+def build_multi_domain_user_prompt(
+    question: str,
+    jurisdiction: str,
+    domain_evidence_map: Dict[str, Any],
+    classification_category: str = None,
+    product_context: str = None,
+) -> str:
+    """Formats multi-agent domain-labeled evidence and compound question into synthesis prompt."""
+    domain_blocks = []
+    domains_list = list(domain_evidence_map.keys())
+
+    for domain_name, data in domain_evidence_map.items():
+        sub_q = data.get("sub_question", question)
+        intent_val = data.get("intent", "GENERAL")
+        hits_found = data.get("hits_found", False)
+        evidence_items = data.get("evidence", [])
+
+        ev_lines = []
+        for i, ev in enumerate(evidence_items, start=1):
+            sec = ev.get("section_ref") or ev.get("article_ref") or "General"
+            title = ev.get("doc_title", "Authoritative Source")
+            content = ev.get("content", "")
+            ev_lines.append(f"  [{i}] {title} | {sec}\n  {content}\n")
+
+        ev_text = "\n".join(ev_lines) if ev_lines else "  NO SPECIFIC STATUTORY CHUNKS RETRIEVED FOR THIS DOMAIN (hits_found: False)."
+
+        domain_blocks.append(
+            f"=== DOMAIN: [{domain_name}] (Intent: {intent_val}) ===\n"
+            f"Sub-Question: {sub_q}\n"
+            f"Hits Found: {hits_found}\n"
+            f"Evidence Items:\n{ev_text}\n"
+        )
+
+    domain_evidence_blocks = "\n".join(domain_blocks)
+
+    context_lines = []
+    if classification_category:
+        context_lines.append(f"Active Product Classification: {classification_category}")
+    if product_context:
+        context_lines.append(f"Known Product Context: {product_context}")
+
+    product_context_block = "\n".join(context_lines) if context_lines else ""
+
+    return MULTI_DOMAIN_USER_PROMPT_TEMPLATE.format(
+        jurisdiction=jurisdiction,
+        domains_list=", ".join(domains_list),
+        product_context_block=product_context_block,
+        domain_evidence_blocks=domain_evidence_blocks,
+        question=question,
+        multi_domain_directive=MULTI_DOMAIN_SYNTHESIS_DIRECTIVE,
+    )
+

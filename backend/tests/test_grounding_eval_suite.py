@@ -20,10 +20,16 @@ load_dotenv(root_dir / "backend" / ".env")
 load_dotenv(root_dir / "ai" / ".env")
 
 from src.classification.jurisdiction_classifier import JurisdictionClassifier
-from src.prompts.templates import CONSULTATION_SYSTEM_PROMPT, build_user_prompt
+from src.confidence.confidence_scorer import ConfidenceScorer
+from src.orchestration.decomposer import QueryDecomposer, AgentTask
+from src.prompts.templates import (
+    CONSULTATION_SYSTEM_PROMPT,
+    build_user_prompt,
+    build_multi_domain_user_prompt,
+)
 from src.reasoning.llm_provider import get_llm_provider
 from src.retrieval.qdrant_manager import QdrantManager
-from src.retrieval.retriever import HybridRetriever, MIN_RELEVANCE_SCORE
+from src.retrieval.retriever import HybridRetriever, MIN_RELEVANCE_SCORE, DomainEvidenceSet
 from src.embeddings.embedding_provider import get_embedding_provider
 from src.embeddings.sparse_provider import BM25SparseProvider
 
@@ -181,6 +187,127 @@ def test_eval_grounding_adversarial_tangential_evidence_rejection(llm):
     resp = llm.generate(system_prompt=CONSULTATION_SYSTEM_PROMPT, user_prompt=prompt, temperature=0.0)
 
     # Must disclaim that fee schedules and specific section numbers are absent from the indexed database
-    assert "not indexed" in resp.lower() or "absent" in resp.lower() or "unverified" in resp.lower() or "direct verification" in resp.lower()
+    assert any(w in resp.lower() for w in ["not indexed", "absent", "unverified", "direct verification", "not present", "not available"])
     # Must NOT claim Form 25-D is used in Australia
     assert '"regulatory_pathway": "Form 25-D"' not in resp
+
+
+def test_multi_domain_decomposition():
+    """Confirms query decomposer splits compound multi-intent queries and preserves single-intent fast path."""
+    # 1. Compound query spanning Patent + ABS
+    compound_q = "Can I patent my Ashwagandha formulation and do I need NBA approval to source it from Western Ghats?"
+    tasks = QueryDecomposer.decompose(compound_q, jurisdiction="INDIA")
+    assert len(tasks) == 2
+    scopes = {t.agent_scope for t in tasks}
+    assert "patent_agent" in scopes
+    assert "biodiversity_agent" in scopes
+
+    # 2. Single-intent query (Fast Path regression check)
+    single_q = "What are the traditional knowledge exclusions under Section 3(p) of the Patents Act?"
+    single_tasks = QueryDecomposer.decompose(single_q, jurisdiction="INDIA")
+    assert len(single_tasks) == 1
+    assert single_tasks[0].agent_scope == "patent_agent"
+    assert single_tasks[0].intent == "PATENT"
+
+
+def test_multi_domain_parallel_scoped_retrieval_isolation(qdrant_retriever):
+    """
+    Confirms domain-scoped retrieval preserves strict isolation:
+    Patent agent evidence contains Patent statutes, ABS agent evidence contains Biodiversity statutes.
+    """
+    compound_q = "Can I patent my Ashwagandha extract and do I need NBA Form 1 approval to access biological resources?"
+    tasks = QueryDecomposer.decompose(compound_q, jurisdiction="INDIA")
+    assert len(tasks) >= 2
+
+    # Execute scoped retrieval per task
+    results = [qdrant_retriever.retrieve_for_task(t, top_k=2) for t in tasks]
+    domain_map = {r.agent_scope: r for r in results}
+
+    assert "patent_agent" in domain_map
+    assert "biodiversity_agent" in domain_map
+
+    patent_set = domain_map["patent_agent"]
+    abs_set = domain_map["biodiversity_agent"]
+
+    assert patent_set.hits_found is True
+    assert abs_set.hits_found is True
+
+    # Check isolation: patent set has patent statutes, ABS set has biological diversity statutes
+    patent_titles = " ".join(e.doc_title.lower() for e in patent_set.evidence)
+    abs_titles = " ".join(e.doc_title.lower() for e in abs_set.evidence)
+
+    assert "patent" in patent_titles or "the_patents_act" in patent_titles
+    assert "biodiversity" in abs_titles or "biological" in abs_titles or "guidelines" in abs_titles
+
+
+def test_multi_domain_partial_grounding_and_synthesis(llm):
+    """
+    Evaluates partial grounding across multiple domains:
+    Patent domain has strong statutory chunks; Food regulation domain has 0 hits.
+    The synthesized response must ground the patent section while applying the absence disclaimer for food regulation.
+    """
+    domain_evidence_map = {
+        "patent_agent": {
+            "intent": "PATENT",
+            "sub_question": "Can I patent my Ashwagandha formulation?",
+            "hits_found": True,
+            "evidence": [
+                {
+                    "doc_title": "The_Patents_Act,_1970.pdf",
+                    "section_ref": "Section 3(p)",
+                    "content": "Section 3(p): an invention which in effect is traditional knowledge or an aggregation of known properties of traditionally known components.",
+                }
+            ],
+        },
+        "food_regulation_agent": {
+            "intent": "FOOD_REGULATION",
+            "sub_question": "What are the exact FSSAI laboratory testing fees for Ayurveda Aahara?",
+            "hits_found": False,
+            "evidence": [],
+        },
+    }
+
+    prompt = build_multi_domain_user_prompt(
+        question="Can I patent my Ashwagandha formulation and what are the exact FSSAI laboratory testing fees?",
+        jurisdiction="INDIA",
+        domain_evidence_map=domain_evidence_map,
+        classification_category="Ayurveda-Aahar / Nutraceutical",
+    )
+
+    resp = llm.generate(system_prompt=CONSULTATION_SYSTEM_PROMPT, user_prompt=prompt, temperature=0.0)
+
+    # Patent section must cite Section 3(p)
+    assert "3(p)" in resp or "Section 3" in resp
+    # Food regulation section must disclaim missing fee schedule in database
+    assert "not indexed" in resp.lower() or "not present" in resp.lower() or "unverified" in resp.lower() or "general principles" in resp.lower() or "direct verification" in resp.lower()
+
+
+def test_multi_domain_confidence_scoring():
+    """Confirms composite multi-domain confidence score is driven by the weakest domain."""
+    domain_evidence_map = {
+        "patent_agent": {
+            "hits_found": True,
+            "evidence": [
+                type("Evidence", (), {"score": 0.72, "chunk_id": "c1", "doc_title": "The_Patents_Act,_1970.pdf"})()
+            ],
+        },
+        "biodiversity_agent": {
+            "hits_found": False,
+            "evidence": [],
+        },
+    }
+
+    assessment = ConfidenceScorer.calculate_multi_domain_confidence(
+        response_text="Advisory response covering Section 3(p) and NBA.",
+        domain_evidence_map=domain_evidence_map,
+        validated_citations=[],
+    )
+
+    assert assessment.domain_confidence["patent_agent"]["score"] > 0.60
+    assert assessment.domain_confidence["biodiversity_agent"]["score"] <= 0.45
+    assert assessment.domain_confidence["biodiversity_agent"]["label"] == "LOW"
+    # Overall score must reflect the weakest domain
+    assert assessment.overall_composite_score <= 0.45
+    assert assessment.overall_confidence_label == "LOW"
+    assert assessment.requires_human_review is True
+

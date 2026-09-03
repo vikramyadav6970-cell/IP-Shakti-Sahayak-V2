@@ -46,6 +46,25 @@ class RetrievedEvidence:
         }
 
 
+@dataclass
+class DomainEvidenceSet:
+    """Domain-specific evidence package returned by scoped agent retrieval."""
+    agent_scope: str
+    intent: str
+    sub_question: str
+    evidence: List[RetrievedEvidence]
+    hits_found: bool
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "agent_scope": self.agent_scope,
+            "intent": self.intent,
+            "sub_question": self.sub_question,
+            "evidence": [e.to_dict() for e in self.evidence],
+            "hits_found": self.hits_found,
+        }
+
+
 # Intent to collection mapping
 INTENT_COLLECTION_ROUTING: Dict[str, List[str]] = {
     "PATENT": ["legal_statutory", "case_law_prior_art", "procedural_forms_checklists"],
@@ -63,7 +82,7 @@ INTENT_IP_DOMAINS: Dict[str, List[str]] = {
     "PATENT": ["patents", "traditional_knowledge", "drugs_cosmetics", "herbal_standards", "general_ip", "international_treaties"],
     "ABS": ["biological_diversity", "traditional_knowledge", "international_treaties", "general_ip"],
     "TRADEMARK": ["trademarks", "general_ip", "international_treaties"],
-    "FOOD_REGULATION": ["food_safety", "traditional_knowledge", "drugs_cosmetics", "herbal_standards"],
+    "FOOD_REGULATION": ["food_safety", "food_regulation", "traditional_knowledge", "drugs_cosmetics", "herbal_standards"],
     "FORMULATION": ["herbal_standards", "traditional_knowledge", "drugs_cosmetics", "patents"],
     "EXPORT": ["export_control", "international_treaties", "traditional_knowledge", "patents", "trademarks", "general_ip", "copyright", "geographical_indications", "industrial_designs"],
     "CASE_LAW": ["patents", "trademarks", "copyright", "industrial_designs", "geographical_indications", "traditional_knowledge", "general_ip", "drugs_cosmetics"],
@@ -130,6 +149,7 @@ class HybridRetriever:
         Executes hybrid retrieval across routed collections with strict jurisdiction and domain filtering.
         """
         # 1. Determine collections to query
+        avail = self.qdrant.get_available_collections()
         if target_collections:
             collections = [c for c in target_collections if c in CANONICAL_COLLECTIONS]
         elif intent and intent in INTENT_COLLECTION_ROUTING:
@@ -140,6 +160,14 @@ class HybridRetriever:
                 collections = ["international_export", "case_law_prior_art", "legal_statutory"]
             else:
                 collections = ["legal_statutory", "standards_formulations", "case_law_prior_art", "procedural_forms_checklists"]
+
+        # Filter strictly to collections currently present in active Qdrant cluster
+        effective_collections = [c for c in collections if c in avail]
+        if not effective_collections and "legal_statutory" in avail:
+            effective_collections = ["legal_statutory"]
+        elif not effective_collections:
+            effective_collections = list(avail)
+        collections = effective_collections
 
         # 2. Derive dynamic semantic anchor and vectorize query
         anchor = get_adaptive_query_anchor(query, intent=intent)
@@ -277,3 +305,22 @@ class HybridRetriever:
                 break
 
         return deduped_hits
+
+    def retrieve_for_task(self, task: Any, top_k: int = 3) -> DomainEvidenceSet:
+        """
+        Executes domain-scoped retrieval for an individual AgentTask in multi-agent orchestration.
+        Maintains independent gating, filtering, adaptive query anchoring, and deduplication.
+        """
+        hits = self.retrieve(
+            query=task.sub_question,
+            jurisdiction=task.jurisdiction,
+            intent=task.intent,
+            top_k=top_k,
+        )
+        return DomainEvidenceSet(
+            agent_scope=task.agent_scope,
+            intent=task.intent,
+            sub_question=task.sub_question,
+            evidence=hits,
+            hits_found=len(hits) > 0,
+        )

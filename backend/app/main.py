@@ -1,7 +1,7 @@
 """
 backend/app/main.py
 
-FastAPI application entrypoint for IP-SAKTI Sahayak.
+FastAPI application entrypoint for IP-SAKTI Sahayak (v2.1 Speech Sanitized).
 """
 
 import os
@@ -78,7 +78,8 @@ async def lifespan(app: FastAPI):
             # Pre-warm embedding model and Qdrant client in memory
             try:
                 from app.services.chat_service import get_shared_retriever
-                get_shared_retriever()
+                _retriever = get_shared_retriever()
+                _ = _retriever.dense_provider.embed("Warmup query embedding for pre-loading weights")
                 print(" [AI RUNTIME READY] Embedding model & vector retriever pre-warmed successfully in memory.")
             except Exception as e_warm:
                 print(f"[AI Pre-warm Notice]: {e_warm}")
