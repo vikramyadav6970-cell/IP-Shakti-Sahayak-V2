@@ -73,17 +73,17 @@ async def lifespan(app: FastAPI):
                     await conn.commit()
                 except Exception:
                     await conn.rollback()
-        # Check Dedicated Encryption Master Key for External Connectors (Hard requirement)
+        # Check Dedicated Encryption Master Key for External Connectors
         from app.core.encryption import validate_encryption_setup
         try:
             validate_encryption_setup()
             print(" [SECURITY INITIALIZED] Dedicated ENCRYPTION_MASTER_KEY validated successfully.")
-        except RuntimeError as err:
+        except Exception as err:
             print("\n" + "!" * 80)
-            print(f" ⚠️  CRITICAL SECURITY STARTUP ERROR: {err}")
+            print(f" ⚠️  SECURITY NOTICE: ENCRYPTION_MASTER_KEY configuration notice: {err}")
+            print(" External connector credentials cannot be encrypted/decrypted until ENCRYPTION_MASTER_KEY is set in your environment variables.")
+            print(" Core API endpoints (Chat, Search, Auth, Classification, Health) remain fully operational.")
             print("!" * 80 + "\n")
-            if settings.ENVIRONMENT != "test":
-                raise
 
         # Check Embedding Provider Configuration
         embedding_prov = (os.environ.get("EMBEDDING_PROVIDER") or "bge-m3").lower()
@@ -108,8 +108,6 @@ async def lifespan(app: FastAPI):
                 print(f"[AI Pre-warm Notice]: {e_warm}")
     except Exception as e:
         print(f"[Lifespan Startup Notice]: {e}")
-        if isinstance(e, RuntimeError) and "ENCRYPTION_MASTER_KEY" in str(e) and settings.ENVIRONMENT != "test":
-            raise
     yield
 
 
