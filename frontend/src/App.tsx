@@ -6,6 +6,7 @@ import { LandingPage } from "@/app/LandingPage";
 import { ChatPage } from "@/app/ChatPage";
 import { ABSPage } from "@/app/ABSPage";
 import { FacilitatorQueriesPage } from "@/app/FacilitatorQueriesPage";
+import { ConnectionsPage } from "@/app/ConnectionsPage";
 import { LoginPage } from "@/app/LoginPage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -20,15 +21,13 @@ const queryClient = new QueryClient({
   },
 });
 
-const LoginRoute: React.FC = () => {
-  const { isAuthenticated } = useAuthStore();
-  if (isAuthenticated) {
-    return <Navigate to="/chat" replace />;
-  }
-  return <LoginPage />;
-};
-
 export const App: React.FC = () => {
+  const initAuth = useAuthStore((state) => state.initAuth);
+
+  React.useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -64,12 +63,24 @@ export const App: React.FC = () => {
               }
             />
             <Route
+              path="connections"
+              element={
+                <ProtectedRoute>
+                  <ConnectionsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="integrations"
+              element={<Navigate to="/connections" replace />}
+            />
+            <Route
               path="my-queries"
               element={<Navigate to="/facilitator-desk" replace />}
             />
-            <Route path="login" element={<LoginRoute />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

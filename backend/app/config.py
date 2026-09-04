@@ -61,14 +61,28 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # Dedicated Master Key for User-Managed External Connector Symmetric Encryption
+    ENCRYPTION_MASTER_KEY: Optional[str] = Field(
+        default=None,
+        description="Dedicated 32+ char key strictly required for encrypting external connector credentials at rest. Must NOT be shared with JWT_SECRET.",
+    )
+
     # Qdrant Vector Store
     QDRANT_URL: Optional[str] = None
     QDRANT_API_KEY: Optional[str] = None
 
-    # LLM Provider (Google Gemini)
-    LLM_PROVIDER: str = "gemini"
-    LLM_MODEL: str = "gemini-3.5-flash-lite"
+    # LLM Provider Configuration (dynamically loaded from .env)
+    LLM_PROVIDER: str = Field(
+        default="gemini",
+        description="LLM provider: 'gemini' | 'openai' | 'anthropic' | 'mock'",
+    )
+    LLM_MODEL: str = Field(
+        default="gemini-2.5-flash",
+        description="LLM model name (e.g. gemini-2.5-flash, gemini-3.5-flash-lite, gpt-4o, claude-3-5-sonnet)",
+    )
     GEMINI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+    ANTHROPIC_API_KEY: Optional[str] = None
 
     # Translation Provider (Sarvam AI)
     SARVAM_API_KEY: Optional[str] = None

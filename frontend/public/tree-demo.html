@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ayurvedic Sacred Tree - Translucent UI & Living Growth Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #05140e;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #f8fafc;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Ambient Background Glow */
+    .bg-aura {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.22) 0%, rgba(5, 150, 105, 0.08) 55%, transparent 85%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Floating Spores Canvas */
+    #sporesCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ----------------------------------------------------
+       MASSIVE WHOLE-PAGE TREE CONTAINER
+       (Locked dead-center, opacity set to FULL 100%)
+       ---------------------------------------------------- */
+    .tree-stage-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .tree-stage-inner {
+      width: min(1580px, 98vw);
+      height: min(1400px, 98vh);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1.0; /* FULL 100% OPACITY */
+      transform: scale(1.22);
+      transform-origin: center center;
+      transition: opacity 0.3s ease, transform 0.25s ease;
+    }
+
+    .tree-sway {
+      animation: sacredTreeBreeze 9s ease-in-out infinite alternate;
+    }
+    @keyframes sacredTreeBreeze {
+      0% {
+        transform: scale(1.22) rotate(-0.5deg);
+      }
+      50% {
+        transform: scale(1.235) rotate(0.4deg);
+      }
+      100% {
+        transform: scale(1.22) rotate(0.6deg);
+      }
+    }
+
+    #treeRenderCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 38px rgba(52, 211, 153, 0.95)) drop-shadow(0 0 14px rgba(110, 231, 183, 1));
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* ----------------------------------------------------
+       TRANSLUCENT / TRANSPARENT PLATFORM UI
+       (Text opacity set to MEDIUM 50%)
+       ---------------------------------------------------- */
+    .landing-ui {
+      position: relative;
+      z-index: 10;
+      max-width: 980px;
+      width: 92%;
+      text-align: center;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      opacity: 0.50; /* MEDIUM 50% OPACITY */
+      transition: opacity 0.25s ease;
+    }
+
+    .ministry-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: rgba(110, 231, 183, 0.9);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.45) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: rgba(203, 213, 225, 0.75);
+      max-width: 700px;
+      line-height: 1.55;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(6, 35, 25, 0.45);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: rgba(52, 211, 153, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      margin-top: 6px;
+    }
+    @media (max-width: 768px) {
+      .cards-row {
+        grid-template-columns: 1fr;
+      }
+      .hero-title {
+        font-size: 28px;
+      }
+    }
+
+    .preview-card {
+      background: rgba(15, 23, 42, 0.22);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      padding: 15px 18px;
+      border-radius: 18px;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+    .preview-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.6);
+      background: rgba(15, 23, 42, 0.45);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(241, 245, 249, 0.85);
+      margin-bottom: 5px;
+    }
+    .card-desc {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.70);
+      line-height: 1.4;
+    }
+
+    /* Floating Dock Controls */
+    .controls-dock {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      padding: 10px 24px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 25px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+    }
+
+    .ctrl-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a7f3d0;
+      font-weight: 600;
+    }
+    .ctrl-item input[type="range"] {
+      accent-color: #34d399;
+      cursor: pointer;
+      width: 90px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-aura"></div>
+  <canvas id="sporesCanvas"></canvas>
+
+  <!-- ----------------------------------------------------
+       PERFECTLY CENTERED SACRED TREE (FULL OPACITY: 1.0)
+       ---------------------------------------------------- -->
+  <div class="tree-stage-center">
+    <div class="tree-stage-inner tree-sway" id="treeInnerWrap">
+      <canvas id="treeRenderCanvas" width="462" height="456"></canvas>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------
+       TRANSPARENT HERO TEXT OVERLAID (MEDIUM OPACITY: 50%)
+       ---------------------------------------------------- -->
+  <div class="landing-ui" id="landingUI">
+    <div class="ministry-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Ministry of Ayush · Legal & Regulatory Intelligence
+    </div>
+
+    <h1 class="hero-title">
+      Rooted in Ayurvedic Tradition,<br />
+      Branching into Modern IP Innovation
+    </h1>
+
+    <p class="hero-sub">
+      Notice how the monumental sacred tree now commands the entire center of the platform — growing deliberately from root to trunk, branch by branch, and leaf by leaf.
+    </p>
+
+    <div class="status-pill" id="growthStatus">GERMINATING SACRED SEED...</div>
+
+    <div class="cards-row">
+      <div class="preview-card">
+        <div class="card-title">🌿 Deep Root Clearance</div>
+        <div class="card-desc">Grounds proprietary formulations against TKDL traditional knowledge prior art.</div>
+      </div>
+      <div class="preview-card">
+        <div class="card-title">⚖️ Statutory Trunk Rigor</div>
+        <div class="card-desc">Navigates Patents Act § 3(p) and NBA Biological Diversity Act 2023 exemptions.</div>
+      </div>
+      <div class="preview-card">
+        <div class="card-title">🍃 Canopy Licensing</div>
+        <div class="card-desc">Streamlined Form 25-D (ASU) vs FSSAI Ayurveda-Aahara regulatory pathways.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Control Dock -->
+  <div class="controls-dock">
+    <button class="btn" id="replayBtn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Replay Growth
+    </button>
+    <div class="ctrl-item">
+      <span>Text Opacity:</span>
+      <input type="range" id="textOpacitySlider" min="0.10" max="1.0" step="0.05" value="0.50" />
+      <span id="textOpacityVal" style="font-family: monospace; font-size: 11px; width: 28px;">50%</span>
+    </div>
+    <div class="ctrl-item">
+      <span>Tree Opacity:</span>
+      <input type="range" id="treeOpacitySlider" min="0.20" max="1.0" step="0.05" value="1.0" />
+      <span id="treeOpacityVal" style="font-family: monospace; font-size: 11px; width: 34px;">100%</span>
+    </div>
+    <div class="ctrl-item">
+      <span>Duration:</span>
+      <input type="range" id="speedSlider" min="2000" max="12000" step="500" value="4000" />
+      <span id="speedVal" style="font-family: monospace; font-size: 11px; width: 28px;">4.0s</span>
+    </div>
+  </div>
+
+  <script>
+    const renderCanvas = document.getElementById("treeRenderCanvas");
+    const renderCtx = renderCanvas.getContext("2d", { willReadFrequently: true });
+    const growthStatus = document.getElementById("growthStatus");
+    const treeInnerWrap = document.getElementById("treeInnerWrap");
+    const landingUI = document.getElementById("landingUI");
+
+    let masterPixels = [];
+    let imgWidth = 462;
+    let imgHeight = 456;
+    let isDataReady = false;
+
+    // Set speed to 4.0s as requested
+    let growthDuration = 4000;
+    let startTime = performance.now();
+    let isGrowing = true;
+
+    const sourceImg = new Image();
+    sourceImg.src = "tree-cutout.png";
+
+    sourceImg.onload = () => {
+      imgWidth = sourceImg.width;
+      imgHeight = sourceImg.height;
+      renderCanvas.width = imgWidth;
+      renderCanvas.height = imgHeight;
+
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = imgWidth;
+      offCanvas.height = imgHeight;
+      const offCtx = offCanvas.getContext("2d", { willReadFrequently: true });
+      offCtx.drawImage(sourceImg, 0, 0);
+
+      const imgData = offCtx.getImageData(0, 0, imgWidth, imgHeight);
+      const data = imgData.data;
+
+      const centerX = imgWidth / 2;
+      const rootBaseY = 250;
+      const trunkForkY = 208;
+      const maxRootDist = 180;
+      const maxCanopyDist = 175;
+
+      masterPixels = [];
+
+      for (let y = 0; y < imgHeight; y++) {
+        for (let x = 0; x < imgWidth; x++) {
+          const idx = (y * imgWidth + x) * 4;
+          const alpha = data[idx + 3];
+
+          if (alpha > 18) {
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+
+            let appearT = 0;
+
+            if (y >= rootBaseY) {
+              const rootDist = Math.hypot(x - centerX, y - rootBaseY);
+              const angle = Math.atan2(x - centerX, y - rootBaseY);
+              const wave = Math.sin(angle * 6.5) * 0.04;
+              appearT = 0.01 + (rootDist / maxRootDist) * 0.32 + wave;
+            } else if (y >= 228 && y < rootBaseY) {
+              const trunkDist = (rootBaseY - y) / (rootBaseY - 228);
+              appearT = 0.28 + trunkDist * 0.14;
+            } else if (y >= trunkForkY && y < 228) {
+              const forkDist = (228 - y) / (228 - trunkForkY);
+              appearT = 0.40 + forkDist * 0.15;
+            } else {
+              const dist = Math.hypot(x - centerX, y - trunkForkY);
+              const angle = Math.atan2(x - centerX, trunkForkY - y);
+              const branchTier = (dist / maxCanopyDist);
+              const angularWave = Math.sin(angle * 5) * 0.06;
+              const isOuterLeaf = dist > 78 && (g > 150 && g > r + 30);
+
+              if (isOuterLeaf) {
+                const leafHash = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1;
+                appearT = 0.70 + (branchTier * 0.18) + (leafHash * 0.12);
+              } else {
+                appearT = 0.52 + (branchTier * 0.24) + angularWave;
+              }
+            }
+
+            appearT = Math.max(0.01, Math.min(appearT, 0.99));
+
+            masterPixels.push({
+              x: x, y: y, r: r, g: g, b: b, a: alpha, appearT: appearT
+            });
+          }
+        }
+      }
+
+      isDataReady = true;
+      startGrowth();
+    };
+
+    function startGrowth() {
+      startTime = performance.now();
+      isGrowing = true;
+      requestAnimationFrame(renderLoop);
+    }
+
+    function renderLoop(now) {
+      if (!isDataReady) {
+        requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / growthDuration, 1);
+      const frameBuffer = renderCtx.createImageData(imgWidth, imgHeight);
+      const fData = frameBuffer.data;
+
+      for (let i = 0; i < masterPixels.length; i++) {
+        const p = masterPixels[i];
+
+        if (progress >= p.appearT) {
+          const pixelIdx = (p.y * imgWidth + p.x) * 4;
+          const timeSinceEmergence = progress - p.appearT;
+          let r = p.r;
+          let g = p.g;
+          let b = p.b;
+          let a = p.a;
+
+          if (timeSinceEmergence < 0.035) {
+            const boost = (1 - timeSinceEmergence / 0.035);
+            r = Math.min(255, r + 90 * boost);
+            g = 255;
+            b = Math.min(255, b + 120 * boost);
+          }
+
+          fData[pixelIdx] = r;
+          fData[pixelIdx + 1] = g;
+          fData[pixelIdx + 2] = b;
+          fData[pixelIdx + 3] = a;
+        }
+      }
+
+      renderCtx.putImageData(frameBuffer, 0, 0);
+
+      if (progress < 0.28) {
+        growthStatus.textContent = "1. SACRED ROOTS DELVING DOWNWARDS INTO TKDL SOIL...";
+      } else if (progress < 0.42) {
+        growthStatus.textContent = "2. LOWER TRUNK ASCENDING STURDILY...";
+      } else if (progress < 0.55) {
+        growthStatus.textContent = "3. UPPER TRUNK & MAIN BOUGHS BIFURCATING...";
+      } else if (progress < 0.74) {
+        growthStatus.textContent = "4. CANOPY BRANCHES EXPANDING OUTWARD...";
+      } else if (progress < 0.96) {
+        growthStatus.textContent = "5. EMERALD LEAVES BLOOMING ONE BY ONE...";
+      } else {
+        growthStatus.textContent = "SACRED AYURVEDIC TREE COMPLETE (LIVING BREATHING AMBIENCE)";
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(renderLoop);
+      } else {
+        isGrowing = false;
+      }
+    }
+
+    // Floating spores
+    const canvas = document.getElementById("sporesCanvas");
+    const ctx = canvas.getContext("2d");
+    let cw, ch;
+
+    function resizeCanvas() {
+      cw = canvas.width = window.innerWidth;
+      ch = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    const spores = [];
+    for (let i = 0; i < 85; i++) {
+      spores.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 2.2 + 0.6,
+        speedY: Math.random() * 0.45 + 0.15,
+        speedX: (Math.random() - 0.5) * 0.3,
+        pulse: Math.random() * Math.PI * 2,
+        baseAlpha: Math.random() * 0.45 + 0.25
+      });
+    }
+
+    function renderSpores() {
+      ctx.clearRect(0, 0, cw, ch);
+      spores.forEach((s) => {
+        s.y -= s.speedY;
+        s.x += s.speedX;
+        s.pulse += 0.03;
+
+        if (s.y < -15) {
+          s.y = ch + 15;
+          s.x = Math.random() * cw;
+        }
+
+        const a = (Math.sin(s.pulse) * 0.3 + 0.7) * s.baseAlpha;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(167, 243, 208, ${a})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#34d399";
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(renderSpores);
+    }
+    renderSpores();
+
+    document.getElementById("replayBtn").addEventListener("click", startGrowth);
+
+    // Text Opacity Slider (medium default 50%)
+    const textOpacitySlider = document.getElementById("textOpacitySlider");
+    const textOpacityVal = document.getElementById("textOpacityVal");
+    textOpacitySlider.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      landingUI.style.opacity = val;
+      textOpacityVal.textContent = Math.round(val * 100) + "%";
+    });
+
+    // Tree Opacity Slider (full default 100%)
+    const treeOpacitySlider = document.getElementById("treeOpacitySlider");
+    const treeOpacityVal = document.getElementById("treeOpacityVal");
+    treeOpacitySlider.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      treeInnerWrap.style.opacity = val;
+      treeOpacityVal.textContent = Math.round(val * 100) + "%";
+    });
+
+    // Speed Slider (4s default)
+    const speedSlider = document.getElementById("speedSlider");
+    const speedVal = document.getElementById("speedVal");
+    speedSlider.addEventListener("input", (e) => {
+      growthDuration = parseInt(e.target.value, 10);
+      speedVal.textContent = (growthDuration / 1000).toFixed(1) + "s";
+    });
+  </script>
+</body>
+</html>

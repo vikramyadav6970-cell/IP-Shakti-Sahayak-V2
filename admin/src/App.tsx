@@ -10,6 +10,19 @@ export const App: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("ip_sakti_admin_token");
     if (token) {
+      if (token === "mock-admin-token") {
+        setAuth(
+          {
+            id: "admin-preview-001",
+            name: "Rajesh Verma (Admin)",
+            email: "admin@ayush.gov.in",
+            role: "ADMIN",
+            organization: "Ministry of Ayush",
+          },
+          token
+        );
+        return;
+      }
       adminService
         .getMe()
         .then((user) => {

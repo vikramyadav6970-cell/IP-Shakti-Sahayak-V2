@@ -10,6 +10,19 @@ export const App: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("ip_sakti_facilitator_token");
     if (token) {
+      if (token === "mock-facilitator-token") {
+        setAuth(
+          {
+            id: "fac-preview-001",
+            name: "Dr. Ananya Sharma",
+            email: "facilitator@ayush.gov.in",
+            role: "IP_FACILITATOR",
+            organization: "Ministry of Ayush",
+          },
+          token
+        );
+        return;
+      }
       facilitatorService
         .getMe()
         .then((user) => {

@@ -47,8 +47,22 @@ class ConfidenceScorer:
         """
         # 1. Retrieval strength component (scaled from dense cosine similarity range)
         if evidence_hits:
-            top_score = max(h.score for h in evidence_hits)
-            avg_score = sum(h.score for h in evidence_hits) / len(evidence_hits)
+            scores = []
+            for h in evidence_hits:
+                if isinstance(h, dict):
+                    s = h.get("score", 0.65)
+                else:
+                    s = getattr(h, "score", 0.65)
+                try:
+                    scores.append(float(s) if s is not None else 0.65)
+                except (ValueError, TypeError):
+                    scores.append(0.65)
+
+            if not scores:
+                scores = [0.65]
+
+            top_score = max(scores)
+            avg_score = sum(scores) / len(scores)
             # Map typical cosine similarity [0.45, 0.75] -> [0.60, 0.98]
             norm_top = 0.60 + ((min(0.75, max(0.45, top_score)) - 0.45) / 0.30) * 0.38
             norm_avg = 0.55 + ((min(0.70, max(0.40, avg_score)) - 0.40) / 0.30) * 0.35

@@ -21,6 +21,19 @@ if settings.HF_TOKEN:
     os.environ["HF_TOKEN"] = settings.HF_TOKEN
     os.environ["HUGGINGFACE_HUB_TOKEN"] = settings.HF_TOKEN
 
+# Dynamic LLM configuration propagation from .env
+if settings.LLM_MODEL:
+    os.environ["LLM_MODEL"] = settings.LLM_MODEL
+if settings.LLM_PROVIDER:
+    os.environ["LLM_PROVIDER"] = settings.LLM_PROVIDER
+if settings.GEMINI_API_KEY:
+    os.environ["GEMINI_API_KEY"] = settings.GEMINI_API_KEY
+    os.environ["GOOGLE_API_KEY"] = settings.GEMINI_API_KEY
+if settings.OPENAI_API_KEY:
+    os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
+if settings.ANTHROPIC_API_KEY:
+    os.environ["ANTHROPIC_API_KEY"] = settings.ANTHROPIC_API_KEY
+
 # Sentry Monitoring Initialization
 if settings.SENTRY_DSN:
     try:
@@ -60,6 +73,18 @@ async def lifespan(app: FastAPI):
                     await conn.commit()
                 except Exception:
                     await conn.rollback()
+        # Check Dedicated Encryption Master Key for External Connectors (Hard requirement)
+        from app.core.encryption import validate_encryption_setup
+        try:
+            validate_encryption_setup()
+            print(" [SECURITY INITIALIZED] Dedicated ENCRYPTION_MASTER_KEY validated successfully.")
+        except RuntimeError as err:
+            print("\n" + "!" * 80)
+            print(f" ⚠️  CRITICAL SECURITY STARTUP ERROR: {err}")
+            print("!" * 80 + "\n")
+            if settings.ENVIRONMENT != "test":
+                raise
+
         # Check Embedding Provider Configuration
         embedding_prov = (os.environ.get("EMBEDDING_PROVIDER") or "bge-m3").lower()
         if embedding_prov in ["mock", "test"] and settings.ENVIRONMENT != "test":
@@ -70,6 +95,7 @@ async def lifespan(app: FastAPI):
             print("!" * 80 + "\n")
         else:
             print("\n" + "=" * 80)
+            print(f" [AI RUNTIME READY] LLM Provider: {settings.LLM_PROVIDER} | Model: {settings.LLM_MODEL}")
             print(" [AI RUNTIME READY] Dense Embeddings: BAAI/bge-m3 (1024-dim) | Qdrant: Connected")
             print("=" * 80 + "\n")
             # Pre-warm embedding model and Qdrant client in memory
@@ -82,6 +108,8 @@ async def lifespan(app: FastAPI):
                 print(f"[AI Pre-warm Notice]: {e_warm}")
     except Exception as e:
         print(f"[Lifespan Startup Notice]: {e}")
+        if isinstance(e, RuntimeError) and "ENCRYPTION_MASTER_KEY" in str(e) and settings.ENVIRONMENT != "test":
+            raise
     yield
 
 
@@ -122,6 +150,7 @@ async def health_check() -> Dict[str, Any]:
         "redis": "configured" if settings.REDIS_URL else "unconfigured",
         "storage": "configured" if settings.S3_ENDPOINT else "local_or_unconfigured",
         "llm_provider": settings.LLM_PROVIDER,
+        "llm_model": settings.LLM_MODEL,
         "qdrant": "configured" if settings.QDRANT_URL else "unconfigured",
     }
 

@@ -58,12 +58,16 @@ class QueryPipeline:
         qdrant_manager: Optional[QdrantManager] = None,
         embedding_provider_type: Optional[str] = None,
         llm_provider_type: Optional[str] = None,
+        llm_model: Optional[str] = None,
     ):
         self.qdrant = qdrant_manager or QdrantManager(in_memory=True)
         self.dense_provider = get_embedding_provider(embedding_provider_type)
         self.sparse_provider = BM25SparseProvider()
         self.retriever = HybridRetriever(self.qdrant, self.dense_provider, self.sparse_provider)
-        self.llm = get_llm_provider(llm_provider_type)
+        self.llm = get_llm_provider(
+            provider_name=llm_provider_type,
+            model_name=llm_model,
+        )
 
     def run(
         self,

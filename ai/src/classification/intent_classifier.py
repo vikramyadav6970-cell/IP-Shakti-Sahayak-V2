@@ -190,7 +190,11 @@ class IntentClassifier:
     """Classifies user inquiries into structured intent domains."""
 
     @staticmethod
-    def is_in_domain(query: str, product_context: Optional[Dict] = None) -> Tuple[bool, float, str]:
+    def is_in_domain(
+        query: str,
+        product_context: Optional[Dict] = None,
+        has_prior_dialogue: bool = False,
+    ) -> Tuple[bool, float, str]:
         """
         Determines whether a user query falls within the Ayush/Traditional Medicine IP & regulatory domain.
         Returns (is_in_domain, confidence_score, matched_intent_or_reason).
@@ -199,6 +203,17 @@ class IntentClassifier:
         if not q:
             return False, 0.0, "OUT_OF_SCOPE"
 
+        # 0. Conversational Affirmations & Follow-ups in ongoing dialogues
+        affirmative_words = {
+            "yes", "yep", "yeah", "sure", "ok", "okay", "proceed", "go ahead",
+            "continue", "please do", "yes please", "sure thing", "tell me more",
+            "elaborate", "explain", "why", "how", "let's do that", "both", "all",
+            "the first one", "the second one", "first one", "second one", "option 1", "option 2",
+        }
+        clean_q = re.sub(r"[\.\?\!\,\;]", "", q).strip()
+        if (has_prior_dialogue or product_context) and (clean_q in affirmative_words or any(clean_q.startswith(w) for w in ["yes,", "sure,", "tell me"])):
+            return True, 0.90, "CONVERSATIONAL_CONTINUATION"
+
         # 1. If active product context exists (in-session dialogue), respect ongoing conversation
         if product_context:
             has_prod = bool(
@@ -206,6 +221,7 @@ class IntentClassifier:
                 or product_context.get("ingredients")
                 or product_context.get("description")
                 or product_context.get("formulation")
+                or product_context.get("category")
                 or product_context.get("state") in ["COLLECTING_PRODUCT_INFORMATION", "CLASSIFIED"]
             )
             if has_prod:
@@ -226,7 +242,11 @@ class IntentClassifier:
             score = min(0.9, 0.4 + (ayush_matches * 0.15))
             return True, round(score, 2), "AYUSH_DOMAIN"
 
-        # 4. Out of domain query (e.g. "what is a mobile", "how to repair car", general knowledge)
+        # 4. If part of prior dialogue and short response, avoid hard refusal unless explicit off-topic
+        if has_prior_dialogue and len(q.split()) <= 6:
+            return True, 0.75, "CONVERSATIONAL_CONTINUATION"
+
+        # 5. Out of domain query (e.g. "what is a mobile", "how to repair car", general knowledge)
         return False, 0.0, "OUT_OF_SCOPE"
 
     @staticmethod

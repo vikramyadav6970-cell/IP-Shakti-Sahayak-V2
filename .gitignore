@@ -57,6 +57,11 @@ yarn-error.log*
 *.sqlite3
 test_local.db
 *.log
+ai/logs/
+*.jsonl
+scratch/
+
+
 
 # IDE & Operating System Artifacts
 .vscode/

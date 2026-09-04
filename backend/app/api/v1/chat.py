@@ -6,7 +6,7 @@ Endpoints for chat consultation, conversation history, and feedback.
 
 from typing import List, Optional
 import uuid
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -23,6 +23,7 @@ from app.schemas.chat import (
 )
 from app.security.dependencies import get_current_user, get_optional_current_user
 from app.services.chat_service import ChatService
+from app.services.chat_summary_service import ChatSummaryService
 from app.services.voice_service import voice_service
 
 router = APIRouter(prefix="/chat", tags=["Chat & Consultation"])
@@ -190,6 +191,83 @@ async def delete_conversation(
     service = ChatService(db)
     await service.delete_user_conversation(current_user, conversation_id)
     return {"message": "Conversation deleted successfully", "id": str(conversation_id)}
+
+
+@router.get(
+    "/conversations/{conversation_id}/summary",
+    status_code=status.HTTP_200_OK,
+    summary="Generate LLM-powered structured consultation summary",
+)
+@router.post(
+    "/conversations/{conversation_id}/summary",
+    status_code=status.HTTP_200_OK,
+    summary="Generate LLM-powered structured consultation summary",
+)
+async def get_conversation_summary(
+    conversation_id: uuid.UUID,
+    current_user: User = Depends(get_optional_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Synthesizes an executive legal and regulatory consultation summary for the session
+    using LLM reasoning and statutory grounding.
+    """
+    summary_service = ChatSummaryService(db)
+    try:
+        return await summary_service.generate_summary(conversation_id, current_user)
+    except ValueError as val_err:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(val_err),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate consultation summary: {str(exc)}",
+        )
+
+
+@router.get(
+    "/conversations/{conversation_id}/summary/pdf",
+    status_code=status.HTTP_200_OK,
+    summary="Download publication-ready consultation summary PDF dossier",
+)
+@router.post(
+    "/conversations/{conversation_id}/summary/pdf",
+    status_code=status.HTTP_200_OK,
+    summary="Download publication-ready consultation summary PDF dossier",
+)
+async def download_conversation_summary_pdf(
+    conversation_id: uuid.UUID,
+    current_user: User = Depends(get_optional_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Compiles and returns a high-fidelity PDF report dossier containing executive summary,
+    product classification, patentability assessment, ABS compliance, and citation index.
+    """
+    summary_service = ChatSummaryService(db)
+    try:
+        pdf_bytes = await summary_service.generate_pdf_report(conversation_id, current_user)
+        filename = f"IP_SAKTI_Consultation_Summary_{str(conversation_id)[:8]}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Content-Type": "application/pdf",
+            },
+        )
+    except ValueError as val_err:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(val_err),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to compile PDF summary report: {str(exc)}",
+        )
 
 
 @router.post(

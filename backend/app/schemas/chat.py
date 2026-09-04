@@ -20,6 +20,9 @@ class CitationRead(BaseModel):
     jurisdiction: str
     document_type: Optional[str] = None
     verification_status: Optional[str] = "VERIFIED_OFFICIAL_GAZETTE"
+    is_live: Optional[bool] = False
+    is_paid_source: Optional[bool] = False
+    retrieved_at: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

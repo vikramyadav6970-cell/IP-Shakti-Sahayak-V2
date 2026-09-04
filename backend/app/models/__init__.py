@@ -19,6 +19,7 @@ from app.models.entities import (
     AuditLog,
     Feedback,
     ExpertRequest,
+    UserExternalConnection,
 )
 
 __all__ = [
@@ -43,4 +44,5 @@ __all__ = [
     "AuditLog",
     "Feedback",
     "ExpertRequest",
+    "UserExternalConnection",
 ]

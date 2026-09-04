@@ -66,6 +66,9 @@ export interface Citation {
   document_type?: string;
   verification_status?: string;
   chunk_id?: string;
+  is_live?: boolean;
+  is_paid_source?: boolean;
+  retrieved_at?: string;
 }
 
 export interface Message {
@@ -177,4 +180,34 @@ export interface ConversationDetail {
   created_at: string;
   updated_at: string;
   messages: Message[];
+}
+
+export interface ConnectorCredentialField {
+  name: string;
+  label: string;
+  field_type: "text" | "password";
+  placeholder: string;
+  required: boolean;
+  help_text: string;
+}
+
+export interface ConnectorInfo {
+  name: string;
+  display_name: string;
+  description: string;
+  requires_api_key: boolean;
+  is_paid: boolean;
+  rate_limit_per_minute: number;
+  credential_fields: ConnectorCredentialField[];
+  is_connected: boolean;
+  status: "connected" | "error" | "disconnected";
+  last_tested_at?: string;
+  last_error_code?: string;
+  last_error_message?: string;
+}
+
+export interface ConnectorTestResult {
+  success: boolean;
+  error_code?: string;
+  error_message?: string;
 }

@@ -45,6 +45,8 @@ class QueryDecomposer:
         jurisdiction: str = "INDIA",
         explicit_intent: Optional[str] = None,
         confidence_threshold: float = 0.15,
+        product_context: Optional[Dict] = None,
+        has_prior_dialogue: bool = False,
     ) -> List[AgentTask]:
         """
         Decomposes query into one or more AgentTasks.
@@ -69,7 +71,11 @@ class QueryDecomposer:
 
         # If no qualifying in-domain patterns matched
         if not qualifying:
-            in_domain, conf, _ = IntentClassifier.is_in_domain(query)
+            in_domain, conf, _ = IntentClassifier.is_in_domain(
+                query,
+                product_context=product_context,
+                has_prior_dialogue=has_prior_dialogue,
+            )
             if in_domain:
                 primary_intent = explicit_intent or "FORMULATION"
                 scope = INTENT_TO_AGENT_SCOPE.get(primary_intent, "formulation_agent")

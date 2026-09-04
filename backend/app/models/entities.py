@@ -19,8 +19,10 @@ from sqlalchemy import (
     Index,
     Integer,
     JSON,
+    LargeBinary,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -93,6 +95,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     products: Mapped[List["Product"]] = relationship("Product", back_populates="user", cascade="all, delete-orphan")
     feedbacks: Mapped[List["Feedback"]] = relationship("Feedback", back_populates="user")
     expert_requests: Mapped[List["ExpertRequest"]] = relationship("ExpertRequest", foreign_keys="[ExpertRequest.user_id]", back_populates="user")
+    external_connections: Mapped[List["UserExternalConnection"]] = relationship("UserExternalConnection", back_populates="user", cascade="all, delete-orphan")
 
 
 class Conversation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -298,3 +301,22 @@ class ExpertRequest(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     # Relationships
     user: Mapped["User"] = relationship("User", foreign_keys=[user_id], back_populates="expert_requests")
+
+
+class UserExternalConnection(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    """User-managed external API credentials (encrypted at rest)."""
+    __tablename__ = "user_external_connections"
+    __table_args__ = (
+        UniqueConstraint("user_id", "connector_name", name="uq_user_connector"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    connector_name: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    encrypted_credentials: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="connected", nullable=False, index=True)  # "connected" | "error" | "disconnected"
+    last_tested_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_error_code: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    last_error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="external_connections")

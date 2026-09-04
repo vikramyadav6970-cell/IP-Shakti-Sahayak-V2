@@ -23,6 +23,7 @@ from src.classification.jurisdiction_classifier import JurisdictionClassifier
 from src.classification.intent_classifier import IntentClassifier
 from src.confidence.confidence_scorer import ConfidenceScorer
 from src.orchestration.decomposer import QueryDecomposer, AgentTask
+from src.orchestration.contextualizer import QueryContextualizer, ContextualizedQuery
 from src.prompts.templates import (
     CONSULTATION_SYSTEM_PROMPT,
     build_user_prompt,
@@ -379,5 +380,133 @@ def test_in_domain_borderline_not_over_refused(borderline_query, expected_min_in
     assert len(tasks) >= 1
     assert all(t.intent != "OUT_OF_SCOPE" for t in tasks), f"Task for '{borderline_query}' was incorrectly set to OUT_OF_SCOPE"
     assert all(t.agent_scope != "out_of_scope_agent" for t in tasks)
+
+
+# ==============================================================================
+# 6. CONVERSATIONAL CONTEXTUALIZATION & SHORT QUERY RESOLUTION
+# ==============================================================================
+
+def test_conversational_affirmation_contextualization():
+    """
+    Confirms short affirmative follow-ups ('yes', 'proceed', 'sure') are contextualized
+    using the previous assistant question and active product context, preventing
+    garbage vector retrieval on the token 'yes' and preventing out-of-scope refusals.
+    """
+    history = [
+        {"role": "user", "content": "Can I patent my herbal moisturizing cream in USA?"},
+        {
+            "role": "assistant",
+            "content": (
+                "To assess the patentability of your herbal moisturizing cream in the USA, we must apply 35 U.S.C.\n\n"
+                "Would you like to explore the requirements for documenting 'non-obviousness' or the implications of using biological resources in your formulation?"
+            ),
+        },
+    ]
+    p_ctx = {
+        "product_name": "Herbal Moisturizing Cream",
+        "category": "Cosmetic",
+        "ingredients": ["Aloe vera", "Turmeric", "Chandana"],
+        "state": "CLASSIFIED",
+    }
+
+    # 1. Contextualizer resolution
+    res = QueryContextualizer.contextualize(
+        query="yes",
+        history_messages=history,
+        product_context=p_ctx,
+        jurisdiction="INTERNATIONAL",
+    )
+    assert res.is_followup is True
+    assert res.raw_query == "yes"
+    assert "non-obviousness" in res.resolved_query.lower()
+    assert "Herbal Moisturizing Cream" in res.resolved_query
+
+    # 2. IntentClassifier in-domain check
+    in_domain, conf, reason = IntentClassifier.is_in_domain("yes", product_context=p_ctx, has_prior_dialogue=True)
+    assert in_domain is True
+    assert reason == "CONVERSATIONAL_CONTINUATION"
+
+    # 3. Query Decomposition on contextualized query
+    tasks = QueryDecomposer.decompose(
+        query=res.resolved_query,
+        jurisdiction="INTERNATIONAL",
+        product_context=p_ctx,
+        has_prior_dialogue=True,
+    )
+    assert len(tasks) >= 1
+    assert all(t.intent != "OUT_OF_SCOPE" for t in tasks)
+    assert all(t.agent_scope != "out_of_scope_agent" for t in tasks)
+    # Tasks must contain relevant domain sub-questions
+    assert any("non-obvious" in t.sub_question.lower() or "patent" in t.intent.lower() for t in tasks)
+
+
+def test_conversational_anaphoric_pronoun_contextualization():
+    """
+    Confirms anaphoric queries like 'can I patent it?' substitute pronouns with the concrete product details.
+    """
+    p_ctx = {
+        "product_name": "Classical Haridra Khanda",
+        "ingredients": ["Curcuma longa rhizome powder", "Cow ghee"],
+        "category": "Classical / Generic Medicine",
+        "state": "CLASSIFIED",
+    }
+    history = [
+        {"role": "user", "content": "I have Classical Haridra Khanda."},
+        {"role": "assistant", "content": "Based on the information provided, this product is classified as Classical / Generic Medicine."},
+    ]
+
+    res = QueryContextualizer.contextualize(
+        query="Can I patent it in India?",
+        history_messages=history,
+        product_context=p_ctx,
+        jurisdiction="INDIA",
+    )
+    assert res.is_followup is True
+    assert "Classical Haridra Khanda" in res.resolved_query
+    assert "it" not in res.resolved_query.lower().split()
+
+
+def test_diagnostic_intake_retrieval_bypass_detection():
+    """
+    Confirms pure diagnostic responses during product intake are tagged as diagnostic intake
+    to avoid running irrelevant statutory vector retrieval.
+    """
+    history = [
+        {"role": "assistant", "content": "Please provide the following details: 1. Is this intended for therapeutic use, or cosmetic daily hydration?"}
+    ]
+    p_ctx = {"state": "COLLECTING_PRODUCT_INFORMATION"}
+
+    res = QueryContextualizer.contextualize(
+        query="It is for cosmetic daily hydration",
+        history_messages=history,
+        product_context=p_ctx,
+        jurisdiction="INDIA",
+        classification_state="COLLECTING_PRODUCT_INFORMATION",
+    )
+    assert res.is_diagnostic_intake is True
+    assert res.is_followup is True
+
+
+def test_prompt_history_injection_formatting():
+    """
+    Verifies build_user_prompt and build_multi_domain_user_prompt include formatted dialogue history turns.
+    """
+    history = [
+        {"role": "user", "content": "Can I patent my cream?"},
+        {"role": "assistant", "content": "It is classified as a cosmetic. [[PRODUCT_CONTEXT:{\"state\": \"CLASSIFIED\"}]]"},
+    ]
+
+    user_prompt = build_user_prompt(
+        question="yes",
+        jurisdiction="INTERNATIONAL",
+        intent="PATENT",
+        evidence_items=[],
+        conversation_history=history,
+    )
+    assert "=== RECENT CONVERSATION DIALOGUE ===" in user_prompt
+    assert "[INNOVATOR (User)]: Can I patent my cream?" in user_prompt
+    assert "[AI SAHAYAK (Assistant)]: It is classified as a cosmetic." in user_prompt
+    assert "[[PRODUCT_CONTEXT:{" not in user_prompt  # internal context tag stripped from dialogue history
+
 
 

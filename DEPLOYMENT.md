@@ -106,5 +106,6 @@ You can host the entire FastAPI backend with the local 2.2GB model directly on H
 | `EMBEDDING_PROVIDER` | **Yes** | `remote` (for 512MB RAM Render) or `bge-m3` (if 2GB+ RAM available) |
 | `EMBEDDING_API_URL` | If remote | `https://<username>-bge-m3-embedder.hf.space/embed` |
 | `JWT_SECRET` | **Yes** | 32+ character random string for signing JWT tokens |
+| `ENCRYPTION_MASTER_KEY` | **Yes** | 32+ character dedicated symmetric key for encrypting user connector secrets at rest (isolated from JWT_SECRET) |
 | `CORS_ORIGINS` | **Yes** | Comma-separated allowed origins (e.g. `https://my-app.vercel.app,http://localhost:5173`) |
 | `VITE_API_BASE_URL` | **Frontend** | URL pointing to the deployed backend |

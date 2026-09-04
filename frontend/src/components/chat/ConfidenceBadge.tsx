@@ -11,7 +11,7 @@ interface ConfidenceBadgeProps {
 export const ConfidenceBadge: React.FC<ConfidenceBadgeProps> = ({
   score,
   label = "HIGH",
-  requiresReview = false,
+  requiresReview,
 }) => {
   let pct: number;
   if (score !== undefined && score !== null) {
@@ -20,7 +20,11 @@ export const ConfidenceBadge: React.FC<ConfidenceBadgeProps> = ({
     pct = label === "HIGH" ? 94 : label === "MEDIUM" ? 72 : 45;
   }
 
-  if (requiresReview || label === "LOW") {
+  const effectiveLabel = (requiresReview && label === "LOW") 
+    ? "LOW" 
+    : (label || (pct >= 80 ? "HIGH" : pct >= 55 ? "MEDIUM" : "LOW"));
+
+  if (effectiveLabel === "LOW") {
     return (
       <span
         title={`Grounding Confidence Score: ${pct}%`}

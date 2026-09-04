@@ -2,9 +2,11 @@
 ai/src/prompts/templates.py
 
 System and user prompt templates enforcing strict evidence grounding,
-statutory citations, regulatory clarity, and conversational product classification.
+statutory citations, regulatory clarity, conversational product classification,
+and distinct labeling of live external sources (WIPO PATENTSCOPE / Paid IP APIs).
 """
 
+import re
 from typing import Any, Dict, List, Optional
 
 CONSULTATION_SYSTEM_PROMPT = """You are IP-SAKTI Sahayak, an authoritative AI legal and regulatory decision support assistant for Ayurvedic, herbal, and traditional innovations developed under Ministry of Ayush guidelines.
@@ -70,6 +72,13 @@ CRITICAL EVIDENCE-GROUNDING & JURISDICTION BOUNDARY DIRECTIVE (MANDATORY):
   1. Do NOT extrapolate or present tangential snippets as direct answers to procedural/fee questions.
   2. State clearly that while general background/treaty data is available, the specific statutory fee schedule or regulatory article is not indexed in the database and requires direct verification with the relevant patent office.
 
+LIVE EXTERNAL SOURCE GROUNDING DIRECTIVE (MANDATORY):
+When live external source results (e.g. NCBI PubMed botanical/biomedical prior art, WIPO PATENTSCOPE, WIPO Pearl, or live patent registries) are provided in the prompt:
+1. CLEAR CITATION & INTEGRATION: When the user asks for scientific literature, clinical trials, or live patent filings, summarize the findings and cite the retrieved papers or records directly (e.g. including the paper title, authors, journal, PMID, and direct link when available, such as "According to a live NCBI PubMed search (PMID: 34090907)...").
+2. SEPARATION FROM STATUTORY LAW: Explicitly state when a finding comes from live external literature or registry searches versus static statutory provisions from the indexed legal corpus.
+3. POINT-IN-TIME SNAPSHOT: State clearly that live registry and database findings represent current point-in-time public records.
+4. NEVER FABRICATE: Do NOT invent PMIDs, filing statuses, or external links if the live connector returned no records. If live lookup returns relevant hits, utilize and present them clearly to the user.
+
 OUT-OF-DOMAIN BOUNDARY DIRECTIVE (MANDATORY):
 If the user's query is not about Ayurvedic/traditional medicine IP, regulatory compliance, or a product you are actively helping classify, you MUST NOT provide any substantive answer, definition, explanation, or information about the off-topic subject — not even one sentence, not even if you know the answer confidently. Do not partially answer before redirecting. State only that this is outside your scope and redirect to what you can help with. Answering ANY part of an out-of-scope question, however brief or accurate, is a guardrail violation.
 
@@ -87,13 +96,32 @@ CONSULTATION_USER_PROMPT_TEMPLATE = """Active Jurisdiction: {jurisdiction}
 Declared Intent: {intent}
 {product_context_block}
 
-RETRIEVED STATUTORY EVIDENCE:
+=== INDEXED STATUTORY EVIDENCE ===
 {evidence_block}
-
-USER CONVERSATION / QUERY:
+{live_external_block}
+{history_block}
+CURRENT USER INQUIRY:
 {question}
 
-Provide an authoritative, adaptive response adhering strictly to the Conversational Product Classification workflow and the Evidence-Grounding / Jurisdiction Boundary directives. Output the [[PRODUCT_CONTEXT:...]] tag at the very end:"""
+Provide an authoritative, adaptive response adhering strictly to the Conversational Product Classification workflow, Evidence-Grounding, and Live External Source directives. Output the [[PRODUCT_CONTEXT:...]] tag at the very end:"""
+
+
+def _format_conversation_history_block(conversation_history: Optional[List[Dict[str, str]]] = None) -> str:
+    """Formats recent conversation turns into a clean dialogue history block."""
+    if not conversation_history:
+        return ""
+    lines = ["=== RECENT CONVERSATION DIALOGUE ==="]
+    for msg in conversation_history[-6:]:  # Last 6 messages (up to 3 turns)
+        role = msg.get("role", "user")
+        content = msg.get("content", "").strip()
+        # Clean internal [[PRODUCT_CONTEXT:...]] tags from history for cleaner LLM context
+        clean_content = re.sub(r"\[\[PRODUCT_CONTEXT:\s*(?:```json)?\s*\{[\s\S]*?\}\s*(?:```)?\s*\]\]", "", content).strip()
+        if not clean_content:
+            continue
+        role_tag = "[INNOVATOR (User)]" if role == "user" else "[AI SAHAYAK (Assistant)]"
+        lines.append(f"{role_tag}: {clean_content}")
+    
+    return "\n" + "\n".join(lines) + "\n" if len(lines) > 1 else ""
 
 
 def build_user_prompt(
@@ -103,8 +131,10 @@ def build_user_prompt(
     evidence_items: list,
     classification_category: str = None,
     product_context: str = None,
+    live_evidence_items: Optional[list] = None,
+    conversation_history: Optional[List[Dict[str, str]]] = None,
 ) -> str:
-    """Formats retrieved evidence chunks and question into prompt payload."""
+    """Formats retrieved statutory evidence chunks, live external hits, dialogue history, and question into prompt payload."""
     evidence_lines = []
     for i, ev in enumerate(evidence_items, start=1):
         sec = ev.get("section_ref") or ev.get("article_ref") or "General"
@@ -114,6 +144,26 @@ def build_user_prompt(
 
     evidence_block = "\n".join(evidence_lines) if evidence_lines else "NO SPECIFIC STATUTORY CHUNKS RETRIEVED IN CURRENT DATABASE FOR THIS TOPIC / JURISDICTION."
 
+    # Format live external source evidence if present
+    live_external_block = ""
+    if live_evidence_items:
+        live_lines = []
+        for j, hit in enumerate(live_evidence_items, start=1):
+            src_name = hit.get("source_name", "Live External Source")
+            ret_time = hit.get("retrieved_at", "Live Snapshot")
+            title = hit.get("title", "Live Document")
+            ref_num = hit.get("reference_number")
+            url = hit.get("url")
+            snippet = hit.get("snippet", "")
+            ref_str = f" | Ref: {ref_num}" if ref_num else ""
+            url_str = f" | Link: {url}" if url else ""
+            live_lines.append(
+                f"=== LIVE EXTERNAL SOURCE [{j}]: {src_name} (retrieved {ret_time} UTC){ref_str}{url_str} ===\n"
+                f"Title: {title}\n"
+                f"Snippet: {snippet}\n"
+            )
+        live_external_block = "\n" + "\n".join(live_lines) + "\n"
+
     context_lines = []
     if classification_category:
         context_lines.append(f"Active Product Classification: {classification_category}")
@@ -121,12 +171,15 @@ def build_user_prompt(
         context_lines.append(f"Known Product Context: {product_context}")
 
     product_context_block = "\n".join(context_lines) if context_lines else ""
+    history_block = _format_conversation_history_block(conversation_history)
 
     return CONSULTATION_USER_PROMPT_TEMPLATE.format(
         jurisdiction=jurisdiction,
         intent=intent,
         product_context_block=product_context_block,
         evidence_block=evidence_block,
+        live_external_block=live_external_block,
+        history_block=history_block,
         question=question,
     )
 
@@ -145,7 +198,10 @@ You have been provided with labeled evidence from multiple domain-specific retri
 3. STRUCTURED PER-DOMAIN HEADINGS:
    - Structure your response with a clear markdown heading for each domain (e.g., "### 1. Patentability Assessment (§3(p) / §3(e))" and "### 2. Biological Resources & NBA ABS Compliance").
 
-4. CONTEXT TAG:
+4. LIVE EXTERNAL SOURCE DISTINCTION:
+   - If live external hits are included, explicitly mention them as current registry lookups separate from statutory sections.
+
+5. CONTEXT TAG:
    - Output the single-line [[PRODUCT_CONTEXT:...]] tag at the very end of your response.
 """
 
@@ -155,8 +211,9 @@ Mode: MULTI-AGENT ORCHESTRATION (Domains Dispatched: {domains_list})
 
 MULTI-DOMAIN LABELED STATUTORY EVIDENCE:
 {domain_evidence_blocks}
-
-USER COMPOUND QUERY:
+{live_external_block}
+{history_block}
+CURRENT USER COMPOUND INQUIRY:
 {question}
 
 {multi_domain_directive}
@@ -170,8 +227,10 @@ def build_multi_domain_user_prompt(
     domain_evidence_map: Dict[str, Any],
     classification_category: str = None,
     product_context: str = None,
+    live_evidence_items: Optional[list] = None,
+    conversation_history: Optional[List[Dict[str, str]]] = None,
 ) -> str:
-    """Formats multi-agent domain-labeled evidence and compound question into synthesis prompt."""
+    """Formats multi-agent domain-labeled evidence, live hits, dialogue history, and compound question into synthesis prompt."""
     domain_blocks = []
     domains_list = list(domain_evidence_map.keys())
 
@@ -199,6 +258,25 @@ def build_multi_domain_user_prompt(
 
     domain_evidence_blocks = "\n".join(domain_blocks)
 
+    live_external_block = ""
+    if live_evidence_items:
+        live_lines = []
+        for j, hit in enumerate(live_evidence_items, start=1):
+            src_name = hit.get("source_name", "Live External Source")
+            ret_time = hit.get("retrieved_at", "Live Snapshot")
+            title = hit.get("title", "Live Document")
+            ref_num = hit.get("reference_number")
+            url = hit.get("url")
+            snippet = hit.get("snippet", "")
+            ref_str = f" | Ref: {ref_num}" if ref_num else ""
+            url_str = f" | Link: {url}" if url else ""
+            live_lines.append(
+                f"=== LIVE EXTERNAL SOURCE [{j}]: {src_name} (retrieved {ret_time} UTC){ref_str}{url_str} ===\n"
+                f"Title: {title}\n"
+                f"Snippet: {snippet}\n"
+            )
+        live_external_block = "\n" + "\n".join(live_lines) + "\n"
+
     context_lines = []
     if classification_category:
         context_lines.append(f"Active Product Classification: {classification_category}")
@@ -206,13 +284,15 @@ def build_multi_domain_user_prompt(
         context_lines.append(f"Known Product Context: {product_context}")
 
     product_context_block = "\n".join(context_lines) if context_lines else ""
+    history_block = _format_conversation_history_block(conversation_history)
 
     return MULTI_DOMAIN_USER_PROMPT_TEMPLATE.format(
         jurisdiction=jurisdiction,
         domains_list=", ".join(domains_list),
         product_context_block=product_context_block,
         domain_evidence_blocks=domain_evidence_blocks,
+        live_external_block=live_external_block,
+        history_block=history_block,
         question=question,
         multi_domain_directive=MULTI_DOMAIN_SYNTHESIS_DIRECTIVE,
     )
-

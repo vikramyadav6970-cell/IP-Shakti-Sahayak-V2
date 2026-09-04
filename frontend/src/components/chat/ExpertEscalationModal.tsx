@@ -252,8 +252,7 @@ export const ExpertEscalationModal: React.FC<ExpertEscalationModalProps> = ({
                   </span>
                   <ConfidenceBadge
                     score={confidenceScore}
-                    label={(confidenceLabel as any) || "LOW"}
-                    requiresReview={true}
+                    label={(confidenceLabel as any) || (confidenceScore && confidenceScore >= 0.8 ? "HIGH" : "MEDIUM")}
                   />
                 </div>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-snug">

@@ -17,6 +17,10 @@ import {
   Languages,
   BookOpen,
   Sparkles,
+  ChevronDown,
+  Globe,
+  ExternalLink,
+  FileDown,
 } from "lucide-react";
 import { useJurisdiction } from "@/store/useJurisdictionStore";
 import { useChatStore, ChatMessage } from "@/store/useChatStore";
@@ -44,7 +48,10 @@ export const ChatPage: React.FC = () => {
   const [selectedMessageId, setSelectedMessageId] = useState<string | undefined>(undefined);
   const [showClassifier, setShowClassifier] = useState(true);
   const [feedbackMap, setFeedbackMap] = useState<Record<string, number>>({});
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [exportingConvId, setExportingConvId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { primary, setPrimary, active } = useJurisdiction();
 
@@ -74,8 +81,15 @@ export const ChatPage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    setIsScrolledUp(scrollHeight - scrollTop - clientHeight > 100);
+  };
+
   useEffect(() => {
-    scrollToBottom();
+    if (!isScrolledUp) {
+      scrollToBottom();
+    }
   }, [messages, isSending]);
 
   useEffect(() => {
@@ -128,17 +142,26 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const handleExportPDF = async (e?: React.MouseEvent, convId?: string, title?: string) => {
+    if (e) e.stopPropagation();
+    const targetId = convId || activeConversationId;
+    if (!targetId) {
+      alert("No active consultation session found to export. Please start or select a conversation first.");
+      return;
+    }
+    setExportingConvId(targetId);
+    try {
+      await chatService.downloadConversationPDF(targetId, title);
+    } catch (err: any) {
+      console.error("PDF export error:", err);
+      alert(`Export failed: ${err.message || "Could not generate PDF summary."}`);
+    } finally {
+      setExportingConvId(null);
+    }
+  };
+
   return (
-    <div
-      className="h-full w-full p-2 sm:p-3 rounded-2xl glass-page-bg transition-all flex flex-col overflow-hidden min-h-0"
-      style={{
-        background: `
-          radial-gradient(circle at 15% 15%, var(--bg-blob-1, #D7F5E5) 0%, transparent 45%),
-          radial-gradient(circle at 85% 85%, var(--bg-blob-2, #DCF0E0) 0%, transparent 45%),
-          var(--bg-page, #F3F8F5)
-        `,
-      }}
-    >
+    <div className="h-full w-full p-2 sm:p-3 rounded-2xl bg-transparent transition-all flex flex-col overflow-hidden min-h-0">
       {/* Workspace: Collapsible Sidebar + Main Chat Panel */}
       <div className="flex flex-col lg:flex-row gap-3 items-stretch w-full flex-1 min-h-0 overflow-hidden">
         {/* =========================================================================
@@ -146,18 +169,17 @@ export const ChatPage: React.FC = () => {
             ========================================================================= */}
         <aside
           aria-label="Sidebar Workspace"
-          className={`shrink-0 flex flex-col justify-between transition-all duration-200 ease-in-out rounded-2xl glass-panel-card h-full min-h-0 overflow-hidden ${
+          className={`shrink-0 flex flex-col justify-between transition-all duration-200 ease-in-out rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-xl h-full min-h-0 overflow-hidden ${
             isSidebarCollapsed ? "w-12 p-2 items-center" : "w-full lg:w-64 xl:w-72 p-2.5"
           }`}
         >
           {isSidebarCollapsed ? (
-            /* Collapsed Rail (Icon-only, clean without list or scrollbars) */
+            /* Collapsed Rail */
             <div className="w-full flex flex-col items-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(false)}
-                className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
-                style={{ color: "var(--accent-600, #059669)" }}
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-600 dark:text-emerald-400 transition-colors cursor-pointer"
                 title="Expand Sidebar"
               >
                 <PanelLeftOpen className="w-4 h-4" />
@@ -165,8 +187,7 @@ export const ChatPage: React.FC = () => {
               <button
                 type="button"
                 onClick={startNewConsultation}
-                className="p-1.5 rounded-lg hover:bg-white/80 transition-colors"
-                style={{ color: "var(--accent-600, #059669)" }}
+                className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition-colors cursor-pointer"
                 title="New Consultation"
               >
                 <Plus className="w-4 h-4" />
@@ -175,18 +196,18 @@ export const ChatPage: React.FC = () => {
           ) : (
             /* Expanded 30-70 Split Sidebar */
             <div className="flex-1 flex flex-col overflow-hidden min-h-0 w-full gap-2">
-              {/* --- Upper Part: Product Classifier Diagnostic (Non-scrollable, fits naturally, shifts history dynamically) --- */}
+              {/* --- Upper Part: Product Classifier Diagnostic --- */}
               {showClassifier ? (
                 <div className="shrink-0 flex flex-col pb-1">
                   <div className="flex items-center justify-between px-1 pb-1 shrink-0">
-                    <span className="text-[11px] font-bold text-[#047857] flex items-center gap-1 uppercase tracking-tight">
-                      <Sparkles className="w-3 h-3 text-[#059669]" />
+                    <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 uppercase tracking-tight">
+                      <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                       Classifier
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowClassifier(false)}
-                      className="text-[10px] text-[#5C6B62] hover:text-[#047857] font-medium px-1.5 py-0.5 rounded hover:bg-white/80 transition-colors"
+                      className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 font-medium px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       title="Hide Classifier"
                     >
                       Hide
@@ -203,15 +224,15 @@ export const ChatPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between px-1 py-1 shrink-0 bg-white/50 rounded-lg border border-slate-200/50">
-                  <span className="text-[11px] font-semibold text-[#5C6B62] flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-[#059669]" />
+                <div className="flex items-center justify-between px-1.5 py-1 shrink-0 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-700">
+                  <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     Classifier
                   </span>
                   <button
                     type="button"
                     onClick={() => setShowClassifier(true)}
-                    className="text-[10px] text-[#047857] hover:underline font-semibold px-1.5 py-0.5 rounded hover:bg-white/80"
+                    className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:underline font-semibold px-1.5 py-0.5 rounded hover:bg-white dark:hover:bg-slate-700 cursor-pointer"
                   >
                     Show
                   </button>
@@ -219,32 +240,30 @@ export const ChatPage: React.FC = () => {
               )}
 
               {/* Subtle Divider */}
-              {showClassifier && <div className="border-t border-slate-200/60 my-0.5 shrink-0" />}
+              {showClassifier && <div className="border-t border-slate-200 dark:border-slate-800 my-0.5 shrink-0" />}
 
               {/* --- Lower Part (~70% height): Conversation History --- */}
               <div className="flex-1 flex flex-col min-h-0 overflow-hidden pt-0.5">
                 <div className="flex items-center justify-between px-1 pb-1.5 shrink-0">
-                  <span
-                    className="text-[12px] font-semibold tracking-tight uppercase"
-                    style={{ color: "var(--text-secondary, #5C6B62)" }}
-                  >
-                    History
+                  <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <MessageSquare className="w-3 h-3 text-slate-400" />
+                    <span>History</span>
                   </span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={startNewConsultation}
-                      className="p-1 rounded-lg hover:bg-white/80 transition-colors"
-                      style={{ color: "var(--accent-600, #059669)" }}
+                      className="group relative overflow-hidden p-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:border-emerald-400/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 transition-all duration-300 cursor-pointer flex items-center gap-1 text-[10px] font-semibold px-2 shadow-2xs"
                       title="Start New Consultation"
                     >
-                      <Plus className="w-4 h-4" />
+                      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-600 group-hover:w-[150px] group-hover:h-[150px] transition-all duration-500 ease-out pointer-events-none" />
+                      <Plus className="w-3 h-3 relative z-10 group-hover:text-white transition-colors" />
+                      <span className="relative z-10 group-hover:text-white transition-colors">New</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsSidebarCollapsed(true)}
-                      className="p-1 rounded-lg hover:bg-white/80 transition-colors"
-                      style={{ color: "var(--text-muted, #8B978F)" }}
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
                       title="Collapse Sidebar"
                     >
                       <PanelLeftClose className="w-4 h-4" />
@@ -255,12 +274,11 @@ export const ChatPage: React.FC = () => {
                 {/* Conversation List */}
                 <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 custom-scrollbar min-h-0">
                   {conversations.length === 0 ? (
-                    <p
-                      className="text-[11px] px-2 py-4 text-center italic"
-                      style={{ color: "var(--text-muted, #8B978F)" }}
-                    >
-                      No prior sessions
-                    </p>
+                    <div className="px-2 py-4 text-center rounded-xl bg-slate-100/60 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/60">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 italic">
+                        No prior sessions
+                      </p>
+                    </div>
                   ) : (
                     conversations.map((conv) => {
                       const isActive = conv.id === activeConversationId;
@@ -269,28 +287,45 @@ export const ChatPage: React.FC = () => {
                           key={conv.id}
                           onClick={() => loadConversation(conv.id)}
                           className={`group cursor-pointer transition-all p-2 rounded-xl flex items-center justify-between gap-1.5 ${
-                            isActive ? "glass-history-item-active" : "glass-history-item-inactive"
+                            isActive
+                              ? "bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/50 text-emerald-900 dark:text-white shadow-xs font-semibold"
+                              : "bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white"
                           }`}
                           title={conv.title || conv.product_name || "Consultation"}
                         >
-                          <div className="flex items-center gap-2 truncate">
+                          <div className="flex items-center gap-2 truncate flex-1 min-w-0">
                             <MessageSquare
                               className={`w-3.5 h-3.5 shrink-0 ${
-                                isActive ? "text-[#047857]" : "text-[#8B978F]"
+                                isActive ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"
                               }`}
                             />
                             <span className="text-xs truncate font-medium">
                               {conv.product_name || conv.title || "Session"}
                             </span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDeleteConversation(e, conv.id)}
-                            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-rose-600 transition-opacity"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => handleExportPDF(e, conv.id, conv.product_name || conv.title)}
+                              disabled={exportingConvId === conv.id}
+                              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-emerald-600 dark:hover:text-emerald-400 text-slate-400 transition-opacity cursor-pointer disabled:opacity-100"
+                              title="Download PDF Summary"
+                            >
+                              {exportingConvId === conv.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin text-emerald-600" />
+                              ) : (
+                                <FileDown className="w-3 h-3" />
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteConversation(e, conv.id)}
+                              className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:text-rose-500 text-slate-400 transition-opacity cursor-pointer"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                       );
                     })
@@ -302,38 +337,24 @@ export const ChatPage: React.FC = () => {
         </aside>
 
         {/* =========================================================================
-            2. Main Chat Panel (Glass Card)
+            2. Main Chat Panel (Fixed Height, Responsive Glass Card)
             ========================================================================= */}
-        <main
-          className="flex-1 flex flex-col justify-between p-3 sm:p-4 glass-panel-card relative overflow-hidden h-full min-h-0"
-          style={{
-            background: "var(--glass-medium, rgba(255, 255, 255, 0.65))",
-            backdropFilter: "blur(var(--blur-card, 16px))",
-            WebkitBackdropFilter: "blur(var(--blur-card, 16px))",
-            border: "0.5px solid var(--glass-border, rgba(255, 255, 255, 0.85))",
-            borderRadius: "var(--radius-card, 16px)",
-            boxShadow: "var(--shadow-card, 0 12px 32px rgba(16, 60, 40, 0.10))",
-          }}
-        >
+        <main className="flex-1 flex flex-col justify-between p-3 sm:p-4 rounded-2xl relative overflow-hidden h-full min-h-0 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-xl backdrop-blur-xl">
           {/* Top Bar inside the Panel */}
-          <header className="flex items-center justify-between gap-3 pb-3 border-b border-white/60">
+          <header className="flex items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
             {/* Left: App Title & Diagnostic Status */}
             <div className="flex items-center gap-2">
               <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white shadow-sm"
-                style={{ background: "var(--accent-gradient)" }}
+                className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white shadow-sm border border-emerald-400/30"
               >
                 <Scale className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h2
-                  className="text-sm font-medium tracking-tight"
-                  style={{ color: "var(--text-primary, #152018)" }}
-                >
+                <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
                   IP-SAKTI Sahayak
                 </h2>
                 {classificationState === "CLASSIFIED" && (activeClassification || productContext?.category) && (
-                  <span className="text-[10px] font-semibold text-[#047857] flex items-center gap-1">
+                  <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" />
                     {activeClassification?.category_name || productContext?.category}
                   </span>
@@ -341,66 +362,70 @@ export const ChatPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Jurisdiction Toggle Pill & Language Selector */}
+            {/* Right: PDF Export, Language Selector & Jurisdiction Toggle Pill */}
             <div className="flex items-center gap-2">
+              {/* PDF Summary Export Button */}
+              {activeConversationId && messages.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => handleExportPDF(undefined, activeConversationId, activeClassification?.category_name || productContext?.category || "Consultation")}
+                  disabled={exportingConvId === activeConversationId}
+                  className="group relative overflow-hidden flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600/50 shadow-xs transition-all duration-200 cursor-pointer text-xs font-semibold disabled:opacity-60"
+                  title="Generate & Download LLM Executive PDF Summary"
+                >
+                  {exportingConvId === activeConversationId ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
+                      <span className="hidden sm:inline">Generating PDF...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 group-hover:translate-y-0.5 transition-transform" />
+                      <span className="hidden sm:inline">Export PDF</span>
+                    </>
+                  )}
+                </button>
+              )}
+
               {/* Language Selector */}
               <LanguageSelector />
 
               {/* Jurisdiction Toggle Pill */}
-              <div
-                role="group"
-                aria-label="Jurisdiction Selector"
-                className="flex items-center p-0.5 rounded-full border shadow-2xs"
-                style={{
-                  background: "rgba(241, 247, 243, 0.8)",
-                  borderRadius: "var(--radius-pill, 20px)",
-                  borderColor: "rgba(220, 240, 224, 0.8)",
-                }}
-              >
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setPrimary("INDIA")}
-                  className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                  aria-pressed={primary === "INDIA"}
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                     primary === "INDIA"
-                      ? "text-white font-semibold shadow-xs"
-                      : "text-[#5C6B62] hover:text-[#152018]"
+                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
-                  style={
-                    primary === "INDIA"
-                      ? {
-                          background: "var(--accent-gradient)",
-                          boxShadow: "0 3px 8px rgba(5,150,105,0.35)",
-                        }
-                      : {}
-                  }
                 >
-                  India
+                  🇮🇳 India
                 </button>
                 <button
                   type="button"
                   onClick={() => setPrimary("INTERNATIONAL")}
-                  className={`text-xs px-3 py-1 rounded-full font-medium transition-all ${
+                  aria-pressed={primary === "INTERNATIONAL"}
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all cursor-pointer ${
                     primary === "INTERNATIONAL"
-                      ? "text-white font-semibold shadow-xs"
-                      : "text-[#5C6B62] hover:text-[#152018]"
+                      ? "bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-xs"
+                      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
-                  style={
-                    primary === "INTERNATIONAL"
-                      ? {
-                          background: "var(--accent-gradient)",
-                          boxShadow: "0 3px 8px rgba(5,150,105,0.35)",
-                        }
-                      : {}
-                  }
                 >
-                  International
+                  🌐 Global
                 </button>
               </div>
             </div>
           </header>
 
-          {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto space-y-4 py-4 pr-1">
+          {/* Messages Stream Container */}
+          <div
+            ref={messagesContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto overflow-x-hidden space-y-3 py-3 pr-1 min-h-0 custom-scrollbar relative"
+          >
             {messages.map((msg: ChatMessage) => (
               <div
                 key={msg.id}
@@ -410,14 +435,14 @@ export const ChatPage: React.FC = () => {
                 {msg.role === "assistant" && (
                   <div
                     className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white shrink-0 shadow-xs mt-1"
-                    style={{ background: "var(--accent-gradient)" }}
+                    style={{ background: "linear-gradient(135deg, #059669, #10B981)" }}
                   >
                     <Scale className="w-3.5 h-3.5" />
                   </div>
                 )}
 
                 <div
-                  className={`space-y-1.5 max-w-[80%] ${
+                  className={`space-y-1.5 max-w-[85%] ${
                     msg.role === "user" ? "items-end" : "items-start"
                   }`}
                 >
@@ -426,46 +451,46 @@ export const ChatPage: React.FC = () => {
                     className={`p-3.5 ${
                       msg.role === "user"
                         ? "glass-user-bubble ml-auto"
-                        : "glass-assistant-bubble"
+                        : "rounded-2xl bg-slate-100/95 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800 shadow-md text-slate-900 dark:text-white"
                     }`}
                   >
                     {msg.role === "user" ? (
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      <p className="whitespace-pre-wrap text-white text-[13.5px] leading-relaxed">{msg.content}</p>
                     ) : (
-                      <div className="space-y-2 text-[#152018]">
+                      <div className="space-y-2 text-slate-800 dark:text-white">
                         <ReactMarkdown
                           components={{
                             h1: ({ node, ...props }) => (
-                              <h1 className="text-sm font-bold text-[#047857] mt-2 mb-1" {...props} />
+                              <h1 className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-2 mb-1" {...props} />
                             ),
                             h2: ({ node, ...props }) => (
-                              <h2 className="text-sm font-bold text-[#047857] mt-2 mb-1" {...props} />
+                              <h2 className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-2 mb-1" {...props} />
                             ),
                             h3: ({ node, ...props }) => (
-                              <h3 className="text-xs font-bold text-[#059669] mt-1.5 mb-1" {...props} />
+                              <h3 className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mt-1.5 mb-1" {...props} />
                             ),
                             h4: ({ node, ...props }) => (
-                              <h4 className="text-xs font-semibold text-[#152018] mt-1 mb-0.5" {...props} />
+                              <h4 className="text-xs font-semibold text-slate-900 dark:text-white mt-1 mb-0.5" {...props} />
                             ),
                             p: ({ node, ...props }) => (
-                              <p className="mb-1.5 leading-relaxed text-[13px] last:mb-0" {...props} />
+                              <p className="mb-1.5 leading-relaxed text-[13px] text-slate-800 dark:text-slate-100 last:mb-0" {...props} />
                             ),
                             strong: ({ node, ...props }) => (
-                              <strong className="font-semibold text-[#152018]" {...props} />
+                              <strong className="font-bold text-slate-950 dark:text-white" {...props} />
                             ),
                             ul: ({ node, ...props }) => (
-                              <ul className="list-disc pl-4 mb-2 space-y-1 text-xs text-[#152018]" {...props} />
+                              <ul className="list-disc pl-4 mb-2 space-y-1 text-xs text-slate-700 dark:text-slate-200" {...props} />
                             ),
                             ol: ({ node, ...props }) => (
-                              <ol className="list-decimal pl-4 mb-2 space-y-1 text-xs text-[#152018]" {...props} />
+                              <ol className="list-decimal pl-4 mb-2 space-y-1 text-xs text-slate-700 dark:text-slate-200" {...props} />
                             ),
-                            li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                            li: ({ node, ...props }) => <li className="leading-relaxed text-slate-700 dark:text-slate-200" {...props} />,
                             hr: ({ node, ...props }) => (
-                              <hr className="my-2 border-slate-200" {...props} />
+                              <hr className="my-2 border-slate-300 dark:border-slate-700" {...props} />
                             ),
                             blockquote: ({ node, ...props }) => (
                               <blockquote
-                                className="pl-3 border-l-2 border-[#10B981] italic text-[#5C6B62] my-2 text-xs"
+                                className="pl-3 border-l-2 border-emerald-500 italic text-slate-600 dark:text-slate-300 my-2 text-xs"
                                 {...props}
                               />
                             ),
@@ -478,10 +503,10 @@ export const ChatPage: React.FC = () => {
 
                     {/* Classified Product Callout */}
                     {msg.product_classification && (
-                      <div className="mt-2.5 p-2 rounded-lg bg-[#ECFDF5] border border-[#10B981]/30 text-xs text-[#047857] flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0" />
+                      <div className="mt-2.5 p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/40 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                         <div>
-                          <span className="font-bold">Statutory Categorization: </span>
+                          <span className="font-bold text-slate-900 dark:text-white">Statutory Categorization: </span>
                           <span>
                             {msg.product_classification.category_name} (
                             {msg.product_classification.regulatory_pathway})
@@ -515,34 +540,60 @@ export const ChatPage: React.FC = () => {
                         />
                       )}
 
-                      {/* Verified Statutory Citations (Fully Expanded by default, no hidden text) */}
+                      {/* Citations Row: Static Statutory Evidence & Live External Hits */}
                       {msg.citations &&
-                        msg.citations.map((c, idx) => (
-                          <span
-                            key={c.id || idx}
-                            style={{
-                              backgroundColor: "var(--chip-citation-bg, #ECFDF5)",
-                              color: "var(--chip-citation-text, #047857)",
-                              fontSize: "10px",
-                              padding: "4px 9px",
-                              borderRadius: "6px",
-                              border: "1px solid rgba(16, 185, 129, 0.25)",
-                            }}
-                            className="inline-flex items-start gap-1.5 font-medium shadow-2xs break-words max-w-full text-left leading-snug"
-                            title={`${c.document_title} - ${c.section_ref} (${c.jurisdiction || "Statutory Authority"})`}
-                          >
-                            <BookOpen className="w-3 h-3 shrink-0 text-emerald-600 mt-0.5" />
-                            <span className="break-words">
-                              <span className="font-bold">{c.document_title?.replace(".pdf", "")}</span>
-                              <span className="text-[#059669] font-mono font-medium"> — {c.section_ref}</span>
-                              {c.jurisdiction && (
-                                <span className="ml-1 text-[9px] uppercase px-1 py-0.2 rounded bg-emerald-100/60 font-semibold">
-                                  {c.jurisdiction}
-                                </span>
-                              )}
+                        msg.citations.map((c, idx) => {
+                          if (c.is_live) {
+                            return (
+                              <a
+                                key={c.id || idx}
+                                href={c.source_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-200 shadow-xs transition-all hover:scale-[1.02] cursor-pointer group"
+                                title={`Live External Source: ${c.document_title} (Click to open registry)`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shrink-0" />
+                                <Globe className="w-3 h-3 text-cyan-400 shrink-0" />
+                                <span className="font-bold text-cyan-100">Live •</span>
+                                <span className="truncate max-w-[200px]">{c.document_title}</span>
+                                {c.section_ref && (
+                                  <span className="font-mono text-cyan-300 text-[9px] bg-cyan-900/60 px-1 py-0.2 rounded border border-cyan-700/50">
+                                    {c.section_ref}
+                                  </span>
+                                )}
+                                <ExternalLink className="w-2.5 h-2.5 text-cyan-400 opacity-60 group-hover:opacity-100 transition-opacity" />
+                              </a>
+                            );
+                          }
+
+                          return (
+                            <span
+                              key={c.id || idx}
+                              style={{
+                                backgroundColor: "var(--chip-citation-bg, #ECFDF5)",
+                                color: "var(--chip-citation-text, #047857)",
+                                fontSize: "10px",
+                                padding: "4px 9px",
+                                borderRadius: "6px",
+                                border: "1px solid rgba(16, 185, 129, 0.25)",
+                              }}
+                              className="inline-flex items-start gap-1.5 font-medium shadow-2xs break-words max-w-full text-left leading-snug"
+                              title={`${c.document_title} - ${c.section_ref} (${c.jurisdiction || "Statutory Authority"})`}
+                            >
+                              <BookOpen className="w-3 h-3 shrink-0 text-emerald-600 mt-0.5" />
+                              <span className="break-words">
+                                <span className="font-bold">{c.document_title?.replace(".pdf", "")}</span>
+                                <span className="text-emerald-700 dark:text-emerald-400 font-mono font-medium"> — {c.section_ref}</span>
+                                {c.jurisdiction && (
+                                  <span className="ml-1 text-[9px] uppercase px-1 py-0.2 rounded bg-emerald-100/60 dark:bg-emerald-900/60 font-semibold">
+                                    {c.jurisdiction}
+                                  </span>
+                                )}
+                              </span>
                             </span>
-                          </span>
-                        ))}
+                          );
+                        })}
 
                       {/* Escalation Prompt Chip / Action - Always accessible to consult accredited IP Facilitator */}
                       {!msg.id?.startsWith("err-") && (
@@ -570,7 +621,7 @@ export const ChatPage: React.FC = () => {
 
                       {/* Translation Badge */}
                       {msg.is_translated && (
-                        <span className="text-[10px] text-[#059669] flex items-center gap-0.5 font-medium ml-1">
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 font-medium ml-1">
                           <Languages className="w-2.5 h-2.5" />
                           Sarvam AI
                         </span>
@@ -582,8 +633,8 @@ export const ChatPage: React.FC = () => {
                           type="button"
                           onClick={() => handleFeedback(msg.id, 5)}
                           aria-label="Helpful"
-                          className={`p-0.5 rounded hover:bg-white/80 ${
-                            feedbackMap[msg.id] === 5 ? "text-[#059669] font-bold" : "text-[#8B978F]"
+                          className={`p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 ${
+                            feedbackMap[msg.id] === 5 ? "text-emerald-600 dark:text-emerald-400 font-bold" : "text-slate-400"
                           }`}
                         >
                           <ThumbsUp className="w-3 h-3" />
@@ -592,8 +643,8 @@ export const ChatPage: React.FC = () => {
                           type="button"
                           onClick={() => handleFeedback(msg.id, 1)}
                           aria-label="Unhelpful"
-                          className={`p-0.5 rounded hover:bg-white/80 ${
-                            feedbackMap[msg.id] === 1 ? "text-rose-600 font-bold" : "text-[#8B978F]"
+                          className={`p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 ${
+                            feedbackMap[msg.id] === 1 ? "text-rose-600 font-bold" : "text-slate-400"
                           }`}
                         >
                           <ThumbsDown className="w-3 h-3" />
@@ -608,10 +659,7 @@ export const ChatPage: React.FC = () => {
             {/* Sample Starters (Initial conversation only) */}
             {messages.length === 1 && (
               <div className="pt-2">
-                <span
-                  className="text-[11px] font-medium block mb-1.5"
-                  style={{ color: "var(--text-secondary, #5C6B62)" }}
-                >
+                <span className="text-[11px] font-semibold block mb-1.5 text-slate-600 dark:text-slate-300">
                   {getSampleQueriesHeading(selectedLanguage)}
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -620,7 +668,7 @@ export const ChatPage: React.FC = () => {
                       key={i}
                       type="button"
                       onClick={() => handleSendMessage(sq)}
-                      className="p-2.5 text-left text-xs rounded-xl glass-history-item-inactive hover:bg-white transition-all text-[#152018]"
+                      className="p-2.5 text-left text-xs rounded-xl bg-slate-50 dark:bg-slate-950/70 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-all text-slate-800 dark:text-slate-200 cursor-pointer"
                     >
                       "{sq}"
                     </button>
@@ -634,16 +682,32 @@ export const ChatPage: React.FC = () => {
               <div className="flex gap-2.5 justify-start items-center">
                 <div
                   className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white shrink-0 shadow-xs"
-                  style={{ background: "var(--accent-gradient)" }}
+                  style={{ background: "linear-gradient(135deg, #059669, #10B981)" }}
                 >
                   <Scale className="w-3.5 h-3.5" />
                 </div>
-                <div className="p-3 rounded-2xl glass-assistant-bubble text-xs flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#059669]" />
-                  <span className="font-medium text-[#5C6B62]">
+                <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800 text-xs flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-medium">
                     Analyzing statutory grounding and evaluating compliance...
                   </span>
                 </div>
+              </div>
+            )}
+
+            {/* Floating Dynamic Green Scroll-to-Latest Button with Green Arrow */}
+            {isScrolledUp && (
+              <div className="sticky bottom-2 flex justify-center w-full pointer-events-none z-20">
+                <button
+                  type="button"
+                  onClick={scrollToBottom}
+                  className="pointer-events-auto group relative overflow-hidden flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-950/40 border border-emerald-400/50 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 animate-bounce cursor-pointer"
+                  title="Scroll to latest message"
+                >
+                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full bg-gradient-to-r from-teal-300 via-emerald-400 to-teal-400 group-hover:w-[160px] group-hover:h-[160px] transition-all duration-500 ease-out pointer-events-none" />
+                  <span className="relative z-10 text-[11px]">Latest messages</span>
+                  <ChevronDown className="w-3.5 h-3.5 relative z-10 text-emerald-200 stroke-[3] group-hover:translate-y-0.5 transition-transform" />
+                </button>
               </div>
             )}
 
@@ -653,13 +717,13 @@ export const ChatPage: React.FC = () => {
           {/* =========================================================================
               3. Input Bar & Voice Controls (Pill Container)
               ========================================================================= */}
-          <div className="space-y-2 pt-2">
+          <div className="space-y-1.5 pt-2 shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage(input);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 glass-input-bar"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 dark:bg-slate-950/90 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-900 dark:text-white backdrop-blur-md"
             >
               {/* Text Input */}
               <input
@@ -672,10 +736,7 @@ export const ChatPage: React.FC = () => {
                     : "Describe your product formulation, herbal ingredients, or IPR query..."
                 }
                 disabled={isSending}
-                style={{
-                  color: "var(--text-primary, #152018)",
-                }}
-                className="flex-1 bg-transparent border-0 text-sm placeholder:text-[#8B978F] focus:outline-none focus:ring-0 px-2"
+                className="flex-1 bg-transparent border-0 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-0 px-2"
               />
 
               {/* Dictation Mic Button */}
@@ -691,30 +752,28 @@ export const ChatPage: React.FC = () => {
                 disabled={isSending}
               />
 
-              {/* Send Button */}
+              {/* Send Button with Radial Center-Out Fill */}
               <button
                 type="submit"
                 disabled={!input.trim() || isSending}
                 style={{
-                  background: "var(--accent-gradient, linear-gradient(135deg, #10B981, #059669))",
+                  background: "linear-gradient(135deg, #10B981, #059669)",
                   boxShadow: "0 4px 12px rgba(5, 150, 105, 0.4)",
                 }}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100"
+                className="group relative overflow-hidden w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:scale-100 cursor-pointer shadow-md shadow-emerald-800/30"
                 title="Send query"
               >
+                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full bg-gradient-to-r from-teal-300 via-emerald-400 to-teal-400 group-hover:w-[90px] group-hover:h-[90px] transition-all duration-500 ease-out pointer-events-none" />
                 {isSending ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <Loader2 className="w-4 h-4 animate-spin text-white relative z-10" />
                 ) : (
-                  <Send className="w-3.5 h-3.5 text-white" />
+                  <Send className="w-3.5 h-3.5 text-white relative z-10 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 )}
               </button>
             </form>
 
             {/* 4. Disclaimer Footer */}
-            <p
-              className="text-[10px] text-center tracking-tight"
-              style={{ color: "var(--text-muted, #8B978F)" }}
-            >
+            <p className="text-[10px] text-center tracking-tight text-slate-500 dark:text-slate-400">
               Statutory Notice: IP-SAKTI Sahayak provides verified legal/regulatory information, not legal advice. Official filings require review by a registered patent agent or legal counsel.
             </p>
           </div>

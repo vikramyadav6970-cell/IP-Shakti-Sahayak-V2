@@ -104,4 +104,41 @@ export const chatService = {
       };
     }
   },
+
+  getConversationSummary: async (conversationId: string): Promise<any> => {
+    return await api.get<any>(`/api/v1/chat/conversations/${conversationId}/summary`);
+  },
+
+  downloadConversationPDF: async (conversationId: string, title?: string): Promise<void> => {
+    const token = localStorage.getItem("ip_sakti_token");
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+    const url = `${BASE_URL}/api/v1/chat/conversations/${conversationId}/summary/pdf`;
+
+    const headers: Record<string, string> = {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    const response = await fetch(url, { method: "GET", headers });
+    if (!response.ok) {
+      let errText = "Failed to download summary PDF";
+      try {
+        const errJson = await response.json();
+        errText = errJson.detail || errText;
+      } catch {}
+      throw new Error(errText);
+    }
+
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    const cleanTitle = (title || `IP_SAKTI_Consultation_${conversationId.slice(0, 8)}`)
+      .replace(/[^a-zA-Z0-9_\-\s]/g, "")
+      .replace(/\s+/g, "_");
+    a.download = `${cleanTitle}_Summary.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(blobUrl);
+    document.body.removeChild(a);
+  },
 };

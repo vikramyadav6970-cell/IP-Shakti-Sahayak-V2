@@ -23,6 +23,9 @@ from src.confidence.confidence_scorer import ConfidenceScorer
 from src.embeddings.embedding_provider import get_embedding_provider
 from src.embeddings.sparse_provider import BM25SparseProvider
 from src.orchestration.decomposer import QueryDecomposer, AgentTask
+from src.orchestration.contextualizer import QueryContextualizer, ContextualizedQuery
+from src.connectors.router import detect_live_lookup_intent, dispatch_live_lookup
+from src.connectors.base import ExternalHit
 from src.prompts.templates import (
     CONSULTATION_SYSTEM_PROMPT,
     build_user_prompt,
@@ -30,7 +33,7 @@ from src.prompts.templates import (
 )
 from src.reasoning.llm_provider import get_llm_provider
 from src.retrieval.qdrant_manager import QdrantManager
-from src.retrieval.retriever import HybridRetriever, DomainEvidenceSet
+from src.retrieval.retriever import HybridRetriever, DomainEvidenceSet, RetrievedEvidence
 
 from app.config import settings
 from app.models.entities import AuditLog, Citation, Conversation, Feedback, Message, User
@@ -83,10 +86,17 @@ class ChatService:
         self.retriever = get_shared_retriever()
         self.dense_provider = self.retriever.dense_provider
         
-        active_model = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-3.5-flash-lite"
-        active_key = os.environ.get("GEMINI_API_KEY") or settings.GEMINI_API_KEY
+        active_provider = settings.LLM_PROVIDER or os.environ.get("LLM_PROVIDER", "gemini")
+        active_model = settings.LLM_MODEL or os.environ.get("LLM_MODEL")
+        if active_provider == "openai":
+            active_key = settings.OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY")
+        elif active_provider in ["anthropic", "claude"]:
+            active_key = settings.ANTHROPIC_API_KEY or os.environ.get("ANTHROPIC_API_KEY")
+        else:
+            active_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
+
         self.llm_provider = get_llm_provider(
-            provider_name="gemini",
+            provider_name=active_provider,
             model_name=active_model,
             api_key=active_key,
         )
@@ -110,6 +120,13 @@ class ChatService:
                 active_classification_id=req.active_classification_id,
                 active_intent=req.active_intent,
             )
+
+        # Extract prior conversation dialogue history (up to last 6 messages)
+        history_messages: List[Dict[str, str]] = []
+        if conversation and getattr(conversation, "messages", None):
+            for m in conversation.messages[-6:]:
+                history_messages.append({"role": m.role, "content": m.content})
+        has_prior_dialogue = len(history_messages) > 0
 
         # Update active classification context if provided in this turn
         if req.active_classification_id and not conversation.active_classification_id:
@@ -172,9 +189,41 @@ class ChatService:
             core_question = translated_q
             is_translated = True
 
-        # Check Jurisdiction Guardrails (evaluated on English query)
+        # 2.5. Conversational Query Contextualization & Resolution
+        t_context_start = time.perf_counter()
+        prev_context_data: Dict[str, Any] = {}
+        if req.active_product_context:
+            try:
+                prev_context_data = json.loads(req.active_product_context)
+            except Exception:
+                pass
+        elif conversation.product_context_json:
+            prev_context_data = conversation.product_context_json
+
+        contextualized: ContextualizedQuery = QueryContextualizer.contextualize(
+            query=core_question,
+            history_messages=history_messages,
+            product_context=prev_context_data,
+            jurisdiction=req.jurisdiction,
+            classification_state=conversation.classification_state or prev_context_data.get("state"),
+        )
+
+        if contextualized.is_followup:
+            print("\n" + "=" * 80)
+            print(f" [CONVERSATIONAL QUERY CONTEXTUALIZATION] (Source: {contextualized.context_source})")
+            print(f" Raw User Query       : '{req.question}'")
+            print(f" Contextualized Query : '{contextualized.resolved_query}'")
+            print(f" Is Diagnostic Intake : {contextualized.is_diagnostic_intake}")
+            print("=" * 80 + "\n")
+
+        # Check Jurisdiction Guardrails (evaluated on contextualized inquiry if applicable)
+        jur_eval_text = (
+            contextualized.resolved_query
+            if (contextualized.is_followup and not contextualized.is_diagnostic_intake)
+            else core_question
+        )
         detected_jur, is_out_scope, out_explanation = JurisdictionClassifier.classify(
-            core_question, current_active=req.jurisdiction
+            jur_eval_text, current_active=req.jurisdiction
         )
 
         if is_out_scope:
@@ -226,27 +275,23 @@ class ChatService:
 
         t_trans_guard_ms = (time.perf_counter() - t_trans_guard_start) * 1000
 
-        # 3. Parse existing prior product context
         # 3. Resolve Intent & Multi-Agent Decomposition
-        t_context_start = time.perf_counter()
-        prev_context_data: Dict[str, Any] = {}
-        if req.active_product_context:
-            try:
-                prev_context_data = json.loads(req.active_product_context)
-            except Exception:
-                pass
-        elif conversation.product_context_json:
-            prev_context_data = conversation.product_context_json
-
         explicit_intent = req.active_intent.value if req.active_intent else None
+        effective_decomp_query = (
+            contextualized.resolved_query
+            if not contextualized.is_diagnostic_intake
+            else core_question
+        )
         agent_tasks: List[AgentTask] = QueryDecomposer.decompose(
-            query=core_question,
+            query=effective_decomp_query,
             jurisdiction=req.jurisdiction,
             explicit_intent=explicit_intent,
+            product_context=prev_context_data,
+            has_prior_dialogue=has_prior_dialogue,
         )
 
         # Layer 1 Structural Hard Guardrail: Detect out-of-domain queries before open LLM generation
-        if len(agent_tasks) == 1 and agent_tasks[0].intent == "OUT_OF_SCOPE":
+        if len(agent_tasks) == 1 and agent_tasks[0].intent == "OUT_OF_SCOPE" and not (has_prior_dialogue or prev_context_data):
             if is_new_conv:
                 await self.chat_repo.create_conversation(conversation)
 
@@ -303,12 +348,80 @@ class ChatService:
         is_multi_agent = len(agent_tasks) > 1
         t_context_ms = (time.perf_counter() - t_context_start) * 1000
 
-        # 4. Scoped Hybrid Retrieval (Parallel multi-domain or single-pass fast path)
+        # 3.5. Live External Source Lookup (Additive & Concurrent with BYOK resolution)
+        live_lookup_target = (
+            contextualized.resolved_query
+            if (contextualized.is_followup and not contextualized.is_diagnostic_intake)
+            else core_question
+        )
+        live_signal = detect_live_lookup_intent(live_lookup_target)
+        live_hits: List[ExternalHit] = []
+        if live_signal.has_live_signal:
+            try:
+                t_live_start = time.perf_counter()
+                live_hits = await dispatch_live_lookup(
+                    live_lookup_target,
+                    signal=live_signal,
+                    timeout=7.0,
+                    user_id=user.id if user else None,
+                    db=self.session,
+                )
+                t_live_ms = (time.perf_counter() - t_live_start) * 1000
+
+                # Detailed Terminal Logging for Backend Console
+                print("\n" + "=" * 80)
+                print(" [LIVE EXTERNAL REGISTRY / CONNECTOR RESPONSE]")
+                print(f" Query: '{live_lookup_target}'")
+                print(f" Trigger Signal: {live_signal.signal_type} | Pattern: {live_signal.detected_pattern} | Confidence: {live_signal.confidence:.2f}")
+                print(f" Target Lookup: '{live_signal.search_terms or live_signal.reference_number}' | Time: {t_live_ms:.1f}ms")
+                print(f" Total External Hits: {len(live_hits)}")
+                print("-" * 80)
+                if live_hits:
+                    for idx, lh in enumerate(live_hits, 1):
+                        paid_tag = "[PAID SOURCE]" if lh.is_paid_source else "[EXTERNAL / REGISTRY]"
+                        print(f"   [{idx}] {paid_tag} {lh.source_name}")
+                        print(f"       Title: {lh.title}")
+                        print(f"       Ref #: {lh.reference_number or 'N/A'}")
+                        print(f"       URL: {lh.url}")
+                        snippet_clean = lh.snippet.replace('\n', ' ')[:180]
+                        print(f"       Snippet: {snippet_clean}...")
+                        if lh.metadata:
+                            print(f"       Metadata: {lh.metadata}")
+                else:
+                    print("   (No live external hits returned or fallback engaged)")
+                print("=" * 80 + "\n")
+            except Exception as exc:
+                print(f"\n[LIVE EXTERNAL CONNECTOR ERROR]: {exc}\n")
+                live_hits = []
+
+        # 4. Scoped Hybrid Retrieval (Parallel multi-domain, single-pass, or diagnostic bypass)
         t_retrieval_start = time.perf_counter()
         evidence_hits: List[RetrievedEvidence] = []
         domain_evidence_map: Dict[str, Any] = {}
 
-        if not is_multi_agent:
+        if contextualized.is_diagnostic_intake:
+            # Bypass heavy vector retrieval on purely diagnostic intake responses to avoid noisy irrelevant chunks
+            single_task = agent_tasks[0]
+            intent = single_task.intent
+            t_single_ms = 0.0
+            system_prompt = CONSULTATION_SYSTEM_PROMPT
+            user_prompt = build_user_prompt(
+                question=core_question,
+                jurisdiction=req.jurisdiction,
+                intent=intent,
+                evidence_items=[],
+                classification_category=prev_context_data.get("category"),
+                product_context=req.active_product_context,
+                live_evidence_items=None,
+                conversation_history=history_messages,
+            )
+            t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
+            print("\n" + "=" * 80)
+            print(" [DIAGNOSTIC INTAKE TURN - RETRIEVAL BYPASS]")
+            print(f" Query: '{core_question}'")
+            print(" Skipping vector search to preserve clean diagnostic product intake context.")
+            print("=" * 80 + "\n")
+        elif not is_multi_agent:
             single_task = agent_tasks[0]
             intent = single_task.intent
             t_single_start = time.perf_counter()
@@ -329,6 +442,8 @@ class ChatService:
                 evidence_items=evidence_dicts,
                 classification_category=prev_context_data.get("category"),
                 product_context=req.active_product_context,
+                live_evidence_items=[h.to_dict() for h in live_hits] if live_hits else None,
+                conversation_history=history_messages,
             )
 
             t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
@@ -336,7 +451,7 @@ class ChatService:
             # Terminal Logging: Single-Agent retrieval results
             print("\n" + "=" * 80)
             print(" [VECTOR RETRIEVAL - SINGLE-AGENT]")
-            print(f" Query: '{core_question}'")
+            print(f" Raw Query: '{core_question}' | Sub-Query: '{single_task.sub_question}'")
             print(f" Jurisdiction: {req.jurisdiction} | Overall Retrieval Time: {t_retrieval_ms:.1f}ms | Total Chunks: {len(evidence_hits)}")
             print("-" * 80)
             print(f" [Agent: {single_task.agent_scope}] (Intent: {single_task.intent}) -> Retrieved {len(evidence_hits)} chunks in {t_single_ms:.1f}ms:")
@@ -379,6 +494,8 @@ class ChatService:
                 domain_evidence_map=domain_evidence_map,
                 classification_category=prev_context_data.get("category"),
                 product_context=req.active_product_context,
+                live_evidence_items=[h.to_dict() for h in live_hits] if live_hits else None,
+                conversation_history=history_messages,
             )
 
             t_retrieval_ms = (time.perf_counter() - t_retrieval_start) * 1000
@@ -386,7 +503,7 @@ class ChatService:
             # Terminal Logging: Multi-Agent domain-scoped retrieval breakdown
             print("\n" + "=" * 80)
             print(f" [VECTOR RETRIEVAL ORCHESTRATION] (MULTI-AGENT: {len(agent_tasks)} AGENTS)")
-            print(f" Query: '{core_question}'")
+            print(f" Raw Query: '{core_question}' | Contextual Focus: '{effective_decomp_query}'")
             print(f" Jurisdiction: {req.jurisdiction} | Overall Retrieval Time: {t_retrieval_ms:.1f}ms | Total Chunks: {len(evidence_hits)}")
             print("-" * 80)
 
@@ -559,11 +676,11 @@ class ChatService:
         await self.chat_repo.add_message(user_msg)
 
         # 7. Validate Citations and Compute Dynamic Multi-Factor Confidence Score
-        # 7. Validate Citations and Compute Dynamic Multi-Factor Confidence Score
         validated_citations, citation_ratio = CitationValidator.validate_citations(
             response_text=answer_text,
             retrieved_evidence=evidence_hits,
             jurisdiction=req.jurisdiction,
+            live_external_hits=live_hits,
         )
 
         domain_confidence_dict: Optional[Dict[str, Any]] = None
@@ -588,12 +705,13 @@ class ChatService:
             confidence_label = confidence_assessment.confidence_label
             requires_human_review = confidence_assessment.requires_human_review
 
-        # 8. Persist Citations ONLY if actual evidence was retrieved from RAG
+        # 8. Persist Citations ONLY if actual evidence was retrieved from RAG or Live Sources
         persisted_citations: List[CitationRead] = []
         has_legal_intent = bool(
             req.active_intent
             or req.active_classification_id
-            or any(k in req.question.lower() for k in ["patent", "section 3", "abs", "nba", "fssai", "license", "trips", "statute"])
+            or live_signal.has_live_signal
+            or any(k in req.question.lower() for k in ["patent", "section 3", "abs", "nba", "fssai", "license", "trips", "statute", "wipo", "pct", "status"])
         )
         is_diagnostic_interview = bool(
             product_context_data
@@ -601,8 +719,8 @@ class ChatService:
             and not has_legal_intent
         )
 
-        # Citations are strictly attached ONLY when real RAG retrieval chunks are present
-        if not is_generation_error and evidence_hits and not is_diagnostic_interview:
+        # Citations are strictly attached ONLY when real RAG retrieval chunks or live hits are present
+        if not is_generation_error and (evidence_hits or live_hits) and not is_diagnostic_interview:
             for hit in evidence_hits:
                 cit = Citation(
                     message_id=uuid.uuid4(),  # temporary, will assign to bot_msg
@@ -621,6 +739,32 @@ class ChatService:
                         jurisdiction=hit.jurisdiction,
                         document_type=hit.document_type,
                         verification_status=hit.verification_status,
+                        is_live=False,
+                        is_paid_source=False,
+                    )
+                )
+
+            for lhit in live_hits:
+                lcit = Citation(
+                    message_id=uuid.uuid4(),
+                    document_title=f"{lhit.source_name} — {lhit.title}",
+                    section_ref=f"Live Registry: {lhit.reference_number}" if lhit.reference_number else "Live Global Search",
+                    source_url=lhit.url or "https://patentscope.wipo.int",
+                    jurisdiction=req.jurisdiction,
+                    document_type="LIVE_EXTERNAL_SOURCE",
+                )
+                persisted_citations.append(
+                    CitationRead(
+                        id=lcit.id,
+                        document_title=f"{lhit.source_name} — {lhit.title}",
+                        section_ref=f"Live Registry: {lhit.reference_number}" if lhit.reference_number else "Live Global Search",
+                        source_url=lhit.url or "https://patentscope.wipo.int",
+                        jurisdiction=req.jurisdiction,
+                        document_type="LIVE_EXTERNAL_SOURCE",
+                        verification_status="VERIFIED_LIVE_REGISTRY",
+                        is_live=True,
+                        is_paid_source=lhit.is_paid_source,
+                        retrieved_at=lhit.retrieved_at.isoformat() if hasattr(lhit.retrieved_at, "isoformat") else str(lhit.retrieved_at),
                     )
                 )
 
@@ -653,11 +797,7 @@ class ChatService:
             confidence_score = 0.0
             confidence_label = "LOW"
             requires_human_review = True
-        elif len(persisted_citations) > 0:
-            confidence_score = confidence_assessment.composite_score
-            confidence_label = confidence_assessment.confidence_label
-            requires_human_review = confidence_assessment.requires_human_review
-        else:
+        elif len(persisted_citations) == 0:
             # For pure product intake, questions, or conversational turns without RAG evidence
             confidence_score = None
             confidence_label = None
@@ -726,7 +866,7 @@ class ChatService:
         print(f"   * [1/6] Multilingual & Guardrails   : {t_trans_guard_ms:6.1f} ms")
         print(f"   * [2/6] Intent & Context Resolution : {t_context_ms:6.1f} ms")
         print(f"   * [3/6] Hybrid Parallel Retrieval   : {t_retrieval_ms:6.1f} ms ({len(evidence_hits)} hits from Qdrant)")
-        print(f"   * [4/6] Gemini LLM Reasoning (AI)  : {t_llm_ms:6.1f} ms")
+        print(f"   * [4/6] LLM Reasoning ({self.llm_provider.model_name})  : {t_llm_ms:6.1f} ms")
         print(f"   * [5/6] Context & Citation Parsing  : {t_extract_ms:6.1f} ms")
         print(f"   * [6/6] Database Commit & Audit Log : {t_db_ms:6.1f} ms")
         print(" " + "-" * 76)
@@ -911,3 +1051,6 @@ class ChatService:
         fb = await self.chat_repo.add_feedback(fb)
         await self.session.commit()
         return FeedbackRead.model_validate(fb)
+
+    async def record_feedback(self, user: User, message_id: uuid.UUID, data: FeedbackCreate) -> FeedbackRead:
+        return await self.add_message_feedback(user=user, message_id=message_id, data=data)

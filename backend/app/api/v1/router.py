@@ -14,6 +14,7 @@ from app.api.v1.abs import router as abs_router
 from app.api.v1.ip import router as ip_router
 from app.api.v1.sources import router as sources_router
 from app.api.v1.expert import router as expert_router
+from app.api.v1.connectors import router as connectors_router
 
 api_v1_router = APIRouter()
 
@@ -26,6 +27,7 @@ api_v1_router.include_router(abs_router)
 api_v1_router.include_router(ip_router)
 api_v1_router.include_router(sources_router)
 api_v1_router.include_router(expert_router)
+api_v1_router.include_router(connectors_router)
 
 
 @api_v1_router.get("/ping", tags=["Health"])

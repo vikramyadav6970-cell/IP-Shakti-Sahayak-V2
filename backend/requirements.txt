@@ -39,8 +39,9 @@ google-generativeai==0.8.4
 qdrant-client==1.13.2
 sentence-transformers>=3.4.0
 
-# Document & PDF Parsing
+# Document & PDF Parsing and Generation
 pymupdf>=1.25.0
+reportlab>=4.0.0
 beautifulsoup4>=4.12.0
 
 # Monitoring & Testing
